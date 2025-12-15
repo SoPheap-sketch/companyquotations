@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quote #{{ quote.id if quote else '' }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: {500:'#0ea5e9',600:'#0284c7',700:'#0369a1'} } } } }
+  </script>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen">
+  <header class="bg-white shadow-md border-b border-primary-100">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/projects/{{ quote.project_id if quote else 'list' }}" class="text-slate-600 hover:text-primary-700">← Back</a>
+      <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    {% if not quote %}
+      <div class="bg-white p-8 rounded shadow">Quote not found</div>
+    {% else %}
+      <div class="bg-white p-8 rounded-xl shadow mb-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-3xl font-bold text-slate-900">Quote #{{ quote.id }}</h1>
+            <p class="text-slate-600">{{ quote.title or '' }}</p>
+            <p class="text-slate-500 text-sm">Version {{ quote.version }} — Created: {{ quote.created_at }}</p>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-slate-600">Subtotal</div>
+            <div class="text-2xl font-bold">{{ quote.subtotal or 0 }}</div>
+            <div class="text-sm text-slate-600 mt-2">Profit margin: {{ (quote.profit_margin*100)|round(0) }}%</div>
+            <div class="text-3xl font-extrabold text-primary-700 mt-2">{{ quote.total or 0 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow">
+        <table class="w-full text-sm">
+          <thead class="text-left text-xs text-primary-700 border-b">
+            <tr>
+              <th class="p-2">工事区分</th><th>工種</th><th>要素</th><th>取引業者</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th><th>備考</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            {% for it in quote.items %}
+            <tr>
+              <td class="p-2">{{ it.work_category or '' }}</td>
+              <td>{{ it.work_type or '' }}</td>
+              <td>{{ it.element or '' }}</td>
+              <td>{{ it.supplier or '' }}</td>
+              <td class="text-right pr-2">{{ it.quantity }}</td>
+              <td>{{ it.unit or '' }}</td> <td class="text-right pr-2">{{ it.unit_price }}</td>
+              <td class="text-right pr-2">{{ it.amount }}</td>
+              <td>{{ it.remark or '' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>

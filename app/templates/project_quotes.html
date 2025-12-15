@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes for {{ project.client_name if project else 'Project' }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: {500:'#0ea5e9',600:'#0284c7',700:'#0369a1'} } } } }
+    </script>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen">
+  <header class="bg-white shadow-md border-b-2 border-primary-600">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/projects/{{ project.id if project else 'list' }}" class="text-slate-600 hover:text-primary-700">← Back</a>
+      <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Quotes — {{ project.client_name if project else '' }}</h1>
+            <p class="text-slate-500">All versions and drafts for this project</p>
+        </div>
+        <div >
+            <a href="/project/{{ project.id if project else 'list' }}/quotes/new" class="px-5 py-3 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700">+ New Quote</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      {% for q in quotes %}
+        {% if loop.first %}
+        <table class="w-full">
+          <thead class="text-left text-sm text-primary-700 border-b pb-2">
+            <tr>
+              <th class="py-2">ID</th>
+              <th>Version</th>
+              <th>Title</th>
+              <th>Profit</th>
+              <th>Subtotal</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+        <tbody class="divide-y">
+        {% endif %}
+        
+            <tr class="hover:bg-slate-50">
+              <td class="py-3">{{ q.id }}</td>
+              <td>{{ q.version }}</td>
+              <td>{{ q.title or '-' }}</td>
+              <td>{{ (q.profit_margin * 100) | round(0) }}%</td>
+              <td>{{ q.subtotal or 0 }}</td>
+              <td>{{ q.total or 0 }}</td>
+              <td>
+                <a href="/quotes/{{ q.id }}" class="text-primary-600 mr-3">View</a>
+                <a href="/quotes/{{ q.id }}/edit" class="text-slate-700 mr-3">Edit</a>
+                <form method="post" action="/quotes/{{ q.id }}/delete" class="inline-block">
+                  <button type="submit" class="text-rose-600">Delete</button>
+                </form>
+              </td>
+            </tr>
+        
+        {% else %}
+        <p class="text-center text-slate-500 py-14">No quotes yet. Click “New Quote” to create one.</p>
+        {% endfor %}
+
+        {% if quotes %}
+        </tbody>
+        </table>
+        {% endif %}
+    </div>
+  </main>
+</body>
+</html>
