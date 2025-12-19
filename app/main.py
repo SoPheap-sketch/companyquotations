@@ -1,4 +1,12 @@
 # app/main.py
+# Import the database session
+from app.db import SessionLocal  
+
+# Import your models
+from app.models import Quote, QuoteItem
+
+# Make sure you also have this for the error handling
+from fastapi import HTTPException
 from fastapi import FastAPI, Request, Form, Body, HTTPException
 from fastapi.responses import (
     HTMLResponse,
@@ -407,89 +415,83 @@ def edit_quote_get(request: Request, quote_id: int):
             .order_by(QuoteItem.id.asc())
             .all()
         )
-
+        
         project = db.query(Project).filter(Project.id == q.project_id).first()
+
+        # Format items for JavaScript
+        items_list = []
+        for i in items:
+            items_list.append({
+                "work_category": i.work_category or "",
+                "element": i.element or "",
+                "supplier": i.supplier or "",
+                "date": i.date or "",
+                "spec": i.spec or "",
+                "quantity": i.quantity or 0,
+                "unit": i.unit or "",
+                "unit_price": i.unit_price or 0,
+                "remark": i.remark or ""
+            })
 
         return templates.TemplateResponse(
             "quote_edit.html",
             {
                 "request": request,
                 "quote": q,
-                "items": items,
-
-                # ✅ THIS FIXES ITEMS NOT SHOWING
-                "items_json": json.dumps([
-                    {
-                        "work_category": i.work_category,
-                        "element": i.element,
-                        "supplier": i.supplier,
-                        "date": i.date,
-                        "spec": i.spec,
-                        "quantity": i.quantity,
-                        "unit": i.unit,
-                        "unit_price": i.unit_price,
-                        "remark": i.remark,
-                    } for i in items
-                ]),
+                "items_json": json.dumps(items_list), # Crucial for JS loading
                 "project_id": q.project_id,
-                "project_client_name": project.client_name if project else None,
-                "current_year": datetime.utcnow().year,
+                "project_client_name": project.client_name if project else "N/A",
             }
         )
     finally:
         db.close()
 # --- Save quote items (POST JSON) endpoint used by JS from the quote_edit page ---
 @app.post("/quotes/{quote_id}/items/save")
-def save_quote_items(quote_id: int, payload: dict = Body(...)):
-    from app.db import SessionLocal
-    from app.models import Quote, QuoteItem
-
+def save_quote_items(quote_id: int, data: dict):
+    # Now that SessionLocal is imported at the top, this will work
     db = SessionLocal()
     try:
-        q = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not q:
+        quote = db.query(Quote).filter(Quote.id == quote_id).first()
+        if not quote:
             raise HTTPException(status_code=404, detail="Quote not found")
 
+        quote.title = data.get("title")
+        quote.profit_margin = float(data.get("profit_margin", 0.3))
 
-        if not payload.get("title"):
-            raise HTTPException(status_code=400, detail="Title is required")
-
-        if not payload.get("items"):
-            raise HTTPException(status_code=400, detail="At least one item is required")
-
-        q.title = payload["title"]
-
+        # Delete old items
         db.query(QuoteItem).filter(QuoteItem.quote_id == quote_id).delete()
-        db.commit()
 
-        subtotal = 0.0
-        for it in payload["items"]:
-            qty = float(it.get("quantity") or 0)
-            price = float(it.get("unit_price") or 0)
-            amount = qty * price
-            subtotal += amount
+        total_cost = 0
+        for item in data.get("items", []):
+            qty = float(item.get("quantity", 0))
+            price = float(item.get("unit_price", 0))
+            row_sum = qty * price
+            total_cost += row_sum
 
-            db.add(QuoteItem(
+            # Now that QuoteItem is imported at the top, this will work
+            new_item = QuoteItem(
                 quote_id=quote_id,
-                work_category=it.get("work_category"),
-                element=it.get("element"),
-                supplier=it.get("supplier"),
-                date=it.get("date"),
-                spec=it.get("spec"),
+                work_category=item.get("work_category"),
+                work_type=item.get("work_type"), 
+                element=item.get("element"),
+                supplier=item.get("supplier"),
                 quantity=qty,
-                unit=it.get("unit"),
+                unit=item.get("unit"),
                 unit_price=price,
-                amount=amount,
-                remark=it.get("remark"),
-            ))
-
-        q.subtotal = subtotal
-        q.profit_margin = float(payload.get("profit_margin", 0.3))
-        q.total = subtotal * (1 + q.profit_margin)
-
+                amount=row_sum,
+                spec=item.get("spec"),
+                remark=item.get("remark")
+            )
+            db.add(new_item)
+        
+        quote.subtotal = total_cost
+        quote.total = total_cost * (1 + quote.profit_margin)
+        
         db.commit()
-        return {"ok": True}
-
+        return {"message": "Saved"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
 # --- Delete quote (POST) ---
