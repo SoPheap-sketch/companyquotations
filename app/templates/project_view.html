@@ -97,16 +97,56 @@
       <section class="mt-10">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold text-slate-800">Quotes & Documents</h2>
-          <a href="/projects/{{ project.id }}/quotes/new" class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition duration-150">
+          <a href="/projects/{{ project.id }}/quotes/new"
+            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition">
             + New Quote
           </a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg p-6 text-slate-600">
-          <p class="text-center py-4">
-            No quotes attached yet. Click "+ New Quote" to start generating pricing for this project.
-          </p>
+        {% if quotes and quotes|length > 0 %}
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-slate-100 text-slate-600 text-sm">
+                <tr>
+                  <th class="px-6 py-3">ID</th>
+                  <th class="px-6 py-3">Title</th>
+                  <th class="px-6 py-3">Profit</th>
+                  <th class="px-6 py-3">Subtotal</th>
+                  <th class="px-6 py-3">Total</th>
+                  <th class="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                {% for q in quotes %}
+                <tr class="hover:bg-slate-50">
+                  <td class="px-6 py-3">{{ q.id }}</td>
+                  <td class="px-6 py-3">{{ q.title or '—' }}</td>
+                  <td class="px-6 py-3">{{ (q.profit_margin * 100) | round(1) }}%</td>
+                  <td class="px-6 py-3">{{ q.subtotal or 0 }}</td>
+                  <td class="px-6 py-3 font-semibold">{{ q.total or 0 }}</td>
+                  <td class="px-6 py-3 text-right space-x-3">
+                    <a href="/quotes/{{ q.id }}" class="text-primary-600 hover:underline">View</a>
+                    <a href="/quotes/{{ q.id }}/edit" class="text-slate-600 hover:underline">Edit</a>
+                    <form action="/quotes/{{ q.id }}/delete" method="post" class="inline">
+                      <input type="hidden" name="next" value="/projects/{{project.id}}">
+                      <button class="text-rose-600 hover:underline"
+                              onclick="return confirm('Delete this quote?')">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
+        {% else %}
+          <div class="bg-white rounded-xl shadow-lg p-6 text-slate-600">
+            <p class="text-center py-4">
+              No quotes attached yet. Click "+ New Quote" to start generating pricing for this project.
+            </p>
+          </div>
+        {% endif %}
       </section>
 
     {% else %}

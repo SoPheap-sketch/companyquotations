@@ -1,383 +1,381 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{% if quote %}Edit Quote #{{ quote.id }}{% else %}New Quote{% endif %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        primary: {500:'#0ea5e9',600:'#0284c7',700:'#0369a1'}, // Consistent Blue
-                        success: {500:'#10b981', 600:'#059669'}, // Green for Add Item
-                        danger: {500:'#f43f5e', 600:'#e11d48'},   // Red for Remove
-                        info: {500:'#3b82f6', 600:'#2563eb'} // Blue for Calculation Aid
-                    } 
-                } 
-            } 
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% if quote %}Edit Quote #{{ quote.id }}{% else %}New Quote Builder{% endif %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {500:'#0ea5e9',600:'#0284c7',700:'#0369a1'},
+            success: {500:'#10b981',600:'#059669'},
+            danger: {500:'#f43f5e',600:'#e11d48'}
+          }
         }
-    </script>
-    <style>
-        /* Hide default number arrows */
-        input[type='number']::-webkit-inner-spin-button, 
-        input[type='number']::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-        /* Custom Input Styling (Unchanged) */
-        .input-standard {
-             padding: 10px;
-             border-radius: 8px;
-             border: 1px solid #cbd5e1; /* slate-300 */
-             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* subtle shadow */
-             transition: all 0.15s;
-        }
-        .input-standard:focus {
-             border-color: #0ea5e9; /* primary-500 */
-             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3); /* ring effect */
-        }
-        /* Style for the card matching the user's preferred header */
-        .card-style-top-border {
-            border-radius: 0.75rem; /* rounded-xl */
-            padding-top: 1rem; /* p-4 */
-            border-top: 6px solid #0284c7; /* primary-600 */
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+    .input-standard{
+      padding:10px;border-radius:8px;border:1px solid #cbd5e1;
+      font-size:.875rem;transition:.15s;
+    }
+    .input-standard:focus{
+      border-color:#0ea5e9;outline:none;
+      box-shadow:0 0 0 3px rgba(14,165,233,.2);
+    }
+    .label-mini{
+      font-size:.65rem;font-weight:800;color:#64748b;
+      text-transform:uppercase;margin-bottom:4px;display:block;
+    }
+    .card-header-blue{border-top:6px solid #0284c7;}
+  </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-lg border-b border-primary-100">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="/projects/{{ project_id }}/quotes" class="text-md text-slate-600 hover:text-primary-700 transition duration-150 flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Back to Quotes
-            </a>
-            <div class="flex items-center gap-3">
-                 <button id="saveBtn" class="px-6 py-2.5 bg-primary-600 text-white font-bold rounded-lg shadow-xl hover:bg-primary-700 transition duration-150 transform hover:scale-[1.02]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                    </svg>
-                    Save Quote
-                </button>
-            </div>
-        </div>
-    </header>
+<body
+  class="bg-slate-50 min-h-screen"
+  data-quote-id="{{ quote.id if quote else 0 }}"
+  data-project-id="{{ project_id }}"
+  >
 
-    <main class="flex-1 max-w-7xl mx-auto px-6 py-10 w-full">
-        <h1 class="text-4xl font-extrabold text-slate-900 mb-2">
-            {% if quote %}Edit Quote #{{ quote.id }}
-            {% else %}New Quote Builder
-            {% endif %}
-        </h1>
-        <p class="text-lg text-slate-500 mb-8">Client: **{{ project_client_name or 'N/A' }}** | Draft Title: *{{ quote.title or 'Untitled Estimate' }}*</p>
+<header class="bg-white shadow-sm border-b sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="/projects/{{ project_id }}"
+       class="text-slate-500 hover:text-primary-600 font-medium">← Back</a>
+    <button id="saveBtn"
+      class="bg-primary-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg hover:bg-primary-700">
+      Save Quote
+    </button>
+  </div>
+</header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<main class="max-w-7xl mx-auto px-6 py-8">
+  
 
-            <div class="lg:col-span-4">
-                <div class="bg-white rounded-xl shadow-2xl p-6 h-fit sticky top-6 card-style-top-border">
-                    <h2 class="text-2xl font-bold text-primary-700 border-b pb-3 mb-5">Item Definition</h2>
-                    
-                    <div class="space-y-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-semibold text-slate-600 uppercase block mb-1">Title</label>
-                                <input id="qTitle" value="{{ quote.title if quote else '' }}" class="input-standard w-full text-sm" placeholder="Initial Estimate v1" />
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-slate-600 uppercase block mb-1">Profit Margin (%)</label>
-                                <input id="qMargin" value="{{ (quote.profit_margin * 100) if quote and quote.profit_margin is not none else 30 }}" type="number" step="0.1" class="input-standard w-full text-sm text-right font-mono" />
-                            </div>
-                        </div>
+  <h1 class="text-3xl font-black text-slate-900 mb-2">
+    {% if quote %}Edit Estimate #{{ quote.id }}{% else %}Project Estimation Console{% endif %}
+  </h1>
+  <p class="text-slate-500 mb-6">
+    Client: {{ project_client_name or 'N/A' }}
+  </p>
+  <div class="mb-3 max-w-xl">
+  <label class="label-mini">Estimate Title</label>
+  <input
+    id="quoteTitle"
+    class="input-standard w-full"
+    placeholder="e.g. Exterior work estimate"
+    value="{{ quote.title if quote and quote.title else '' }}"
+  >
+</div>
 
-                        <div class="border-t pt-4">
-                            <h3 class="text-sm font-bold text-slate-800 mb-3">Cost Breakdown (Select or Type)</h3>
-                            
-                            <div class="bg-primary-50 p-3 rounded-lg border border-primary-100">
-                                <label class="text-sm font-semibold text-primary-700 mb-1 block">Quick Load Template (Optional)</label>
-                                <select id="templateSelector" class="input-standard w-full text-sm">
-                                    <option value="">-- Load Standard Item --</option>
-                                    <option value="labor_basic">Basic Laborer (1 Day)</option>
-                                    <option value="concrete_small">Small Concrete Pour (M3)</option>
-                                    <option value="arch_plan">Architectural Design Plan (1 Lot)</option>
-                                </select>
-                            </div>
+  <div class="bg-white rounded-xl shadow-xl p-6 card-header-blue mb-8">
+    <div class="flex justify-between mb-4">
+      <h2 class="text-lg font-bold">🚀 Fast Item Entry</h2>
+      <button onclick="toggleDetails()" class="text-xs font-bold text-primary-600">
+        + Show Detail Fields
+      </button>
+    </div>
 
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700 mb-1 block">1. Work Classification (工事区分)</label>
-                                <input 
-                                    list="categoryOptions" 
-                                    id="workCategory" 
-                                    placeholder="Select or type custom category"
-                                    class="input-standard w-full text-sm"
-                                />
-                                <datalist id="categoryOptions">
-                                    <option value="ブロック撤去">ブロック撤去 (Block Removal)</option>
-                                    <option value="基礎工">基礎工 (Foundation Work)</option>
-                                    <option value="砕石">砕石 (Crushed Stone)</option>
-                                    <option value="建築設計">建築設計 (Architectural Design)</option>
-                                </datalist>
-                            </div>
-
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700 mb-1 block">2. Item/Task (工種)</label>
-                                <input 
-                                    list="typeOptions" 
-                                    id="workType" 
-                                    placeholder="Select or type custom task"
-                                    class="input-standard w-full text-sm"
-                                />
-                                <datalist id="typeOptions">
-                                    <option value="労務">労務 (Labor)</option>
-                                    <option value="機械">機械 (Equipment)</option>
-                                    <option value="材料">材料 (Materials)</option>
-                                    <option value="構造設計">構造設計 (Structural Design)</option>
-                                </datalist>
-                            </div>
-
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700 mb-1 block">3. Specification / Detail (規格)</label>
-                                <input id="element" placeholder="e.g., 作業員 (Worker) / ダンプ排+2t+bh" class="input-standard w-full text-sm" />
-                            </div>
-                            <!-- これは取引者のところです -->
-                             <div>
-                                <label for="">Supplier</label>
-                             </div>
-                            <div class="grid grid-cols-3 gap-3">
-                                <div class="col-span-2">
-                                    <label class="text-sm font-semibold text-slate-700 mb-1 block">Quantity (数量)</label>
-                                    <input id="quantity" type="number" step="0.01" value="1.0" class="input-standard w-full text-sm text-right font-mono" />
-                                </div>
-                                <div>
-                                    <label class="text-sm font-semibold text-slate-700 mb-1 block">Unit (単位)</label>
-                                    <input id="unit" placeholder="式 / 日" class="input-standard w-full text-sm" />
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="text-sm font-semibold text-slate-700 mb-1 block">Unit Price (単価) - Cost</label>
-                                <input id="unitPrice" type="number" step="0.01" value="0" class="input-standard w-full text-lg text-right font-bold text-rose-600 font-mono" />
-                                
-                                <div class="mt-2 text-xs bg-info-50 p-2 rounded-lg text-info-700 border border-info-200">
-                                    <strong class="font-bold">Estimation Helper:</strong> Multiply Qty by: 
-                                    <input type="number" id="helperValue" value="1000" class="w-20 p-0.5 border rounded text-right text-slate-700"> 
-                                    to set Unit Price. 
-                                    <button id="applyHelperBtn" class="ml-2 px-2 py-0.5 bg-info-600 text-white rounded hover:bg-info-700 transition">Apply</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="addItemBtn" class="w-full mt-6 py-3 bg-success-600 text-white font-bold rounded-lg shadow-lg hover:bg-success-700 transition duration-150 transform hover:scale-[1.01]">
-                        + Add Item to Quote List
-                    </button>
-                </div>
-            </div>
-
-
-            <div class="lg:col-span-8">
-                <div class="bg-white rounded-xl shadow-xl overflow-hidden p-6 card-style-top-border"> 
-                    <h2 class="text-2xl font-bold text-slate-800 border-b pb-3 mb-4">Quote Items List</h2>
-
-                    <div class="overflow-x-auto">
-                        <table id="itemsTable" class="min-w-full divide-y divide-slate-200 text-sm">
-                            <thead class="bg-primary-50">
-                                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-primary-700">
-                                    <th class="p-3">Category</th>
-                                    <th class="p-3">Task</th>
-                                    <th class="p-3">Specification</th>
-
-                                    <th class="p-3 text-right">Qty</th>
-                                    <th class="p-3">Unit</th>
-                                    <th class="p-3 text-right">Unit Price</th>
-                                    <th class="p-3 text-right">Cost Amount (円)</th>
-                                    <th class="p-3"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsBody" class="divide-y divide-slate-100">
-                                </tbody>
-                        </table>
-                        <p id="emptyMessage" class="text-center py-6 text-slate-500 italic {% if items %}hidden{% endif %}">
-                            The quote list is empty. Use the builder on the left to add items.
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col items-end mt-8 pt-6 border-t-2 border-slate-300">
-                        
-                        <div class="text-xl font-medium text-slate-700">
-                            Subtotal (Cost Price): <span id="subtotal" class="font-mono text-2xl ml-2 text-rose-700 font-extrabold">0</span>
-                        </div>
-                        
-                        <div class="text-xl font-medium text-green-700 mt-2">
-                            PROFIT MARGIN ({{ (quote.profit_margin * 100) if quote and quote.profit_margin is not none else 30 }}%): 
-                            <span id="marginAmount" class="font-mono text-2xl ml-2 font-extrabold">0</span>
-                        </div>
-                        
-                        <div class="text-3xl font-extrabold text-primary-600 mt-5 pt-4 border-t border-primary-400 w-full text-right">
-                            TOTAL QUOTE PRICE: <span id="total" class="font-mono text-4xl ml-2">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <footer class="bg-white border-t mt-10">
-      <div class="max-w-7xl mx-auto px-6 py-4 text-sm text-slate-500">
-        {{ current_year or '2025' }} — Design & Build Quoter
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+      <div class="md:col-span-3">
+        <label class="label-mini">Item Name</label>
+        <input id="fName" class="input-standard w-full">
       </div>
-    </footer>
-    
+      <div class="md:col-span-2">
+        <label class="label-mini">Category</label>
+        <input id="fCat" class="input-standard w-full">
+      </div>
+      <div class="md:col-span-2">
+        <label class="label-mini">Supplier</label>
+        <input id="fSup" class="input-standard w-full">
+      </div>
+      <div class="md:col-span-1">
+        <label class="label-mini">Qty</label>
+        <input id="fQty" type="number" value="1" class="input-standard w-full text-center">
+      </div>
+      <div class="md:col-span-1">
+        <label class="label-mini">Unit</label>
+        <input id="fUnit" class="input-standard w-full text-center" placeholder="式">
+      </div>
+      <div class="md:col-span-2">
+        <label class="label-mini">Unit Price</label>
+        <input id="fPrice" type="number"
+               class="input-standard w-full text-right font-bold text-rose-600">
+      </div>
+      <div class="md:col-span-1">
+        <button id="addBtn"
+          class="w-full bg-success-600 text-white font-black py-2.5 rounded-lg">
+          ADD
+        </button>
+      </div>
+    </div>
+
+    <div id="detailDrawer" class="hidden mt-6 grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="label-mini">Specification</label>
+        <input id="fSpec" class="input-standard w-full">
+      </div>
+      <div class="md:col-span-3">
+        <label class="label-mini">Date</label>
+        <input id="fDate" type="date" class="input-standard w-full">
+      </div>
+      <div class="md:col-span-5">
+        <label class="label-mini">Remark</label>
+        <input id="fRem" class="input-standard w-full">
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-xl overflow-hidden card-header-blue">
+    <table class="w-full">
+      <thead class="bg-slate-800 text-white text-xs">
+        <tr>
+          <th class="px-4 py-3 text-left">Category / Date</th>
+          <th class="px-4 py-3 text-left">Work</th>
+          <th class="px-4 py-3 text-left">Supplier</th>
+          <th class="px-4 py-3 text-center">Qty</th>
+          <th class="px-4 py-3 text-center">Unit</th>
+          <th class="px-4 py-3 text-right">Unit Price</th>
+          <th class="px-4 py-3 text-right">Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+   
+  
+
+      </tbody>
+    </table>
+
+    <div class="p-6 bg-slate-50 text-right">
+      <div class="text-slate-600">Subtotal: <span id="dispSub">¥0</span></div>
+      <div class="text-slate-600">Margin (%):
+        <input id="globalMargin" value="30" type="number" class="w-14 text-center border rounded">
+      </div>
+      <div class="text-xl font-black mt-2 text-slate-900">
+        TOTAL: <span id="dispTotal">¥0</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+
 <script>
-    // --- JAVASCRIPT LOGIC ---
-    (function () {
-        const quoteId = JSON.parse('{{ quote.id if quote and quote.id is not none else "null" | tojson }}');
-        const itemsBody = document.getElementById('itemsBody');
-        const qMarginInput = document.getElementById('qMargin');
-        const templateSelector = document.getElementById('templateSelector');
-        const helperValue = document.getElementById('helperValue');
-        const applyHelperBtn = document.getElementById('applyHelperBtn');
-        
-        // Define standard templates for Quick Load
-        const TEMPLATES = {
-            labor_basic: { work_category: "労務", work_type: "自社", element: "作業員 (Basic Laborer)", quantity: 1, unit: "日", unit_price: 18000 },
-            concrete_small: { work_category: "材料", work_type: "外注", element: "コンクリート (Small Batch)", quantity: 2, unit: "m3", unit_price: 15000 },
-            arch_plan: { work_category: "建築設計", work_type: "設計士", element: "基本計画作成 (Initial Plan)", quantity: 1, unit: "式", unit_price: 300000 },
-        };
-
-        function fmt(n) {
-            return (Math.round(n)).toLocaleString('ja-JP', { style: 'currency', currency: 'JPY', minimumFractionDigits: 0 });
-        }
-        
-        function getItemData() {
-             return {
-                work_category: document.getElementById('workCategory').value,
-                work_type: document.getElementById('workType').value,
-                element: document.getElementById('element').value,
-                quantity: parseFloat(document.getElementById('quantity').value || 0),
-                unit: document.getElementById('unit').value,
-                unit_price: parseFloat(document.getElementById('unitPrice').value || 0)
-             };
-        }
-
-        function recalcAll() {
-            let subtotal = 0;
-            const marginPct = parseFloat(qMarginInput.value || 0) / 100;
-
-            document.getElementById('emptyMessage').classList.toggle('hidden', itemsBody.children.length > 0);
-
-            document.querySelectorAll('#itemsBody tr').forEach(tr => {
-                const qty = parseFloat(tr.dataset.quantity || 0);
-                const up = parseFloat(tr.dataset.unitPrice || 0);
-                const amt = qty * up;
-                tr.querySelector('.amount').textContent = fmt(amt);
-                subtotal += amt;
-            });
-
-            const marginAmount = subtotal * marginPct;
-            const total = subtotal * (1 + marginPct);
-
-            document.getElementById('subtotal').textContent = fmt(subtotal);
-            document.getElementById('marginAmount').textContent = fmt(marginAmount);
-            document.getElementById('total').textContent = fmt(total);
-            
-            // Update profit margin label
-            document.querySelector('.text-green-700:first-child').innerHTML = `PROFIT MARGIN (${qMarginInput.value}%) : <span id="marginAmount" class="font-mono text-2xl ml-2 font-extrabold">${fmt(marginAmount)}</span>`;
+// --------------------
+// Global constants
+// --------------------
+const QUOTE_ID = Number(document.body.dataset.quoteId);
+const EXISTING_ITEMS = JSON.parse(document.body.dataset.items || "[]");
+const PROJECT_ID = Number(document.body.dataset.projectId);
 
 
-            return subtotal;
-        }
+// DOM References
+const tableBody = document.getElementById('tableBody');
+const addBtn = document.getElementById('addBtn');
+const saveBtn = document.getElementById('saveBtn');
+const marginInput = document.getElementById('globalMargin');
 
-        function createItemRow(data) {
-            const amt = data.quantity * data.unit_price;
-            const tr = document.createElement('tr');
-            tr.className = 'item-row hover:bg-slate-100 transition duration-100';
-            tr.dataset.quantity = data.quantity;
-            tr.dataset.unitPrice = data.unit_price;
-            
-            tr.innerHTML = `
-                <td class="p-3 text-slate-700 text-xs">${data.work_category}</td>
-                <td class="p-3 text-slate-700 text-xs">${data.work_type}</td>
-                <td class="p-3 text-slate-700 text-sm font-medium">${data.element}</td>
-                <td class="p-3 text-right font-mono text-sm">${data.quantity.toFixed(2)}</td>
-                <td class="p-3 text-slate-700 text-xs">${data.unit}</td>
-                <td class="p-3 text-right font-mono text-sm">${data.unit_price.toLocaleString()}</td>
-                <td class="p-3 text-right font-extrabold amount text-rose-700">${fmt(amt)}</td>
-                <td class="p-3"><button class="removeBtn px-2 py-1 text-sm text-danger-600 hover:text-danger-700">✕</button></td>
-            `;
-            
-            tr.querySelector('.removeBtn').addEventListener('click', () => { 
-                tr.remove(); 
-                recalcAll(); 
-            });
+// Form Field References
+const fName = document.getElementById('fName');
+const fCat = document.getElementById('fCat');
+const fSup = document.getElementById('fSup');
+const fQty = document.getElementById('fQty');
+const fUnit = document.getElementById('fUnit');
+const fPrice = document.getElementById('fPrice');
+const fSpec = document.getElementById('fSpec');
+const fDate = document.getElementById('fDate');
+const fRem = document.getElementById('fRem');
 
-            return tr;
-        }
-        
-        // --- NEW FEATURE: Template Loader Logic ---
-        templateSelector.addEventListener('change', (e) => {
-            const templateKey = e.target.value;
-            if (templateKey && TEMPLATES[templateKey]) {
-                const template = TEMPLATES[templateKey];
-                document.getElementById('workCategory').value = template.work_category;
-                document.getElementById('workType').value = template.work_type;
-                document.getElementById('element').value = template.element;
-                document.getElementById('quantity').value = template.quantity;
-                document.getElementById('unit').value = template.unit;
-                document.getElementById('unitPrice').value = template.unit_price;
-            }
-            // Reset the template selector after loading
-            e.target.value = "";
-        });
+// Currency Formatter
+const fmt = v =>
+  Math.round(v).toLocaleString('ja-JP', {
+    style: 'currency',
+    currency: 'JPY'
+  });
 
-        // --- NEW FEATURE: Estimation Helper Logic ---
-        applyHelperBtn.addEventListener('click', () => {
-            const qty = parseFloat(document.getElementById('quantity').value || 0);
-            const multiplier = parseFloat(helperValue.value || 0);
-            
-            if (qty > 0 && multiplier > 0) {
-                 // Set the Unit Price = Multiplier * Quantity (a common calculation for initial cost estimation)
-                 document.getElementById('unitPrice').value = multiplier * qty;
-            } else {
-                 alert("Please enter a valid Quantity and Multiplier value.");
-            }
-        });
+// --------------------
+// UI helpers
+// --------------------
+function toggleDetails() {
+  document.getElementById('detailDrawer').classList.toggle('hidden');
+}
 
+function calculate() {
+  let sub = 0;
+  tableBody.querySelectorAll('tr').forEach(r => {
+    sub += Number(r.dataset.total || 0);
+  });
 
-        // --- Event Listeners (Add Item, Margin, Save) ---
-        
-        document.getElementById('addItemBtn').addEventListener('click', () => {
-            const data = getItemData();
-            if (!data.work_category || !data.element || data.quantity <= 0 || data.unit_price <= 0) {
-                 alert("Please fill in Category, Specification, Quantity, and Unit Price.");
-                 return;
-            }
-            itemsBody.appendChild(createItemRow(data));
-            recalcAll();
-            // Clear builder inputs for next item
-            document.getElementById('element').value = '';
-            document.getElementById('quantity').value = 1.0;
-            document.getElementById('unitPrice').value = 0;
-            document.getElementById('unit').value = '';
-            document.getElementById('workCategory').value = '';
-            document.getElementById('workType').value = '';
-        });
+  const marginPercent = Number(marginInput.value) / 100;
+  const marginAmount = sub * marginPercent;
 
-        qMarginInput.addEventListener('input', recalcAll);
+  document.getElementById('dispSub').innerText = fmt(sub);
+  document.getElementById('dispTotal').innerText = fmt(sub + marginAmount);
+}
+function renderItemRow(item) {
+  const qty = Number(item.quantity || 0);
+  const price = Number(item.unit_price || 0);
+  const total = qty * price;
 
-        document.querySelectorAll('#itemsBody tr').forEach(tr => {
-             const btn = tr.querySelector('.removeBtn');
-             if (btn) btn.addEventListener('click', () => { tr.remove(); recalcAll(); });
-        });
-        
-        document.getElementById('saveBtn').addEventListener('click', async () => {
-             alert('Save function triggered. The final payload should be ready for your server endpoint.');
-        });
-        
-        recalcAll();
+  const tr = document.createElement('tr');
+  tr.className = "border-b hover:bg-slate-50 transition-colors";
 
-    })();
+  tr.dataset.category = item.work_category || '';
+  tr.dataset.name = item.element || '';
+  tr.dataset.supplier = item.supplier || '';
+  tr.dataset.date = item.date || '';
+  tr.dataset.spec = item.spec || '';
+  tr.dataset.qty = qty;
+  tr.dataset.unit = item.unit || '';
+  tr.dataset.unitPrice = price;
+  tr.dataset.remark = item.remark || '';
+  tr.dataset.total = total;
+
+  tr.innerHTML = `
+    <td class="px-4 py-3 text-sm">${item.work_category || ''}<br>
+      <small class="text-slate-400">${item.date || ''}</small>
+    </td>
+    <td class="px-4 py-3 text-sm font-medium">${item.element || ''}<br>
+      <small class="text-slate-400">${item.spec || ''}</small>
+    </td>
+    <td class="px-4 py-3 text-sm">${item.supplier || ''}</td>
+    <td class="px-4 py-3 text-center text-sm">${qty}</td>
+    <td class="px-4 py-3 text-center text-sm">${item.unit || ''}</td>
+    <td class="px-4 py-3 text-right text-sm">${fmt(price)}</td>
+    <td class="px-4 py-3 text-right text-sm font-bold">${fmt(total)}</td>
+    <td class="px-4 py-3 text-center">
+      <button
+        class="text-rose-500 hover:text-rose-700 font-bold"
+        onclick="this.closest('tr').remove();calculate()"
+      >✕</button>
+    </td>
+  `;
+
+  tableBody.appendChild(tr);
+}
+
+// --------------------
+// Add item
+// --------------------
+addBtn.onclick = () => {
+  const name = fName.value.trim();
+  const qty = Number(fQty.value || 1);
+  const price = Number(fPrice.value || 0);
+  const unit = fUnit.value || '式';
+
+  if (!name || price <= 0) {
+    alert("Please enter Name and Price.");
+    return;
+  }
+
+  const total = qty * price;
+  const tr = document.createElement('tr');
+  tr.className = "border-b hover:bg-slate-50 transition-colors";
+
+  tr.dataset.category = fCat.value;
+  tr.dataset.name = name;
+  tr.dataset.supplier = fSup.value;
+  tr.dataset.date = fDate.value;
+  tr.dataset.spec = fSpec.value;
+  tr.dataset.qty = qty;
+  tr.dataset.unit = unit;
+  tr.dataset.unitPrice = price;
+  tr.dataset.remark = fRem.value;
+  tr.dataset.total = total;
+
+  tr.innerHTML = `
+    <td class="px-4 py-3 text-sm">${fCat.value}<br><small class="text-slate-400">${fDate.value}</small></td>
+    <td class="px-4 py-3 text-sm font-medium">${name}<br><small class="text-slate-400">${fSpec.value}</small></td>
+    <td class="px-4 py-3 text-sm">${fSup.value}</td>
+    <td class="px-4 py-3 text-center text-sm">${qty}</td>
+    <td class="px-4 py-3 text-center text-sm">${unit}</td>
+    <td class="px-4 py-3 text-right text-sm">${fmt(price)}</td>
+    <td class="px-4 py-3 text-right text-sm font-bold">${fmt(total)}</td>
+    <td class="px-4 py-3 text-center">
+      <button
+        class="text-rose-500 hover:text-rose-700 font-bold"
+        onclick="this.closest('tr').remove();calculate()"
+      >✕</button>
+    </td>
+  `;
+
+  tableBody.appendChild(tr);
+  calculate();
+
+  fName.value = '';
+  fPrice.value = '';
+};
+// --------------------
+// Save quote
+// --------------------
+saveBtn.onclick = async () => {
+
+  const title = document.getElementById('quoteTitle').value.trim();
+
+  // ❌ Validation
+  if (!title) {
+    alert("❌ Please enter Estimate Title");
+    document.getElementById('quoteTitle').focus();
+    return;
+  }
+
+  if (tableBody.children.length === 0) {
+    alert("❌ Please add at least one item");
+    return;
+  }
+
+  const items = [];
+
+  tableBody.querySelectorAll('tr').forEach(r => {
+    items.push({
+      work_category: r.dataset.category,
+      element: r.dataset.name,
+      supplier: r.dataset.supplier,
+      date: r.dataset.date,
+      spec: r.dataset.spec,
+      quantity: Number(r.dataset.qty),
+      unit: r.dataset.unit,
+      unit_price: Number(r.dataset.unitPrice),
+      remark: r.dataset.remark
+    });
+  });
+
+  try {
+    const res = await fetch(`/quotes/${QUOTE_ID}/items/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title,
+        items: items,
+        profit_margin: Number(marginInput.value) / 100
+      })
+    });
+
+    if (res.ok) {
+      // ✅ AUTO REDIRECT (no alert, no OK)
+      window.location.href = `/projects/${PROJECT_ID}/quotes`;
+    } else {
+      alert("❌ Failed to save quote");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Server connection error");
+  }
+};
+
+marginInput.oninput = calculate;
+if (EXISTING_ITEMS.length > 0) {
+  EXISTING_ITEMS.forEach(item => renderItemRow(item));
+  calculate();
+}
 </script>
+
 </body>
 </html>

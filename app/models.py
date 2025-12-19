@@ -88,3 +88,4 @@ class QuoteItem(Base):
 
     # Relationship
     quote = relationship("Quote", back_populates="items")
+    

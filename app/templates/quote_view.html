@@ -38,28 +38,55 @@
       </div>
 
       <div class="bg-white p-6 rounded-lg shadow">
-        <table class="w-full text-sm">
-          <thead class="text-left text-xs text-primary-700 border-b">
-            <tr>
-              <th class="p-2">工事区分</th><th>工種</th><th>要素</th><th>取引業者</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th><th>備考</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y">
-            {% for it in quote.items %}
-            <tr>
-              <td class="p-2">{{ it.work_category or '' }}</td>
-              <td>{{ it.work_type or '' }}</td>
-              <td>{{ it.element or '' }}</td>
-              <td>{{ it.supplier or '' }}</td>
-              <td class="text-right pr-2">{{ it.quantity }}</td>
-              <td>{{ it.unit or '' }}</td> <td class="text-right pr-2">{{ it.unit_price }}</td>
-              <td class="text-right pr-2">{{ it.amount }}</td>
-              <td>{{ it.remark or '' }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <table class="w-full text-sm border-collapse">
+        <thead class="text-xs text-primary-700 border-b">
+          <tr>
+            <th class="text-left p-2">工事区分</th>
+            <th class="text-left p-2">工種</th>
+            <th class="text-left p-2">要素</th>
+            <th class="text-left p-2">取引業者</th>
+            <th class="text-right p-2">数量</th>
+            <th class="text-left p-2">単位</th>
+            <th class="text-right p-2">単価</th>
+            <th class="text-right p-2">金額</th>
+            <th class="text-left p-2">備考</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y">
+          {% for it in quote.items %}
+          <tr class="hover:bg-slate-50">
+            <td class="p-2">{{ it.work_category or '' }}</td>
+            <td class="p-2">{{ it.work_type or '' }}</td>
+            <td class="p-2">{{ it.element or '' }}</td>
+            <td class="p-2">{{ it.supplier or '' }}</td>
+
+            <!-- 数量 -->
+            <td class="p-2 text-right font-mono">
+              {{ "%.2f"|format(it.quantity or 0) }}
+            </td>
+
+            <!-- 単位 -->
+            <td class="p-2">{{ it.unit or '' }}</td>
+
+            <!-- 単価 -->
+            <td class="p-2 text-right font-mono">
+              {{ it.unit_price | round(0) }}
+            </td>
+
+            <!-- 金額 -->
+            <td class="p-2 text-right font-mono font-semibold">
+              {{ it.amount | round(0) }}
+            </td>
+
+            <!-- 備考 -->
+            <td class="p-2">{{ it.remark or '' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
     {% endif %}
   </main>
 </body>

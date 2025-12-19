@@ -1,10 +1,18 @@
 # app/main.py
-from fastapi import FastAPI, Request, Form, Body
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, PlainTextResponse
+from fastapi import FastAPI, Request, Form, Body, HTTPException
+from fastapi.responses import (
+    HTMLResponse,
+    JSONResponse,
+    RedirectResponse,
+    PlainTextResponse
+)
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
 from app import db as _db
+import json
+
+
 
 app = FastAPI(title="Company Quotation System (MVP)")
 
@@ -34,7 +42,6 @@ def index(request: Request):
             "current_year": datetime.utcnow().year,
         },
     )
-
 
 # --------------------------------------------------
 # Create Project (POST)
@@ -149,33 +156,31 @@ def projects_debug():
 @app.get("/projects/{project_id}", response_class=HTMLResponse)
 def view_project(request: Request, project_id: int):
     from app.db import SessionLocal
-    from app.models import Project
+    from app.models import Project, Quote
     from datetime import datetime
 
     db = SessionLocal()
     try:
-        proj = db.query(Project).filter(Project.id == project_id).first()
-        if not proj:
-            return templates.TemplateResponse(
-                "project_view.html",
-                {"request": request, "project": None, "error": "Project not found", "current_year": datetime.utcnow().year},
-            )
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
 
-        # safe created_at value: try to get attribute, fall back to None or formatted str
-        created_dt = getattr(proj, "created_at", None)
-        if created_dt is None:
-            created_str = None
-        else:
-            try:
-                created_str = created_dt.strftime("%Y-%m-%d")
-            except Exception:
-                created_str = str(created_dt)
+        quotes = (
+            db.query(Quote)
+            .filter(Quote.project_id == project_id)
+            .order_by(Quote.id.desc())
+            .all()
+        )
+
+        created_dt = getattr(project, "created_at", None)
+        created_str = created_dt.strftime("%Y-%m-%d") if created_dt else None
 
         return templates.TemplateResponse(
             "project_view.html",
             {
                 "request": request,
-                "project": proj,
+                "project": project,
+                "quotes": quotes,          # ✅ now guaranteed
                 "created_at": created_str,
                 "current_year": datetime.utcnow().year,
             },
@@ -298,26 +303,75 @@ def project_quotes(request: Request, project_id: int):
 # --- New Quote form (GET) ---
 @app.get("/projects/{project_id}/quotes/new", response_class=HTMLResponse)
 def new_quote_form(request: Request, project_id: int):
-    # render a blank quote edit/create page
-    return templates.TemplateResponse("quote_edit.html", {"request": request, "project_id": project_id, "quote": None, "items": [], "current_year": datetime.utcnow().year})
+    from app.db import SessionLocal
+    from app.models import Project, Quote
+
+    db = SessionLocal()
+    try:
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return templates.TemplateResponse(
+                "quote_edit.html",
+                {
+                    "request": request,
+                    "quote": None,
+                    "error": "Project not found",
+                    "current_year": datetime.utcnow().year,
+                },
+            )
+
+        # 🔥 CREATE DRAFT QUOTE
+        quote = Quote(
+            project_id=project_id,
+            status="draft",
+            profit_margin=0.30,
+        )
+        db.add(quote)
+        db.commit()
+        db.refresh(quote)  # 🔥 THIS IS CRITICAL
+
+        return templates.TemplateResponse(
+            "quote_edit.html",
+            {
+                "request": request,
+                "quote": quote,  # ✅ REAL QUOTE WITH ID
+                "project_id": project.id,
+                "project_client_name": project.client_name,
+                "items": [],
+                "current_year": datetime.utcnow().year,
+            },
+        )
+    finally:
+        db.close()
+
 
 
 # --- Create quote (POST) ---
 @app.post("/projects/{project_id}/quotes/create")
-def create_quote(request: Request, project_id: int, title: str = Form(None), version: int = Form(1), profit_margin: float = Form(0.30), customer_id: int = Form(None), notes: str = Form(None)):
+def create_quote(request: Request, project_id: int):
     from app.db import SessionLocal
     from app.models import Quote
 
     db = SessionLocal()
     try:
-        q = Quote(project_id=project_id, title=title, version=version, profit_margin=profit_margin, customer_id=customer_id, notes=notes)
+        q = Quote(
+            project_id=project_id,
+            title="Draft Estimate",   # ✅ AUTO TITLE
+            version=1,
+            profit_margin=0.30,
+            status="draft"
+        )
         db.add(q)
         db.commit()
         db.refresh(q)
-        # Redirect to edit page so the user can add items
-        return RedirectResponse(url=f"/quotes/{q.id}/edit", status_code=303)
+
+        return RedirectResponse(
+            url=f"/quotes/{q.id}/edit",
+            status_code=303
+        )
     finally:
         db.close()
+
 
 
 # --- View quote (HTML) ---
@@ -335,91 +389,128 @@ def view_quote(request: Request, quote_id: int):
     finally:
         db.close()
 
-
 # --- Edit quote (GET) ---
 @app.get("/quotes/{quote_id}/edit", response_class=HTMLResponse)
 def edit_quote_get(request: Request, quote_id: int):
     from app.db import SessionLocal
-    from app.models import Quote, QuoteItem
+    from app.models import Quote, QuoteItem, Project
 
     db = SessionLocal()
     try:
         q = db.query(Quote).filter(Quote.id == quote_id).first()
         if not q:
-            return templates.TemplateResponse("quote_edit.html", {"request": request, "quote": None, "items": [], "error": "Quote not found", "current_year": datetime.utcnow().year})
-        items = db.query(QuoteItem).filter(QuoteItem.quote_id == quote_id).order_by(QuoteItem.id.asc()).all()
-        return templates.TemplateResponse("quote_edit.html", {"request": request, "quote": q, "items": items, "current_year": datetime.utcnow().year})
+            raise HTTPException(status_code=404, detail="Quote not found")
+
+        items = (
+            db.query(QuoteItem)
+            .filter(QuoteItem.quote_id == quote_id)
+            .order_by(QuoteItem.id.asc())
+            .all()
+        )
+
+        project = db.query(Project).filter(Project.id == q.project_id).first()
+
+        return templates.TemplateResponse(
+            "quote_edit.html",
+            {
+                "request": request,
+                "quote": q,
+                "items": items,
+
+                # ✅ THIS FIXES ITEMS NOT SHOWING
+                "items_json": json.dumps([
+                    {
+                        "work_category": i.work_category,
+                        "element": i.element,
+                        "supplier": i.supplier,
+                        "date": i.date,
+                        "spec": i.spec,
+                        "quantity": i.quantity,
+                        "unit": i.unit,
+                        "unit_price": i.unit_price,
+                        "remark": i.remark,
+                    } for i in items
+                ]),
+                "project_id": q.project_id,
+                "project_client_name": project.client_name if project else None,
+                "current_year": datetime.utcnow().year,
+            }
+        )
     finally:
         db.close()
-
-
 # --- Save quote items (POST JSON) endpoint used by JS from the quote_edit page ---
 @app.post("/quotes/{quote_id}/items/save")
 def save_quote_items(quote_id: int, payload: dict = Body(...)):
-    """
-    payload = {
-      "items": [ {work_category, work_type, element, supplier, date, item_type, spec, quantity, unit, unit_price, remark}, ... ],
-      "profit_margin": 0.25
-    }
-    """
     from app.db import SessionLocal
     from app.models import Quote, QuoteItem
+
     db = SessionLocal()
     try:
         q = db.query(Quote).filter(Quote.id == quote_id).first()
         if not q:
-            return JSONResponse({"error": "quote not found"}, status_code=404)
+            raise HTTPException(status_code=404, detail="Quote not found")
 
-        # delete existing items and recreate (simple approach)
+
+        if not payload.get("title"):
+            raise HTTPException(status_code=400, detail="Title is required")
+
+        if not payload.get("items"):
+            raise HTTPException(status_code=400, detail="At least one item is required")
+
+        q.title = payload["title"]
+
         db.query(QuoteItem).filter(QuoteItem.quote_id == quote_id).delete()
         db.commit()
 
         subtotal = 0.0
-        for it in payload.get("items", []):
+        for it in payload["items"]:
             qty = float(it.get("quantity") or 0)
-            unit_price = float(it.get("unit_price") or 0)
-            amount = qty * unit_price
+            price = float(it.get("unit_price") or 0)
+            amount = qty * price
             subtotal += amount
-            new_item = QuoteItem(
+
+            db.add(QuoteItem(
                 quote_id=quote_id,
                 work_category=it.get("work_category"),
-                work_type=it.get("work_type"),
                 element=it.get("element"),
                 supplier=it.get("supplier"),
                 date=it.get("date"),
-                item_type=it.get("item_type"),
                 spec=it.get("spec"),
                 quantity=qty,
                 unit=it.get("unit"),
-                unit_price=unit_price,
+                unit_price=price,
                 amount=amount,
                 remark=it.get("remark"),
-            )
-            db.add(new_item)
+            ))
+
         q.subtotal = subtotal
-        # update margin if provided
-        if "profit_margin" in payload:
-            q.profit_margin = float(payload["profit_margin"] or q.profit_margin)
-        q.total = subtotal * (1.0 + float(q.profit_margin or 0.0))
-        db.add(q)
+        q.profit_margin = float(payload.get("profit_margin", 0.3))
+        q.total = subtotal * (1 + q.profit_margin)
+
         db.commit()
-        db.refresh(q)
-        return JSONResponse({"ok": True, "subtotal": q.subtotal, "total": q.total})
+        return {"ok": True}
+
     finally:
         db.close()
-
-
 # --- Delete quote (POST) ---
 @app.post("/quotes/{quote_id}/delete")
-def delete_quote(quote_id: int):
+def delete_quote(request: Request, quote_id: int, next: str = Form(None)):
     from app.db import SessionLocal
     from app.models import Quote
+
     db = SessionLocal()
     try:
         q = db.query(Quote).filter(Quote.id == quote_id).first()
         if q:
+            project_id = q.project_id
             db.delete(q)
             db.commit()
     finally:
         db.close()
-    return RedirectResponse(url="/projects/list", status_code=303)
+    if next:
+        return RedirectResponse(next, status_code=303)
+
+    return RedirectResponse(
+        url=f"/projects/{project_id}/quotes",
+        status_code=303
+    )
