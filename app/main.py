@@ -1,24 +1,26 @@
 # app/main.py
-# Import the database session
-from app.db import SessionLocal  
-
-# Import your models
-from app.models import Quote, QuoteItem
-
-# Make sure you also have this for the error handling
-from fastapi import HTTPException
+# app/main.py
 from fastapi import FastAPI, Request, Form, Body, HTTPException
 from fastapi.responses import (
     HTMLResponse,
     JSONResponse,
     RedirectResponse,
-    PlainTextResponse
+    PlainTextResponse,
+    Response,
 )
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
 from datetime import datetime
-from app import db as _db
 import json
+
+from app import db as _db
+from app.db import SessionLocal
+from app.models import Quote, QuoteItem   
+from fastapi.responses import StreamingResponse
+from app.db import SessionLocal
+from app.models import Quote
+from app.pdf_utils import render_pdf_from_html
 
 
 
@@ -28,17 +30,12 @@ app = FastAPI(title="Company Quotation System (MVP)")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
-
-# --------------------------------------------------
-# Startup: Initialize DB
-# --------------------------------------------------
 @app.on_event("startup")
 def startup_event():
     _db.init_db()
 
 
-# --------------------------------------------------
-# Homepage
+
 # --------------------------------------------------
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
@@ -113,8 +110,6 @@ def projects_form(request: Request):
             "current_year": datetime.utcnow().year,
         },
     )
-
-
 # --------------------------------------------------
 # Projects List (HTML)
 # --------------------------------------------------
@@ -336,13 +331,13 @@ def new_quote_form(request: Request, project_id: int):
         )
         db.add(quote)
         db.commit()
-        db.refresh(quote)  # 🔥 THIS IS CRITICAL
+        db.refresh(quote)  
 
         return templates.TemplateResponse(
             "quote_edit.html",
             {
                 "request": request,
-                "quote": quote,  # ✅ REAL QUOTE WITH ID
+                "quote": quote,  # 
                 "project_id": project.id,
                 "project_client_name": project.client_name,
                 "items": [],
@@ -364,8 +359,7 @@ def create_quote(request: Request, project_id: int):
     try:
         q = Quote(
             project_id=project_id,
-            title="Draft Estimate",   # ✅ AUTO TITLE
-            version=1,
+            title="Draft Estimate",   
             profit_margin=0.30,
             status="draft"
         )
@@ -448,7 +442,6 @@ def edit_quote_get(request: Request, quote_id: int):
 # --- Save quote items (POST JSON) endpoint used by JS from the quote_edit page ---
 @app.post("/quotes/{quote_id}/items/save")
 def save_quote_items(quote_id: int, data: dict):
-    # Now that SessionLocal is imported at the top, this will work
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
@@ -465,28 +458,29 @@ def save_quote_items(quote_id: int, data: dict):
         for item in data.get("items", []):
             qty = float(item.get("quantity", 0))
             price = float(item.get("unit_price", 0))
-            row_sum = qty * price
-            total_cost += row_sum
+            amount = qty * price
+            total_cost += amount
 
-            # Now that QuoteItem is imported at the top, this will work
             new_item = QuoteItem(
                 quote_id=quote_id,
                 work_category=item.get("work_category"),
-                work_type=item.get("work_type"), 
+                work_type=item.get("work_type"),
                 element=item.get("element"),
                 supplier=item.get("supplier"),
                 quantity=qty,
                 unit=item.get("unit"),
                 unit_price=price,
-                amount=row_sum,
+                amount=amount,
                 spec=item.get("spec"),
                 remark=item.get("remark")
             )
             db.add(new_item)
-        
+
+        # ✅ Accounting logic (Japanese invoice style)
         quote.subtotal = total_cost
-        quote.total = total_cost * (1 + quote.profit_margin)
-        
+        quote.tax = int(total_cost * 0.1)      # 消費税 10%
+        quote.total = quote.subtotal + quote.tax
+
         db.commit()
         return {"message": "Saved"}
     except Exception as e:
@@ -516,3 +510,38 @@ def delete_quote(request: Request, quote_id: int, next: str = Form(None)):
         url=f"/projects/{project_id}/quotes",
         status_code=303
     )
+# printer-friendly PDF view of quote
+@app.get("/quotes/{quote_id}/pdf")
+def quote_pdf(request: Request, quote_id: int):
+    db = SessionLocal()
+    try:
+        quote = db.query(Quote).filter(Quote.id == quote_id).first()
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+
+        html = templates.get_template("quote_pdf.html").render({
+            "request": request,
+            "quote": quote
+        })
+
+        try:
+            pdf = render_pdf_from_html(html)
+        except Exception as e:
+            # 🔥 SHOW wkhtmltopdf ERROR
+            return PlainTextResponse(
+                f"PDF generation error:\n\n{str(e)}",
+                status_code=500
+            )
+
+        return StreamingResponse(
+            pdf,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"
+            }
+        )
+    finally:
+        db.close()
+@app.head("/quotes/{quote_id}/pdf")
+def quote_pdf_head():
+    return Response(status_code=200)

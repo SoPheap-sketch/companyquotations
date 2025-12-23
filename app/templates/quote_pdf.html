@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+
+<style>
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+* {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ---------- Base ---------- */
+body {
+    font-family: "Meiryo", "Hiragino Sans", sans-serif;
+    font-size: 11px;
+    color: #000;
+    margin: 0;
+}
+
+/* ---------- Title ---------- */
+h1 {
+    text-align: center;
+    letter-spacing: 12px;
+    font-size: 24px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #000;
+    padding-bottom: 6px;
+}
+
+/* ---------- Common ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 6px;
+}
+
+.no-border {
+    border: none !important;
+}
+
+.right { text-align: right; }
+.center { text-align: center; }
+
+/* ---------- Stamps ---------- */
+.stamp-box {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 9px;
+}
+
+/* ---------- Items ---------- */
+.items th {
+    background: #2f4f6f;
+    color: #fff;
+    font-weight: bold;
+}
+
+.items td {
+    height: 24px;
+    vertical-align: middle;
+}
+
+/* ---------- Totals ---------- */
+.total-row {
+    background: #f2f2f2;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>請 求 書</h1>
+
+<!-- ================= HEADER ================= -->
+<table class="no-border" style="margin-bottom:20px;">
+<tr>
+
+<!-- LEFT -->
+<td class="no-border" style="width:60%; vertical-align:top;">
+    <div style="font-size:16px; font-weight:bold; border-bottom:1px solid #000; padding-bottom:4px;">
+        {{ quote.project.client_name }} 御中
+    </div>
+
+    <p style="margin:10px 0;">下記の通り、御請求申し上げます。</p>
+
+    <table class="no-border" style="border-bottom:2px solid #000; margin-bottom:10px;">
+        <tr>
+            <td class="no-border" style="font-size:14px;">ご請求金額</td>
+            <td class="no-border right" style="font-size:22px; font-weight:bold;">
+                ¥{{ "{:,}".format(quote.total|int) }}（税込）
+            </td>
+        </tr>
+    </table>
+
+    件名：{{ quote.title or "" }}
+</td>
+
+<!-- RIGHT -->
+<td class="no-border right" style="width:40%; vertical-align:top;">
+    発行日：{{ quote.created_at.strftime('%Y/%m/%d') }}<br>
+    No：INV-{{ quote.id }}<br><br>
+
+    <strong>{{ quote.company_name }}</strong><br>
+    〒100-0001<br>
+    東京都千代田区千代田1-1-1<br>
+    TEL: 03-1234-5678
+
+    <table class="no-border" style="margin-top:10px; margin-left:auto;">
+        <tr>
+            <td class="stamp-box">承認</td>
+            <td class="stamp-box">検印</td>
+            <td class="stamp-box">担当</td>
+        </tr>
+    </table>
+</td>
+
+</tr>
+</table>
+
+<!-- ================= ITEMS ================= -->
+<table class="items" style="margin-bottom:15px;">
+<thead>
+<tr>
+    <th style="width:5%;">No</th>
+    <th style="width:40%;">品名・仕様</th>
+    <th style="width:8%;">数量</th>
+    <th style="width:8%;">単位</th>
+    <th style="width:12%;">単価</th>
+    <th style="width:15%;">金額</th>
+    <th>摘要</th>
+</tr>
+</thead>
+<tbody>
+
+{% for it in quote.items %}
+<tr>
+    <td class="center">{{ loop.index }}</td>
+    <td>{{ it.element }}</td>
+    <td class="right">{{ it.quantity }}</td>
+    <td class="center">{{ it.unit }}</td>
+    <td class="right">¥{{ "{:,}".format(it.unit_price|int) }}</td>
+    <td class="right">¥{{ "{:,}".format(it.amount|int) }}</td>
+    <td>{{ it.remark or "" }}</td>
+</tr>
+{% endfor %}
+
+{% for i in range(15 - quote.items|length) %}
+<tr>
+    <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+<!-- ================= FOOTER ================= -->
+<table class="no-border">
+<tr>
+
+<td class="no-border" style="width:60%; vertical-align:top;">
+    【備考・振込先】
+    <div style="border:1px solid #000; height:90px; padding:6px; margin-top:5px;">
+        {{ quote.notes or "" | replace('\n','<br>') | safe }}
+    </div>
+</td>
+
+<td class="no-border" style="width:40%; vertical-align:top;">
+    <table>
+        <tr>
+            <td>小計</td>
+            <td class="right">¥{{ "{:,}".format(quote.subtotal|int) }}</td>
+        </tr>
+        <tr>
+            <td>消費税 (10%)</td>
+            <td class="right">¥{{ "{:,}".format(quote.tax|int) }}</td>
+        </tr>
+        <tr class="total-row">
+            <td>合計</td>
+            <td class="right">¥{{ "{:,}".format(quote.total|int) }}</td>
+        </tr>
+    </table>
+</td>
+
+</tr>
+</table>
+
+</body>
+</html>
