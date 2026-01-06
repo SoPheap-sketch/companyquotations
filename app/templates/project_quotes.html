@@ -22,7 +22,6 @@
 
 <header class="bg-white shadow border-b border-primary-600">
   <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-    <!-- Back to PROJECT -->
     <a href="/projects/{{ project.id }}" class="text-slate-600 hover:text-primary-700">
       ← Back
     </a>
@@ -42,7 +41,7 @@
       </p>
     </div>
 
-    <!-- ✅ FIXED ROUTE -->
+    <!-- ✅ ONLY way to create a quote -->
     <a href="/projects/{{ project.id }}/quotes/new"
        class="px-5 py-3 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700">
       + New Quote
@@ -56,9 +55,8 @@
         <tr>
           <th class="py-2">ID</th>
           <th>Version</th>
+          <th>Status</th>
           <th>Title</th>
-          <th>Profit</th>
-          <th>Subtotal</th>
           <th>Total</th>
           <th>Actions</th>
         </tr>
@@ -70,22 +68,26 @@
           <td class="py-3">{{ q.id }}</td>
           <td>{{ q.version }}</td>
 
-          <!-- ✅ TITLE FIX -->
+          <!-- STATUS -->
           <td>
-            {{ q.title if q.title is not none and q.title != '' else '-' }}
+            {% if q.status == 'draft' %}
+              <span class="px-2 py-1 text-xs rounded bg-slate-200">Draft</span>
+            {% elif q.status == 'pending' %}
+              <span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-700">Pending</span>
+            {% elif q.status == 'approved' %}
+              <span class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700">Approved</span>
+            {% endif %}
           </td>
 
-          <td>{{ (q.profit_margin * 100) | round(0) }}%</td>
-          <td>{{ q.subtotal or 0 }}</td>
+          <td>{{ q.title or '-' }}</td>
           <td>{{ q.total or 0 }}</td>
 
           <td class="space-x-3">
             <a href="/quotes/{{ q.id }}" class="text-primary-600">View</a>
             <a href="/quotes/{{ q.id }}/edit" class="text-slate-700">Edit</a>
 
-            <!-- ✅ DELETE STAYS ON SAME PAGE -->
             <form method="post"
-                  action="/quotes/{{ q.id }}/delete"
+                  action="/quotes/{{ q.id }}/delete?next=/projects/{{ project.id }}/quotes"
                   class="inline">
               <button class="text-rose-600"
                       onclick="return confirm('Delete this quote?')">

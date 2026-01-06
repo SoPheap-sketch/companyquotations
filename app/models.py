@@ -3,7 +3,7 @@ from sqlalchemy import (
     Column, Integer, String, Text, Float, DateTime, ForeignKey
 )
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.db import Base
 
 # ----------------------------------------
@@ -41,24 +41,32 @@ class Quote(Base):
     profit_margin = Column(Float, default=0.30)
 
     subtotal = Column(Float, default=0.0)
-    tax = Column(Float, default=0.0)                # ✅ ADD
+    tax = Column(Float, default=0.0)
     total = Column(Float, default=0.0)
 
-    company_name = Column(                           # ✅ ADD
+    company_name = Column(
         String,
-        default="株式会社エキスパート"
+        default="MK技建株式会社"
     )
 
     notes = Column(Text, nullable=True)
     status = Column(String, default="draft")
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    # ✅ AUTO 支払期限（発行日 + 30日）
+    payment_due = Column(
+        DateTime,
+        default=lambda: datetime.utcnow() + timedelta(days=30)
+    )
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     project = relationship("Project", lazy="joined")
     customer = relationship("Customer", lazy="joined")
     items = relationship("QuoteItem", back_populates="quote", cascade="all, delete-orphan")
+
 
 # ---------- Quote Item (each Excel row) ----------
 class QuoteItem(Base):

@@ -1,107 +1,227 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{{ title }}</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MK Giken | Estimate & Project Management System</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
           colors: {
-            // Define a custom primary color based on a professional blue
-            'primary': {
-              500: '#0ea5e9', // sky-500
-              600: '#0284c7', // sky-600
-              700: '#0369a1', // sky-700
-            },
+            mk: {
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+            }
           }
         }
       }
     }
   </script>
 
-  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    body { background-color: #f5f8fb; }
+  </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans">
-  <div class="min-h-screen flex flex-col">
-    <header class="bg-white shadow-md border-b-2 border-primary-600">
-      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-extrabold text-primary-700">Design & Build Quoter</h1>
-          <p class="text-sm text-slate-500 mt-1">Dashboard — manage projects & quotations</p>
-        </div>
-        <div class="text-sm text-slate-600">
-          <a href="/docs" class="hover:text-primary-600 transition duration-150">API Docs</a>
-        </div>
+
+<body class="font-sans text-slate-800 min-h-screen flex flex-col">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white border-b border-mk-600">
+  <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+
+    <!-- LEFT -->
+    <div class="flex items-center gap-3">
+      <div class="bg-mk-600 w-9 h-9 rounded-lg flex items-center justify-center text-white font-black">
+        M
       </div>
-    </header>
-
-    <main class="flex-1 max-w-6xl mx-auto px-6 py-10 w-full">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="col-span-1 md:col-span-2">
-          <div class="bg-white rounded-xl shadow-lg p-8 border-t-4 border-primary-600">
-            <div class="flex flex-col sm:flex-row items-start justify-between sm:space-y-0 space-y-4">
-              <div>
-                <h2 class="text-2xl font-bold text-slate-900">Project Management</h2>
-                <p class="text-md text-slate-600 mt-2">Create and manage client projects to attach quotes to.</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <a href="/projects/form" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg shadow-lg hover:bg-primary-700 transition duration-150 transform hover:scale-[1.02]">
-                  🏗️ New Project
-                </a>
-                <a href="/projects/list" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition duration-150">View All</a>
-              </div>
-            </div>
-
-            <div class="mt-6 border-t pt-4">
-              <p class="text-sm font-semibold text-slate-600">Quick Actions</p>
-              <div class="mt-2 flex gap-4">
-                <a href="/projects/form" class="text-primary-600 hover:underline hover:text-primary-700 transition duration-150">Create New Project</a>
-                <span class="text-slate-300">|</span>
-                <a href="/projects/list" class="text-slate-600 hover:underline">Browse Existing Projects</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-xl font-bold text-slate-900">Tools & Export</h3>
-            <p class="text-sm text-slate-600 mt-2">Export quotes to professional PDF/Excel formats (coming soon)</p>
-          </div>
-          <div class="mt-4">
-            <a href="/docs" class="text-md font-medium inline-flex items-center gap-2 px-4 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition duration-150">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
-              </svg>
-              Open API Docs
-            </a>
-          </div>
-        </div>
+      <div>
+        <p class="font-bold text-slate-800 leading-none">MK Giken Co., Ltd</p>
+        <p class="text-[10px] text-slate-400">Estimate & Project Management System</p>
       </div>
+    </div>
 
-      <section class="mt-10">
-        <div class="bg-white rounded-xl shadow-lg p-8">
-          <h3 class="text-xl font-bold text-slate-900">Getting Started Guide</h3>
-          <ol class="mt-4 list-decimal list-inside space-y-2 text-md text-slate-700">
-            <li><span class="font-semibold text-primary-600">Create New Project:</span> Define scope, client details, and attach initial requirements.</li>
-            <li><span class="font-semibold text-primary-600">Build Quotes:</span> Generate detailed quotations based on your price list.</li>
-            <li><span class="font-semibold text-primary-600">Export:</span> Finalize quotes and export to professional PDF/Excel for client approval.</li>
-            <li><span class="font-semibold text-primary-600">Admin/Settings:</span> Manage your core price list, material costs, and quote templates.</li>
-          </ol>
+    <!-- RIGHT -->
+    <div class="flex items-center gap-4 text-right">
+      <div class="hidden sm:block">
+        <p class="text-[10px] text-slate-400 uppercase">CURRENTUSER</p>
+        <p class="text-xs font-bold">
+          Sopheap <span class="text-mk-600 text-[10px] ml-1">IT / Technical</span>
+        </p>
+      </div>
+      <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="flex-1 max-w-7xl mx-auto px-6 py-8 space-y-10 w-full">
+
+  <!-- Business Overview -->
+  <section>
+    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+      Business Overview
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-slate-400">Total Projects</p>
+        <p class="text-3xl font-black mt-2">{{ total_projects }}</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-slate-400">Pending Estimates</p>
+        <p class="text-3xl font-black mt-2">{{ pending_estimates }}</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm">
+        <p class="text-xs text-slate-400">Approved Quotes</p>
+        <p class="text-3xl font-black mt-2">{{ approved_quotes }}</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- LEFT -->
+    <div class="lg:col-span-2 space-y-8">
+
+      <!-- クイック操作 -->
+      <section>
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          Quick Actions
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a href="/projects/form" class="bg-white p-5 rounded-xl shadow-sm flex items-center gap-4 hover:ring-2 ring-mk-600">
+            <div class="w-12 h-12 rounded-xl bg-mk-600/10 text-mk-600 flex items-center justify-center text-xl">＋</div>
+            <div>
+              <p class="font-bold">New Project</p>
+              <p class="text-xs text-slate-400">Create a new project</p>
+            </div>
+          </a>
+
+          <a href="/projects/list" class="bg-white p-5 rounded-xl shadow-sm flex items-center gap-4 hover:ring-2 ring-mk-600">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-lg">📂</div>
+            <div>
+              <p class="font-bold">Project List</p>
+              <p class="text-xs text-slate-400">View projects and create estimates</p>
+            </div>
+          </a>
         </div>
       </section>
-    </main>
 
-    <footer class="bg-white border-t border-slate-200 mt-10">
-      <div class="max-w-6xl mx-auto px-6 py-5 text-sm text-slate-500 flex justify-between items-center">
-        <span>© 2024 Design & Build Quoter — MVP</span>
-        <span class="text-xs text-slate-400">Powered by FastAI & Python</span>
-      </div>
-    </footer>
+      <!-- 最近の更新 -->
+      <section>
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          Recent Activity
+        </h2>
+        
+        <div class="bg-white rounded-xl shadow-sm divide-y">
+          {% for project in recent_projects %}
+            <a href="/projects/{{ project.id }}"
+              class="block p-4 text-sm hover:bg-slate-50 transition">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">
+                  {{ project.client_name }}
+                </span>
+                <span class="text-xs text-slate-400">
+                  Project
+                </span>
+              </div>
+            </a>
+          {% else %}
+            <div class="p-4 text-sm text-slate-400">
+              No recent projects
+            </div>
+          {% endfor %}
+
+          <!-- Recent Quotes -->
+          {% for quote in recent_quotes %}
+            <a href="/quotes/{{ quote.id }}"
+              class="block p-4 text-sm bg-slate-50 hover:bg-slate-100 transition">
+              <div class="flex justify-between items-center">
+                <span class="font-medium">
+                  Quote #{{ quote.id }}
+                </span>
+                {% if quote.status == "draft" %}
+                  <span class="px-2 py-1 text-xs rounded-full bg-slate-200 text-slate-700">
+                    Draft
+                  </span>
+                {% elif quote.status == "pending" %}
+                  <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
+                    Pending
+                  </span>
+                {% elif quote.status == "approved" %}
+                  <span class="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                    Approved
+                  </span>
+                {% else %}
+                  <span class="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-400">
+                    Unknown
+                  </span>
+                {% endif %}
+
+              </div>
+            </a>
+          {% else %}
+            <div class="p-4 text-sm text-slate-400">
+              No recent quotes
+            </div>
+          {% endfor %}
+
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="space-y-4">
+      <section>
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          Notifications
+        </h2>
+
+        <!-- System Update -->
+        <div class="bg-white p-4 rounded-xl border-l-4 border-mk-600 shadow-sm mb-4">
+          <p class="text-xs font-bold text-mk-600">System Update</p>
+          <p class="text-sm">Estimate template has been added</p>
+          <p class="text-[10px] text-slate-400 mt-1">2024/05/20</p>
+        </div>
+
+        <!-- Pending Approval -->
+        <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-sm">
+          <p class="text-xs font-bold text-amber-600">Pending Approval</p>
+          <p class="text-sm">{{ pending_estimates }} estimates are pending approval</p>
+          <p class="text-[10px] text-slate-400 mt-1">2024/05/18</p>
+        </div>
+      </section>
+
+      <!-- Docs -->
+      <a href="/docs" class="block bg-slate-800 p-5 rounded-xl text-white">
+        <p class="font-bold text-sm">Developer Documentation</p>
+        <p class="text-[10px] text-slate-400 mt-1">FastAPI API仕様はこちら</p>
+      </a>
+
+    </div>
   </div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="bg-white border-t">
+  <div class="max-w-7xl mx-auto px-6 py-3 text-xs text-slate-400 flex justify-between">
+    <span>© {{ current_year }} MK Giken Co., Ltd.</span>
+    <span>Powered by FastAPI & Python</span>
+  </div>
+</footer>
+
 </body>
 </html>

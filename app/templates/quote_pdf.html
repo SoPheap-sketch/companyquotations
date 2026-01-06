@@ -8,7 +8,6 @@
     size: A4;
     margin: 15mm;
 }
-
 * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -45,21 +44,55 @@ th, td {
 
 .no-border {
     border: none !important;
+    
 }
 
 .right { text-align: right; }
 .center { text-align: center; }
+.amount-bar{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+
+}
+.amount-bar td{
+    border:1px solid #333;
+    padding: 8px 10px;
+    vertical-align : middle;
+    
+}
+.amount-label-box{
+    background-color: #2f4f6f;
+    color: #fff;
+    width: 30%;
+    font-weight: bold;
+    text-align: center;
+    font-size: 12px;
+}
+.amount-value-box{
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+}
 
 /* ---------- Stamps ---------- */
 .stamp-box {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border: 1px solid #000;
-    text-align: center;
     font-size: 9px;
-}
+    vertical-align:top;
+    padding: 2px;
 
-/* ---------- Items ---------- */
+}
+.stamp-title{
+    border-bottom: 1px solid #000;
+    text-align:center;
+    font-weight: bold;
+    margin-bottom: 2px;
+
+
+}
 .items th {
     background: #2f4f6f;
     color: #fff;
@@ -95,41 +128,44 @@ th, td {
 
     <p style="margin:10px 0;">下記の通り、御請求申し上げます。</p>
 
-    <table class="no-border" style="border-bottom:2px solid #000; margin-bottom:10px;">
+    <table class="amount-bar">
         <tr>
-            <td class="no-border" style="font-size:14px;">ご請求金額</td>
-            <td class="no-border right" style="font-size:22px; font-weight:bold;">
-                ¥{{ "{:,}".format(quote.total|int) }}（税込）
+            <td class="amount-label-box">ご請求金額</td>
+            <td class="amount-value-box">
+                ¥{{ "{:,}".format(total) }}<span style=" font-size:12px;">（税込）</span>
             </td>
         </tr>
     </table>
-
+    <div class="payment-due">
+       お支払期限：{{ payment_due or "—" }}
+    </div>
     件名：{{ quote.title or "" }}
 </td>
-
-<!-- RIGHT -->
 <td class="no-border right" style="width:40%; vertical-align:top;">
     発行日：{{ quote.created_at.strftime('%Y/%m/%d') }}<br>
     No：INV-{{ quote.id }}<br><br>
 
-    <strong>{{ quote.company_name }}</strong><br>
+    <strong>MK技建株式会社</strong><br>
     〒100-0001<br>
     東京都千代田区千代田1-1-1<br>
     TEL: 03-1234-5678
 
     <table class="no-border" style="margin-top:10px; margin-left:auto;">
         <tr>
-            <td class="stamp-box">承認</td>
-            <td class="stamp-box">検印</td>
-            <td class="stamp-box">担当</td>
+            <td class="stamp-box">
+                <div class="stamp-title">承認</div>
+            </td>
+            <td class="stamp-box">
+                <div class="stamp-title">検印</div>
+            </td>
+            <td class="stamp-box">
+                <div class="stamp-title">担当</div>
+            </td>
         </tr>
     </table>
 </td>
-
 </tr>
 </table>
-
-<!-- ================= ITEMS ================= -->
 <table class="items" style="margin-bottom:15px;">
 <thead>
 <tr>
@@ -143,8 +179,7 @@ th, td {
 </tr>
 </thead>
 <tbody>
-
-{% for it in quote.items %}
+{% for it in items %}
 <tr>
     <td class="center">{{ loop.index }}</td>
     <td>{{ it.element }}</td>
@@ -164,37 +199,30 @@ th, td {
 
 </tbody>
 </table>
-
-<!-- ================= FOOTER ================= -->
 <table class="no-border">
-<tr>
-
-<td class="no-border" style="width:60%; vertical-align:top;">
-    【備考・振込先】
-    <div style="border:1px solid #000; height:90px; padding:6px; margin-top:5px;">
-        {{ quote.notes or "" | replace('\n','<br>') | safe }}
-    </div>
-</td>
-
-<td class="no-border" style="width:40%; vertical-align:top;">
-    <table>
-        <tr>
-            <td>小計</td>
-            <td class="right">¥{{ "{:,}".format(quote.subtotal|int) }}</td>
-        </tr>
-        <tr>
-            <td>消費税 (10%)</td>
-            <td class="right">¥{{ "{:,}".format(quote.tax|int) }}</td>
-        </tr>
-        <tr class="total-row">
-            <td>合計</td>
-            <td class="right">¥{{ "{:,}".format(quote.total|int) }}</td>
-        </tr>
-    </table>
-</td>
-
-</tr>
+    <tr>
+        <td class="no-border" style="width:60%; vertical-align:top; height: 120px;">【備考・振込先】
+            <div style="border:1px solid #000; height:90px; padding:6px; margin-top:5px;">
+                {{ quote.notes or "" | replace('\n','<br>') | safe }}
+            </div>
+        </td>
+        <td class="no-border" style="width:40%; vertical-align:top; padding-top:28px;">
+            <table>
+                <tr>
+                    <td>小計</td>
+                    <td class="right">¥{{ "{:,}".format(subtotal) }}</td>
+                </tr>
+                <tr>
+                    <td>消費税 (10%)</td>
+                    <td class="right">¥{{ "{:,}".format(tax) }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td>合計</td>
+                    <td class="right">¥{{ "{:,}".format(total) }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 </table>
-
 </body>
 </html>

@@ -4,108 +4,174 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Quote #{{ quote.id if quote else '' }}</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: {500:'#0ea5e9',600:'#0284c7',700:'#0369a1'} } } } }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              500:'#0ea5e9',
+              600:'#0284c7',
+              700:'#0369a1'
+            }
+          }
+        }
+      }
+    }
   </script>
 </head>
+
 <body class="bg-slate-100 font-sans min-h-screen">
-  <header class="bg-white shadow-md border-b border-primary-100">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/projects/{{ quote.project_id if quote else 'list' }}" class="text-slate-600 hover:text-primary-700">← Back</a>
-      <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
-    </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto px-6 py-10">
-    {% if not quote %}
-      <div class="bg-white p-8 rounded shadow">Quote not found</div>
-    {% else %}
-      <div class="bg-white p-8 rounded-xl shadow mb-6">
-        <div class="flex justify-between items-start">
-          <div>
-            <h1 class="text-3xl font-bold text-slate-900">Quote #{{ quote.id }}</h1>
-            <p class="text-slate-600">{{ quote.title or '' }}</p>
-            <p class="text-slate-500 text-sm">Version {{ quote.version }} — Created: {{ quote.created_at }}</p>
-          </div>
-          <div class="text-right space-y-2">
-            <div class="text-sm text-slate-600">Subtotal</div>
-            <div class="text-2xl font-bold">{{ quote.subtotal or 0 }}</div>
+<!-- ================= HEADER ================= -->
+<header class="bg-white shadow-md border-b border-primary-100">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="/projects/{{ quote.project_id if quote else 'list' }}"
+       class="text-slate-600 hover:text-primary-700">← Back</a>
+    <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
+  </div>
+</header>
 
-            <div class="text-sm text-slate-600">
-              Profit margin: {{ (quote.profit_margin*100)|round(0) }}%
-            </div>
+<!-- ================= MAIN ================= -->
+<main class="max-w-6xl mx-auto px-6 py-10">
 
-            <div class="text-3xl font-extrabold text-primary-700">
-              {{ quote.total or 0 }}
-            </div>
+{% if not quote %}
+  <div class="bg-white p-8 rounded shadow">
+    Quote not found
+  </div>
+{% else %}
 
-            <!-- PDF BUTTON -->
-            <div class="mt-4">
-              <a href="/quotes/{{ quote.id }}/pdf"
-                target="_blank"
-                class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900">
-                📄 PDF 出力
-              </a>
-            </div>
-          </div>
+<!-- ===== QUOTE SUMMARY ===== -->
+<div class="bg-white p-8 rounded-xl shadow mb-6">
+  <div class="flex justify-between items-start gap-6">
 
-        </div>
+    <!-- LEFT -->
+    <div>
+      <div class="flex items-center gap-3 mb-1">
+        <h1 class="text-3xl font-bold text-slate-900">
+          Quote #{{ quote.id }}
+        </h1>
+
+        {% if quote.status == "draft" %}
+          <span class="px-3 py-1 text-xs rounded-full bg-slate-200 text-slate-700">
+            Draft
+          </span>
+        {% elif quote.status == "pending" %}
+          <span class="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
+            Pending Approval
+          </span>
+        {% elif quote.status == "approved" %}
+          <span class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700">
+            Approved
+          </span>
+        {% endif %}
       </div>
-      <div class="bg-white p-6 rounded-lg shadow">
-      <table class="w-full text-sm border-collapse">
-        <thead class="text-xs text-primary-700 border-b">
-          <tr>
-            <th class="text-left p-2">工事区分</th>
-            <th class="text-left p-2">工種</th>
-            <th class="text-left p-2">要素</th>
-            <th class="text-left p-2">取引業者</th>
-            <th class="text-right p-2">数量</th>
-            <th class="text-left p-2">単位</th>
-            <th class="text-right p-2">単価</th>
-            <th class="text-right p-2">金額</th>
-            <th class="text-left p-2">備考</th>
-          </tr>
-        </thead>
 
-        <tbody class="divide-y">
-          {% for it in quote.items %}
-          <tr class="hover:bg-slate-50">
-            <td class="p-2">{{ it.work_category or '' }}</td>
-            <td class="p-2">{{ it.work_type or '' }}</td>
-            <td class="p-2">{{ it.element or '' }}</td>
-            <td class="p-2">{{ it.supplier or '' }}</td>
+      <p class="text-slate-600">{{ quote.title or '' }}</p>
+      <p class="text-slate-500 text-sm">
+        Version {{ quote.version }} — Created: {{ quote.created_at }}
+      </p>
+    </div>
 
-            <!-- 数量 -->
-            <td class="p-2 text-right font-mono">
-              {{ "%.2f"|format(it.quantity or 0) }}
-            </td>
+    <!-- RIGHT -->
+    <div class="text-right space-y-2">
 
-            <!-- 単位 -->
-            <td class="p-2">{{ it.unit or '' }}</td>
+      <div class="text-sm text-slate-600">
+        Original Cost (Subtotal)
+      </div>
+      <div class="text-2xl font-bold">
+        ¥{{ "{:,.0f}".format(quote.subtotal or 0) }}
+      </div>
 
-            <!-- 単価 -->
-            <td class="p-2 text-right font-mono">
-              {{ it.unit_price | round(0) }}
-            </td>
+      <div class="text-sm text-slate-600">
+        Profit margin: {{ (quote.profit_margin * 100)|round(0) }}%
+      </div>
 
-            <!-- 金額 -->
-            <td class="p-2 text-right font-mono font-semibold">
-              {{ it.amount | round(0) }}
-            </td>
+      <div class="text-sm text-slate-600 font-bold mt-2">
+        Selling Price (Inc. Tax)
+      </div>
+      <div class="text-3xl font-extrabold text-primary-700">
+        ¥{{ "{:,.0f}".format(quote.total or 0) }}
+      </div>
 
-            <!-- 備考 -->
-            <td class="p-2">{{ it.remark or '' }}</td>
-          </tr>
-          {% endfor %}
-         
-        </tbody>
-      </table>
+      <!-- PDF -->
+      <div class="mt-4">
+        <a href="/quotes/{{ quote.id }}/pdf"
+           target="_blank"
+           class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900">
+          📄 PDF Export
+        </a>
+      </div>
+
+      <!-- SUBMIT FOR APPROVAL -->
+      {% if quote.status == "draft" %}
+      <form method="post" action="/quotes/{{ quote.id }}/submit" class="mt-3">
+        <button type="submit"
+          class="bg-amber-500 text-white px-5 py-2 rounded hover:bg-amber-600 font-semibold text-sm">
+          📨 Submit for Approval
+        </button>
+      </form>
+      {% endif %}
+
+      <!-- APPROVE (ADMIN ONLY) -->
+      {% if quote.status == "pending" and role == "admin" %}
+      <form method="post" action="/quotes/{{ quote.id }}/approve" class="mt-3">
+        <button type="submit"
+          class="bg-emerald-600 text-white px-5 py-2 rounded hover:bg-emerald-700 font-semibold text-sm">
+          ✅ Approve Quote
+        </button>
+      </form>
+      {% endif %}
 
     </div>
-   
-    {% endif %}
-  </main>
-  
+  </div>
+</div>
+
+<!-- ===== ITEMS TABLE ===== -->
+<div class="bg-white p-6 rounded-lg shadow">
+  <table class="w-full text-sm border-collapse">
+    <thead class="text-xs text-primary-700 border-b">
+      <tr>
+        <th class="text-left p-2">Work Category</th>
+        <th class="text-left p-2">Work Type</th>
+        <th class="text-left p-2">Element</th>
+        <th class="text-left p-2">Supplier</th>
+        <th class="text-right p-2">Qty</th>
+        <th class="text-left p-2">Unit</th>
+        <th class="text-right p-2">Unit Price</th>
+        <th class="text-right p-2">Amount</th>
+        <th class="text-left p-2">Remark</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y">
+      {% for it in quote.items %}
+      <tr class="hover:bg-slate-50">
+        <td class="p-2">{{ it.work_category or '' }}</td>
+        <td class="p-2">{{ it.work_type or '' }}</td>
+        <td class="p-2">{{ it.element or '' }}</td>
+        <td class="p-2">{{ it.supplier or '' }}</td>
+        <td class="p-2 text-right font-mono">
+          {{ "%.2f"|format(it.quantity or 0) }}
+        </td>
+        <td class="p-2">{{ it.unit or '' }}</td>
+        <td class="p-2 text-right font-mono">
+          {{ it.unit_price | round(0) }}
+        </td>
+        <td class="p-2 text-right font-mono font-semibold">
+          {{ it.amount | round(0) }}
+        </td>
+        <td class="p-2">{{ it.remark or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endif %}
+</main>
+
 </body>
 </html>
