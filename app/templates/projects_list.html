@@ -72,8 +72,16 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ p.contact or '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                   <a href="/projects/{{ p.id }}" class="text-primary-600 hover:text-primary-700 font-medium mr-4">View</a>
-                  <a href="/quotes/{{ p.id }}/edit" class="text-sky-600 hover:text-sky-700 font-medium mr-4">Edit</a>
-                  <a href="/projects/{{ p.id }}/delete" class="text-rose-600 hover:text-rose-700 font-medium">Delete</a>
+                  <a href="/projects/{{ p.id }}/edit" class="text-sky-600 hover:text-sky-700 font-medium mr-4">Edit</a>
+                  <form action="/projects/{{ p.id }}/delete"
+                        method="post"
+                        class="inline"
+                        onsubmit="return confirm('Delete this project?')">
+                    <button class="text-rose-600 hover:underline">
+                      Delete
+                    </button>
+                  </form>
+
                 </td>
               </tr>
               {% endfor %}

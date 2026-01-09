@@ -122,64 +122,108 @@
 
       <!-- 最近の更新 -->
       <section>
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-          Recent Activity
-        </h2>
-        
-        <div class="bg-white rounded-xl shadow-sm divide-y">
-          {% for project in recent_projects %}
-            <a href="/projects/{{ project.id }}"
-              class="block p-4 text-sm hover:bg-slate-50 transition">
-              <div class="flex justify-between items-center">
-                <span class="font-medium">
-                  {{ project.client_name }}
-                </span>
-                <span class="text-xs text-slate-400">
-                  Project
-                </span>
-              </div>
-            </a>
-          {% else %}
-            <div class="p-4 text-sm text-slate-400">
-              No recent projects
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <h3 class="text-sm font-semibold text-slate-500 mb-6 flex items-center gap-2">
+            <span class="w-2 h-2 bg-primary-600 rounded-full"></span>
+            Recent Activity
+          </h3>
+
+          <!-- ================= PROJECTS ================= -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                Recent Projects
+              </p>
+              <a href="/projects/list"
+                class="text-xs text-primary-600 hover:underline">
+                View all →
+              </a>
             </div>
-          {% endfor %}
 
-          <!-- Recent Quotes -->
-          {% for quote in recent_quotes %}
-            <a href="/quotes/{{ quote.id }}"
-              class="block p-4 text-sm bg-slate-50 hover:bg-slate-100 transition">
-              <div class="flex justify-between items-center">
-                <span class="font-medium">
-                  Quote #{{ quote.id }}
-                </span>
-                {% if quote.status == "draft" %}
-                  <span class="px-2 py-1 text-xs rounded-full bg-slate-200 text-slate-700">
-                    Draft
-                  </span>
-                {% elif quote.status == "pending" %}
-                  <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
-                    Pending
-                  </span>
-                {% elif quote.status == "approved" %}
-                  <span class="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700">
-                    Approved
-                  </span>
-                {% else %}
-                  <span class="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-400">
-                    Unknown
-                  </span>
-                {% endif %}
+            {% if recent_projects %}
+              <ul class="space-y-3">
+                {% for p in recent_projects %}
+                <li>
+                  <a href="/projects/{{ p.id }}"
+                    class="flex items-center justify-between bg-slate-50 hover:bg-primary-50 transition rounded-lg px-4 py-3 group">
 
-              </div>
-            </a>
-          {% else %}
-            <div class="p-4 text-sm text-slate-400">
-              No recent quotes
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-primary-100 text-primary-700
+                                  flex items-center justify-center font-bold">
+                        {{ p.client_name[0] }}
+                      </div>
+
+                      <div>
+                        <p class="font-semibold text-slate-700 group-hover:text-primary-700">
+                          {{ p.client_name }}
+                        </p>
+                        <p class="text-xs text-slate-400">
+                          Created {{ p.created_at.strftime("%Y-%m-%d") }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span class="text-slate-400 group-hover:text-primary-600">→</span>
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-sm text-slate-400">No recent projects</p>
+            {% endif %}
+          </div>
+
+          <hr class="my-6">
+
+          <!-- ================= QUOTES ================= -->
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                Recent Quotes
+              </p>
             </div>
-          {% endfor %}
 
+
+            {% if recent_quotes %}
+              <ul class="space-y-3">
+                {% for q in recent_quotes %}
+                <li>
+                  <a href="/quotes/{{ q.id }}"
+                    class="flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition rounded-lg px-4 py-3">
+
+                    <div>
+                      <p class="font-semibold text-slate-700">
+                        Quote #{{ q.id }} — {{ q.title or "Untitled" }}
+                      </p>
+                      <p class="text-xs text-slate-400">
+                        {{ q.created_at.strftime("%Y-%m-%d") }}
+                      </p>
+                    </div>
+
+                    <!-- STATUS BADGE -->
+                    {% if q.status == "draft" %}
+                      <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
+                        Draft
+                      </span>
+                    {% elif q.status == "pending" %}
+                      <span class="px-3 py-1 text-xs rounded-full bg-yellow-200 text-yellow-800">
+                        Pending
+                      </span>
+                    {% elif q.status == "approved" %}
+                      <span class="px-3 py-1 text-xs rounded-full bg-green-200 text-green-800">
+                        Approved
+                      </span>
+                    {% endif %}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="text-sm text-slate-400">No recent quotes</p>
+            {% endif %}
+          </div>
         </div>
+
       </section>
     </div>
 
@@ -214,7 +258,6 @@
     </div>
   </div>
 </main>
-
 <!-- ================= FOOTER ================= -->
 <footer class="bg-white border-t">
   <div class="max-w-7xl mx-auto px-6 py-3 text-xs text-slate-400 flex justify-between">

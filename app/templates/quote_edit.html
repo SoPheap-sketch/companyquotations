@@ -26,9 +26,15 @@
 <header class="bg-white shadow-sm border-b sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
     <a href="/projects/{{ project_id }}" class="text-slate-500 hover:text-sky-600 font-medium">← Back to Project</a>
-    <button id="saveBtn" class="bg-sky-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg hover:bg-sky-700">
-      Save All Changes
-    </button>
+    {% if quote.status != "approved" %}
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+        Save
+      </button>
+    {% else %}
+      <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded cursor-not-allowed">
+        Approved (Locked)
+      </button>
+    {% endif %}
   </div>
 </header>
 
