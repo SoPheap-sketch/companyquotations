@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | MK Giken Quotation System</title>
+
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .bg-construction {
+      background-image: url('/static/images/background.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body class="bg-construction min-h-screen relative font-sans">
+
+  <!-- OVERLAY -->
+  <div class="absolute inset-0 bg-slate-900/70"></div>
+
+  <!-- CONTENT -->
+  <div class="relative min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+
+      <!-- HEADER -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 border border-white/20 mb-5">
+          <span class="text-white text-3xl font-extrabold">MK</span>
+        </div>
+        <h1 class="text-3xl font-extrabold text-white">
+          MK Giken Co., Ltd
+        </h1>
+        <p class="text-slate-300 mt-2 font-medium">
+          Quotation & Project Management System
+        </p>
+      </div>
+
+      <!-- LOGIN CARD -->
+      <div class="bg-white/95 rounded-[2.5rem] p-8 shadow-2xl">
+
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-slate-800">
+            Login to System
+          </h2>
+          <p class="text-slate-500 text-sm">
+            Please enter your account information
+          </p>
+        </div>
+
+        <form method="post" action="/login" class="space-y-6">
+
+          <!-- USER -->
+          <div>
+            <label class="text-sm font-bold text-slate-700">Username</label>
+            <div class="relative mt-2">
+              <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+              <input
+                name="username"
+                required
+                class="w-full pl-12 pr-4 py-4 border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <!-- PASSWORD -->
+          <div>
+            <label class="text-sm font-bold text-slate-700">Password</label>
+            <div class="relative mt-2">
+              <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+              <input
+                type="password"
+                name="password"
+                required
+                class="w-full pl-12 pr-4 py-4 border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <!-- REMEMBER -->
+          <label class="flex items-center gap-3 text-sm text-slate-600">
+            <input type="checkbox" class="rounded text-primary-600">
+            Remember me
+          </label>
+
+          <!-- BUTTON -->
+          <button
+            class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-primary-600 transition flex justify-center gap-2"
+          >
+            Login
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </form>
+
+        <!-- FOOTER -->
+        <p class="mt-6 text-center text-sm text-slate-500">
+          Need help?
+          <a href="#" class="text-primary-600 font-bold">Contact System Admin</a>
+        </p>
+      </div>
+
+      <p class="mt-8 text-center text-xs text-slate-300">
+        © 2026 MK Giken Co., Ltd
+      </p>
+
+    </div>
+  </div>
+  {% if error %}
+    <div class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded">
+      {{ error }}
+    </div>
+  {% endif %}
+  <script>
+    lucide.createIcons();
+  </script>
+
+</body>
+</html>

@@ -6,6 +6,8 @@ from sqlalchemy.orm import relationship
 from datetime import datetime, timedelta
 from app.db import Base
 
+from sqlalchemy import Column, Integer, String, Boolean
+
 # ----------------------------------------
 # Your original model (KEEP THIS)
 # ----------------------------------------
@@ -99,3 +101,17 @@ class QuoteItem(Base):
     # Relationship
     quote = relationship("Quote", back_populates="items")
     
+
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, default=False)
+    
+
+    department = Column(String(50), nullable=True)
+    job_title = Column(String(100), nullable=True)

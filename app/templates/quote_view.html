@@ -118,11 +118,9 @@
       {% endif %}
 
       <!-- APPROVE -->
-      {% if quote.status == "pending" %}
+      {% if quote.status == "pending" and request.session.get("is_admin") %}
       <form method="post" action="/quotes/{{ quote.id }}/approve" class="mt-3">
-        <button
-          type="submit"
-          class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-semibold">
+        <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-semibold">
           ✅ Approve Quote
         </button>
       </form>
