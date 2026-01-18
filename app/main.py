@@ -10,6 +10,7 @@ from app.routes.quotes import router as quotes_router
 
 from starlette.middleware.sessions import SessionMiddleware
 from app.routes.auth import router as auth_router
+from app.routes import admin
 
 app = FastAPI(title="Company Quotation System")
 app.add_middleware(
@@ -29,3 +30,4 @@ app.include_router(pages_router)
 app.include_router(api_router)
 app.include_router(quotes_router)
 app.include_router(auth_router)
+app.include_router(admin.router)

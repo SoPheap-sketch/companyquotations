@@ -1,23 +1,30 @@
 {% extends "base.html" %}
-
 {% block title %}User Management{% endblock %}
-
 {% block content %}
 
-<h1 class="text-2xl font-bold mb-6">
-  Admin → User Management
-</h1>
+<!-- ================= HEADER ================= -->
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-2xl font-bold">Admin → User Management</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Manage user roles and departments.
+      <span class="text-red-500 font-semibold">
+        You cannot change your own role.
+      </span>
+    </p>
+  </div>
 
-<p class="text-sm text-slate-500 mb-4">
-  Manage user roles and departments.  
-  <span class="text-red-500 font-semibold">
-    You cannot change your own role.
-  </span>
-</p>
+  <button
+    onclick="document.getElementById('addUserModal').classList.remove('hidden')"
+    class="bg-mk-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-mk-700">
+    ➕ Add User
+  </button>
+</div>
 
+<!-- ================= USER TABLE ================= -->
 <div class="bg-white rounded-xl shadow overflow-hidden">
   <table class="w-full text-sm">
-    <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+    <thead class="bg-slate-100 text-xs uppercase text-slate-600">
       <tr>
         <th class="px-4 py-3 text-left">Username</th>
         <th class="px-4 py-3 text-left">Role</th>
@@ -38,33 +45,24 @@
           {% endif %}
         </td>
 
-        <!-- ROLE -->
-        <td class="px-4 py-3">
+        <!-- ROLE + DEPARTMENT -->
+        <td colspan="2" class="px-4 py-3">
           <form method="post" action="/admin/users/update" class="flex gap-2 items-center">
             <input type="hidden" name="user_id" value="{{ u.id }}">
 
             <select
               name="role"
-              class="border rounded px-2 py-1 text-sm
-                     {% if u.id == request.session.get('user_id') %}
-                       bg-slate-100 cursor-not-allowed
-                     {% endif %}"
+              class="border rounded px-2 py-1 text-sm"
               {% if u.id == request.session.get("user_id") %}disabled{% endif %}
             >
               <option value="staff" {% if u.role == "staff" %}selected{% endif %}>Staff</option>
               <option value="manager" {% if u.role == "manager" %}selected{% endif %}>Manager</option>
               <option value="admin" {% if u.role == "admin" %}selected{% endif %}>Admin</option>
             </select>
-        </td>
 
-        <!-- DEPARTMENT -->
-        <td class="px-4 py-3">
             <select
               name="department"
-              class="border rounded px-2 py-1 text-sm
-                     {% if u.id == request.session.get('user_id') %}
-                       bg-slate-100 cursor-not-allowed
-                     {% endif %}"
+              class="border rounded px-2 py-1 text-sm"
               {% if u.id == request.session.get("user_id") %}disabled{% endif %}
             >
               <option value="">—</option>
@@ -77,13 +75,10 @@
         <!-- ACTION -->
         <td class="px-4 py-3">
             {% if u.id == request.session.get("user_id") %}
-              <span class="text-xs text-slate-400">
-                Cannot edit yourself
-              </span>
+              <span class="text-xs text-slate-400">Cannot edit yourself</span>
             {% else %}
               <button
-                class="bg-mk-600 text-white px-3 py-1 rounded text-xs
-                       hover:bg-mk-700 transition">
+                class="bg-mk-600 text-white px-3 py-1 rounded text-xs hover:bg-mk-700">
                 Save
               </button>
             {% endif %}
@@ -94,6 +89,60 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
+
+<!-- ================= ADD USER MODAL ================= -->
+<div id="addUserModal"
+     class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+
+  <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
+    <h2 class="text-lg font-bold mb-4">Add New User</h2>
+
+    <form method="post" action="/admin/users/create" class="space-y-4">
+
+      <div>
+        <label class="text-sm font-semibold">Username</label>
+        <input name="username" required class="w-full border rounded px-3 py-2 text-sm">
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold">Temporary Password</label>
+        <input name="password" type="password" required
+               class="w-full border rounded px-3 py-2 text-sm">
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold">Role</label>
+        <select name="role" class="w-full border rounded px-3 py-2 text-sm">
+          <option value="staff">Staff</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold">Department</label>
+        <select name="department" class="w-full border rounded px-3 py-2 text-sm">
+          <option value="IT">IT</option>
+          <option value="Design">Design</option>
+          <option value="Management">Management</option>
+        </select>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-4">
+        <button type="button"
+          onclick="document.getElementById('addUserModal').classList.add('hidden')"
+          class="px-4 py-2 text-sm border rounded">
+          Cancel
+        </button>
+        <button type="submit"
+          class="px-4 py-2 text-sm bg-mk-600 text-white rounded font-semibold">
+          Create User
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>
 
 {% endblock %}
