@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">
+  Admin → User Management
+</h1>
+
+<p class="text-sm text-slate-500 mb-4">
+  Manage user roles and departments.  
+  <span class="text-red-500 font-semibold">
+    You cannot change your own role.
+  </span>
+</p>
+
+<div class="bg-white rounded-xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-100 text-slate-600 text-xs uppercase">
+      <tr>
+        <th class="px-4 py-3 text-left">Username</th>
+        <th class="px-4 py-3 text-left">Role</th>
+        <th class="px-4 py-3 text-left">Department</th>
+        <th class="px-4 py-3 text-left">Action</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y">
+      {% for u in users %}
+      <tr class="hover:bg-slate-50">
+
+        <!-- USERNAME -->
+        <td class="px-4 py-3 font-semibold">
+          {{ u.username }}
+          {% if u.id == request.session.get("user_id") %}
+            <span class="ml-2 text-[10px] text-slate-400">(You)</span>
+          {% endif %}
+        </td>
+
+        <!-- ROLE -->
+        <td class="px-4 py-3">
+          <form method="post" action="/admin/users/update" class="flex gap-2 items-center">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+
+            <select
+              name="role"
+              class="border rounded px-2 py-1 text-sm
+                     {% if u.id == request.session.get('user_id') %}
+                       bg-slate-100 cursor-not-allowed
+                     {% endif %}"
+              {% if u.id == request.session.get("user_id") %}disabled{% endif %}
+            >
+              <option value="staff" {% if u.role == "staff" %}selected{% endif %}>Staff</option>
+              <option value="manager" {% if u.role == "manager" %}selected{% endif %}>Manager</option>
+              <option value="admin" {% if u.role == "admin" %}selected{% endif %}>Admin</option>
+            </select>
+        </td>
+
+        <!-- DEPARTMENT -->
+        <td class="px-4 py-3">
+            <select
+              name="department"
+              class="border rounded px-2 py-1 text-sm
+                     {% if u.id == request.session.get('user_id') %}
+                       bg-slate-100 cursor-not-allowed
+                     {% endif %}"
+              {% if u.id == request.session.get("user_id") %}disabled{% endif %}
+            >
+              <option value="">—</option>
+              <option value="IT" {% if u.department == "IT" %}selected{% endif %}>IT</option>
+              <option value="Design" {% if u.department == "Design" %}selected{% endif %}>Design</option>
+              <option value="Management" {% if u.department == "Management" %}selected{% endif %}>Management</option>
+            </select>
+        </td>
+
+        <!-- ACTION -->
+        <td class="px-4 py-3">
+            {% if u.id == request.session.get("user_id") %}
+              <span class="text-xs text-slate-400">
+                Cannot edit yourself
+              </span>
+            {% else %}
+              <button
+                class="bg-mk-600 text-white px-3 py-1 rounded text-xs
+                       hover:bg-mk-700 transition">
+                Save
+              </button>
+            {% endif %}
+          </form>
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
