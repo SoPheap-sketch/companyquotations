@@ -69,7 +69,13 @@ class Quote(Base):
     )
 
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    approved_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    approved_by_name = Column(String(100), nullable=True)
+    approved_by_role = Column(String(50), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
 
+    approved_by = relationship("User", lazy="joined")
     # Relationships
     project = relationship("Project", lazy="joined")
     customer = relationship("Customer", lazy="joined")
@@ -101,17 +107,29 @@ class QuoteItem(Base):
     # Relationship
     quote = relationship("Quote", back_populates="items")
     
-
-
-
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
     username = Column(String(50), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
-    is_admin = Column(Boolean, default=False)
-    
 
-    department = Column(String(50), nullable=True)
+    role = Column(String(20), default="staff")     # admin / ceo / staff
+    department = Column(String(100), nullable=True)
     job_title = Column(String(100), nullable=True)
+
+    is_admin = Column(Boolean, default=False)
+#Create Approval Log Model
+class QuoteApprovalLog(Base):
+    __tablename__ = "quote_approval_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    username = Column(String(100), nullable=False)
+    role = Column(String(50), nullable=False)
+    action = Column(String(20), nullable=False)  # approved / rejected
+    note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    # Relationships
+    quote = relationship("Quote", backref="approval_logs")
+    # user = relationship("User")

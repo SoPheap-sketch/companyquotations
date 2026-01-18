@@ -1,10 +1,12 @@
 # app/routes/api.py
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter,Request, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from datetime import timedelta
 
 from app.db import SessionLocal
 from app.models import Project, Quote, QuoteItem
+
+from datetime import datetime
 
 router = APIRouter()  # ✅ THIS LINE IS REQUIRED
 
@@ -43,28 +45,24 @@ def save_quote_items(quote_id: int, data: dict):
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
         if not quote:
             raise HTTPException(status_code=404, detail="Quote not found")
-
+        if quote.status == "approved":
+            raise HTTPException(status_code=403, detail="Approved quotes can't not modified")
         # ===== BASIC INFO =====
         quote.title = data.get("title")
         quote.profit_margin = float(data.get("profit_margin", 0.30))
-
         # ===== AUTO PAYMENT DUE =====
         if not quote.payment_due:
             quote.payment_due = quote.created_at + timedelta(days=30)
-
         # ===== RESET ITEMS =====
         db.query(QuoteItem).filter(
             QuoteItem.quote_id == quote_id
         ).delete()
-
         total_cost = 0
-
         for item in data.get("items", []):
             qty = float(item.get("quantity", 0))
             price = float(item.get("unit_price", 0))
             amount = qty * price
             total_cost += amount
-
             db.add(QuoteItem(
                 quote_id=quote_id,
                 work_category=item.get("work_category"),
@@ -78,7 +76,6 @@ def save_quote_items(quote_id: int, data: dict):
                 spec=item.get("spec"),
                 remark=item.get("remark"),
             ))
-
         # ===== MONEY LOGIC =====
         quote.subtotal = int(total_cost)
         quote.selling_price = int(
@@ -86,48 +83,12 @@ def save_quote_items(quote_id: int, data: dict):
         )
         quote.tax = int(quote.selling_price * 0.10)
         quote.total = quote.selling_price + quote.tax
-
         db.commit()
         return {"message": "Saved successfully"}
-
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
 
-@router.post("/quotes/{quote_id}/submit")
-def submit_quote(quote_id: int):
-    db = SessionLocal()
-    try:
-        quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not quote:
-            raise HTTPException(status_code=404, detail="Quote not found")
 
-        if quote.status != "draft":
-            raise HTTPException(status_code=400, detail="Only draft quotes allowed")
-
-        quote.status = "pending"
-        db.commit()
-    finally:
-        db.close()
-
-    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
-
-@router.post("/quotes/{quote_id}/approve")
-def approve_quote(quote_id: int):
-    db = SessionLocal()
-    try:
-        quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not quote:
-            raise HTTPException(status_code=404, detail="Quote not found")
-
-        if quote.status != "pending":
-            raise HTTPException(status_code=400, detail="Only pending quotes allowed")
-
-        quote.status = "approved"
-        db.commit()
-    finally:
-        db.close()
-
-    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)

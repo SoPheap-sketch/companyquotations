@@ -1,3 +1,4 @@
+<!-- login.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -38,17 +39,12 @@
     }
   </style>
 </head>
-
 <body class="bg-construction min-h-screen relative font-sans">
-
   <!-- OVERLAY -->
   <div class="absolute inset-0 bg-slate-900/70"></div>
-
   <!-- CONTENT -->
   <div class="relative min-h-screen flex items-center justify-center p-4">
-
     <div class="w-full max-w-md">
-
       <!-- HEADER -->
       <div class="text-center mb-8">
         <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 border border-white/20 mb-5">
@@ -61,10 +57,8 @@
           Quotation & Project Management System
         </p>
       </div>
-
       <!-- LOGIN CARD -->
       <div class="bg-white/95 rounded-[2.5rem] p-8 shadow-2xl">
-
         <div class="mb-6">
           <h2 class="text-2xl font-bold text-slate-800">
             Login to System
@@ -73,9 +67,7 @@
             Please enter your account information
           </p>
         </div>
-
         <form method="post" action="/login" class="space-y-6">
-
           <!-- USER -->
           <div>
             <label class="text-sm font-bold text-slate-700">Username</label>
@@ -88,7 +80,6 @@
               />
             </div>
           </div>
-
           <!-- PASSWORD -->
           <div>
             <label class="text-sm font-bold text-slate-700">Password</label>
@@ -102,13 +93,11 @@
               />
             </div>
           </div>
-
           <!-- REMEMBER -->
           <label class="flex items-center gap-3 text-sm text-slate-600">
             <input type="checkbox" class="rounded text-primary-600">
             Remember me
           </label>
-
           <!-- BUTTON -->
           <button
             class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-primary-600 transition flex justify-center gap-2"
@@ -117,18 +106,15 @@
             <i data-lucide="arrow-right" class="w-5 h-5"></i>
           </button>
         </form>
-
         <!-- FOOTER -->
         <p class="mt-6 text-center text-sm text-slate-500">
           Need help?
           <a href="#" class="text-primary-600 font-bold">Contact System Admin</a>
         </p>
       </div>
-
       <p class="mt-8 text-center text-xs text-slate-300">
         © 2026 MK Giken Co., Ltd
       </p>
-
     </div>
   </div>
   {% if error %}

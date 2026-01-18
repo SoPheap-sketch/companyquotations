@@ -11,8 +11,7 @@ from app.db import SessionLocal
 from app.pdf_utils import render_pdf_from_html
 from app.services.auth import login_required, admin_required
 
-from app.models import Project, Quote, QuoteItem, User
-
+from app.models import Project, Quote, QuoteItem, User, QuoteApprovalLog
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
@@ -55,8 +54,6 @@ def dashboard(request: Request):
         )
     finally:
         db.close()
-
-
 # =====================================================
 # PROJECTS
 # =====================================================
@@ -76,15 +73,12 @@ def projects_list(request: Request):
     finally:
         db.close()
 
-
 @router.get("/projects/form", response_class=HTMLResponse, dependencies=[Depends(login_required)])
 def project_form(request: Request):
     return templates.TemplateResponse(
         "projects.html",
         {"request": request, "current_year": datetime.utcnow().year},
     )
-
-
 @router.post("/projects/create", dependencies=[Depends(login_required)])
 def create_project(
     client_name: str = Form(...),
@@ -100,7 +94,6 @@ def create_project(
 
     return RedirectResponse("/projects/list", status_code=303)
 
-
 @router.get("/projects/{project_id}", response_class=HTMLResponse, dependencies=[Depends(login_required)])
 def view_project(request: Request, project_id: int):
     db = SessionLocal()
@@ -115,7 +108,6 @@ def view_project(request: Request, project_id: int):
             .order_by(Quote.id.desc())
             .all()
         )
-
         return templates.TemplateResponse(
             "project_view.html",
             {
@@ -128,7 +120,6 @@ def view_project(request: Request, project_id: int):
         )
     finally:
         db.close()
-
 
 @router.get("/projects/{project_id}/edit", response_class=HTMLResponse, dependencies=[Depends(login_required)])
 def edit_project_form(request: Request, project_id: int):
@@ -148,7 +139,6 @@ def edit_project_form(request: Request, project_id: int):
         )
     finally:
         db.close()
-
 
 @router.post("/projects/{project_id}/edit", dependencies=[Depends(login_required)])
 def edit_project_submit(
@@ -171,8 +161,6 @@ def edit_project_submit(
         db.close()
 
     return RedirectResponse(f"/projects/{project_id}", status_code=303)
-
-
 @router.post("/projects/{project_id}/delete", dependencies=[Depends(login_required)])
 def delete_project(project_id: int):
     db = SessionLocal()
@@ -185,8 +173,6 @@ def delete_project(project_id: int):
         db.close()
 
     return RedirectResponse("/projects/list", status_code=303)
-
-
 # =====================================================
 # NEW QUOTE
 # =====================================================
@@ -220,8 +206,6 @@ def new_quote_form(request: Request, project_id: int):
         )
     finally:
         db.close()
-
-
 # =====================================================
 # QUOTES
 # =====================================================
@@ -234,6 +218,12 @@ def view_quote(request: Request, quote_id: int):
             raise HTTPException(404)
 
         items = db.query(QuoteItem).filter(QuoteItem.quote_id == quote_id).all()
+        approval_logs = (
+            db.query(QuoteApprovalLog)
+            .filter(QuoteApprovalLog.quote_id == quote_id)
+            .order_by(QuoteApprovalLog.created_at.asc())
+            .all()
+        )
 
         return templates.TemplateResponse(
             "quote_view.html",
@@ -241,12 +231,12 @@ def view_quote(request: Request, quote_id: int):
                 "request": request,
                 "quote": quote,
                 "items": items,
+                "approval_logs": approval_logs,
                 "current_year": datetime.utcnow().year,
             },
         )
     finally:
         db.close()
-
 
 @router.get("/quotes/{quote_id}/edit", response_class=HTMLResponse, dependencies=[Depends(login_required)])
 def edit_quote(request: Request, quote_id: int):
@@ -255,10 +245,8 @@ def edit_quote(request: Request, quote_id: int):
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
         if not quote:
             raise HTTPException(404)
-
         if quote.status == "approved":
             raise HTTPException(403, "Approved quotes cannot be edited")
-
         items = db.query(QuoteItem).filter(QuoteItem.quote_id == quote_id).all()
 
         return templates.TemplateResponse(
@@ -279,8 +267,6 @@ def edit_quote(request: Request, quote_id: int):
         )
     finally:
         db.close()
-
-
 @router.post("/quotes/{quote_id}/delete", dependencies=[Depends(login_required)])
 def delete_quote(quote_id: int):
     db = SessionLocal()
@@ -330,31 +316,5 @@ def quote_pdf(request: Request, quote_id: int):
         db.close()
 
 
-@router.post("/quotes/{quote_id}/submit", dependencies=[Depends(login_required)])
-def submit_quote_for_approval(quote_id: int):
-    db = SessionLocal()
-    try:
-        quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not quote or quote.status != "draft":
-            raise HTTPException(400)
-        quote.status = "pending"
-        db.commit()
-    finally:
-        db.close()
-
-    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
 
 
-@router.post("/quotes/{quote_id}/approve", dependencies=[Depends(admin_required)])
-def approve_quote(quote_id: int):
-    db = SessionLocal()
-    try:
-        quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not quote or quote.status != "pending":
-            raise HTTPException(400)
-        quote.status = "approved"
-        db.commit()
-    finally:
-        db.close()
-
-    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
