@@ -8,8 +8,7 @@ from app.models import Project, Quote, QuoteItem
 
 from datetime import datetime
 
-router = APIRouter()  # ✅ THIS LINE IS REQUIRED
-
+router = APIRouter()  
 # ---------------- PROJECT ACTIONS ----------------
 @router.post("/projects/create")
 def create_project(

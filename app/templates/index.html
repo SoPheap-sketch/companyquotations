@@ -1,182 +1,155 @@
+<!--index.html -->
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
-
 {% block content %}
 
 <!-- ================= BUSINESS OVERVIEW ================= -->
 <section>
-  <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+  <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
     Business Overview
   </h2>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="bg-white p-5 rounded-xl shadow-sm">
+    <div class="bg-white p-4 rounded-lg shadow-sm">
       <p class="text-xs text-slate-400">Total Projects</p>
-      <p class="text-3xl font-black mt-2">{{ total_projects }}</p>
+      <p class="text-3xl font-bold mt-1">{{ total_projects }}</p>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow-sm">
+    <div class="bg-white p-4 rounded-lg shadow-sm">
       <p class="text-xs text-slate-400">Pending Estimates</p>
-      <p class="text-3xl font-black mt-2">{{ pending_estimates }}</p>
+      <p class="text-3xl font-bold text-amber-600 mt-1">{{ pending_estimates }}</p>
     </div>
 
-    <div class="bg-white p-5 rounded-xl shadow-sm">
+    <div class="bg-white p-4 rounded-lg shadow-sm">
       <p class="text-xs text-slate-400">Approved Quotes</p>
-      <p class="text-3xl font-black mt-2">{{ approved_quotes }}</p>
+      <p class="text-3xl font-bold text-emerald-600 mt-1">{{ approved_quotes }}</p>
     </div>
   </div>
 </section>
 
 <!-- ================= MAIN GRID ================= -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-10">
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-6 mt-6">
 
-  <!-- ================= LEFT ================= -->
-  <div class="lg:col-span-2 space-y-8">
+  <!-- LEFT -->
+  <div class="xl:col-span-3 space-y-6">
 
     <!-- QUICK ACTIONS -->
     <section>
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+      <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
         Quick Actions
       </h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <a href="/projects/form"
-           class="bg-white p-5 rounded-xl shadow-sm flex items-center gap-4 hover:ring-2 ring-mk-600">
-          <div class="w-12 h-12 rounded-xl bg-mk-600/10 text-mk-600 flex items-center justify-center text-xl">
-            ＋
+           class="bg-white p-4 rounded-lg shadow-sm flex items-center gap-4 hover:ring-1 ring-mk-600">
+          <div class="w-10 h-10 rounded-lg bg-mk-600/10 text-mk-600 flex items-center justify-center text-lg">
+            +
           </div>
           <div>
-            <p class="font-bold">New Project</p>
-            <p class="text-xs text-slate-400">Create a new project</p>
+            <p class="font-semibold">New Project</p>
+            <p class="text-xs text-slate-400">Create new project</p>
           </div>
         </a>
 
         <a href="/projects/list"
-           class="bg-white p-5 rounded-xl shadow-sm flex items-center gap-4 hover:ring-2 ring-mk-600">
-          <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-lg">
-            📂
+           class="bg-white p-4 rounded-lg shadow-sm flex items-center gap-4 hover:ring-1 ring-mk-600">
+          <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+            📁
           </div>
           <div>
-            <p class="font-bold">Project List</p>
-            <p class="text-xs text-slate-400">View projects & estimates</p>
+            <p class="font-semibold">Project List</p>
+            <p class="text-xs text-slate-400">View projects</p>
           </div>
         </a>
       </div>
     </section>
 
     <!-- RECENT ACTIVITY -->
-    <section class="bg-white rounded-2xl shadow-sm p-6">
-      <h3 class="text-sm font-semibold text-slate-500 mb-6">
+    <section class="bg-white rounded-lg shadow-sm p-4">
+      <h3 class="text-sm font-semibold text-slate-600 mb-4">
         Recent Activity
       </h3>
 
-      <!-- RECENT PROJECTS -->
-      <div class="mb-6">
-        <div class="flex justify-between items-center mb-3">
-          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-            Recent Projects
-          </p>
-          <a href="/projects/list" class="text-xs text-mk-600 hover:underline">
-            View all →
-          </a>
-        </div>
-
-        {% if recent_projects %}
-          <ul class="space-y-3">
-            {% for p in recent_projects %}
-              <li>
-                <a href="/projects/{{ p.id }}"
-                   class="flex justify-between items-center bg-slate-50 hover:bg-slate-100 rounded-lg px-4 py-3">
-                  <div>
-                    <p class="font-semibold text-slate-700">{{ p.client_name }}</p>
-                    <p class="text-xs text-slate-400">
-                      {{ p.created_at.strftime("%Y-%m-%d") }}
-                    </p>
-                  </div>
-                  <span class="text-slate-400">→</span>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-sm text-slate-400">No recent projects</p>
-        {% endif %}
-      </div>
-
-      <hr class="my-6">
-
-      <!-- RECENT QUOTES -->
-      <div>
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
-          Recent Quotes
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-slate-400 uppercase mb-2">
+          Recent Projects
         </p>
 
-        {% if recent_quotes %}
-          <ul class="space-y-3">
-            {% for q in recent_quotes %}
-              <li>
-                <a href="/quotes/{{ q.id }}"
-                   class="flex justify-between items-center bg-slate-50 hover:bg-slate-100 rounded-lg px-4 py-3">
-                  <div>
-                    <p class="font-semibold text-slate-700">
-                      Quote #{{ q.id }} — {{ q.title or "Untitled" }}
-                    </p>
-                    <p class="text-xs text-slate-400">
-                      {{ q.created_at.strftime("%Y-%m-%d") }}
-                    </p>
-                  </div>
-
-                  {% if q.status == "draft" %}
-                    <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
-                      Draft
-                    </span>
-                  {% elif q.status == "pending" %}
-                    <span class="px-3 py-1 text-xs rounded-full bg-yellow-200 text-yellow-800">
-                      Pending
-                    </span>
-                  {% elif q.status == "approved" %}
-                    <span class="px-3 py-1 text-xs rounded-full bg-green-200 text-green-800">
-                      Approved
-                    </span>
-                  {% endif %}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-sm text-slate-400">No recent quotes</p>
-        {% endif %}
+        <ul class="space-y-2">
+          {% for p in recent_projects %}
+          <li>
+            <a href="/projects/{{ p.id }}"
+               class="flex justify-between items-center bg-slate-50 hover:bg-slate-100 rounded-md px-4 py-2">
+              <div>
+                <p class="font-semibold text-sm">{{ p.client_name }}</p>
+                <p class="text-xs text-slate-400">{{ p.created_at.strftime("%Y-%m-%d") }}</p>
+              </div>
+              <span class="text-slate-400">→</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
-    </section>
 
+      <hr class="my-4">
+
+      <p class="text-xs font-semibold text-slate-400 uppercase mb-2">
+        Recent Quotes
+      </p>
+
+      <ul class="space-y-2">
+        {% for q in recent_quotes %}
+        <li>
+          <a href="/quotes/{{ q.id }}"
+             class="flex justify-between items-center bg-slate-50 hover:bg-slate-100 rounded-md px-4 py-2">
+            <div>
+              <p class="font-semibold text-sm">
+                Quote #{{ q.id }} — {{ q.title or "Untitled" }}
+              </p>
+              <p class="text-xs text-slate-400">
+                {{ q.created_at.strftime("%Y-%m-%d") }}
+              </p>
+            </div>
+
+            {% if q.status == "draft" %}
+              <span class="text-xs px-2 py-0.5 bg-gray-200 rounded-full">Draft</span>
+            {% elif q.status == "pending" %}
+              <span class="text-xs px-2 py-0.5 bg-yellow-200 rounded-full">Pending</span>
+            {% elif q.status == "approved" %}
+              <span class="text-xs px-2 py-0.5 bg-green-200 rounded-full">Approved</span>
+            {% endif %}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
   </div>
 
-  <!-- ================= RIGHT ================= -->
+  <!-- RIGHT -->
   <div class="space-y-4">
     <section>
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+      <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
         Notifications
       </h2>
 
-      <div class="bg-white p-4 rounded-xl border-l-4 border-mk-600 shadow-sm mb-4">
-        <p class="text-xs font-bold text-mk-600">System Update</p>
-        <p class="text-sm">Estimate template has been added</p>
-        <p class="text-[10px] text-slate-400 mt-1">2026/01/12</p>
+      <div class="bg-white p-3 rounded-lg border-l-4 border-mk-600 shadow-sm mb-2">
+        <p class="text-xs font-semibold text-mk-600">System Update</p>
+        <p class="text-sm">Estimate template added</p>
+        <p class="text-xs text-slate-400">2026/01/12</p>
       </div>
 
-      <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-sm">
-        <p class="text-xs font-bold text-amber-600">Pending Approval</p>
-        <p class="text-sm">{{ pending_estimates }} estimates pending approval</p>
-        <p class="text-[10px] text-slate-400 mt-1">Today</p>
+      <div class="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
+        <p class="text-xs font-semibold text-amber-600">Pending Approval</p>
+        <p class="text-sm">{{ pending_estimates }} pending</p>
       </div>
     </section>
 
-    <a href="/docs" class="block bg-slate-800 p-5 rounded-xl text-white">
-      <p class="font-bold text-sm">Developer Documentation</p>
-      <p class="text-[10px] text-slate-400 mt-1">FastAPI API reference</p>
+    
+    <a href="/docs" class="block bg-slate-800 p-4 rounded-lg text-white border-l-4 border-red-700 shadow-sm">
+      <p class="font-semibold text-sm text-red-600">Developer Docs</p>
+      <p class="text-xs text-slate-400">FastAPI reference</p>
     </a>
   </div>
-
 </div>
 
 {% endblock %}

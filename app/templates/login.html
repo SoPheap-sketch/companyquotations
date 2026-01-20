@@ -1,10 +1,9 @@
-<!-- login.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | MK Giken Quotation System</title>
+  <title>Login | MK Giken System</title>
 
   <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,11 +15,10 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
             primary: {
+              50: '#f0f9ff',
               500: '#0ea5e9',
               600: '#0284c7',
               700: '#0369a1',
@@ -36,92 +34,196 @@
       background-image: url('/static/images/background.jpg');
       background-size: cover;
       background-position: center;
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+    .input-focus {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .input-focus:focus {
+      background-color: white;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.1);
     }
   </style>
 </head>
-<body class="bg-construction min-h-screen relative font-sans">
-  <!-- OVERLAY -->
-  <div class="absolute inset-0 bg-slate-900/70"></div>
+{% if request.session.get("flash_error") %}
+  <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+    {{ request.session.pop("flash_error") }}
+  </div>
+{% endif %}
+
+{% if request.session.get("flash_success") %}
+  <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+    {{ request.session.pop("flash_success") }}
+  </div>
+{% endif %}
+<body class="bg-construction min-h-screen relative font-sans antialiased">
+
+  <!-- DYNAMIC OVERLAY -->
+  <div class="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-slate-800/75 to-slate-900/90"></div>
+
   <!-- CONTENT -->
-  <div class="relative min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-      <!-- HEADER -->
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 border border-white/20 mb-5">
-          <span class="text-white text-3xl font-extrabold">MK</span>
+  <div class="relative min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
+    
+    <!-- Expanded Max Width from 440px to 520px -->
+    <div class="w-full max-w-[520px] animate-in fade-in zoom-in duration-500">
+
+      <!-- BRANDING HEADER -->
+      <div class="text-center mb-12">
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-[28px] bg-white shadow-2xl mb-8 transform transition hover:rotate-3 duration-300">
+          <span class="text-primary-600 text-4xl font-black tracking-tighter">MK</span>
         </div>
-        <h1 class="text-3xl font-extrabold text-white">
+        <h1 class="text-4xl font-extrabold text-white tracking-tight mb-3">
           MK Giken Co., Ltd
         </h1>
-        <p class="text-slate-300 mt-2 font-medium">
-          Quotation & Project Management System
-        </p>
-      </div>
-      <!-- LOGIN CARD -->
-      <div class="bg-white/95 rounded-[2.5rem] p-8 shadow-2xl">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-slate-800">
-            Login to System
-          </h2>
-          <p class="text-slate-500 text-sm">
-            Please enter your account information
+        <div class="flex items-center justify-center gap-4">
+          <div class="h-px w-12 bg-primary-500/40"></div>
+          <p class="text-slate-300 text-sm font-semibold uppercase tracking-[0.2em]">
+            Quotation & Project System
           </p>
+          <div class="h-px w-12 bg-primary-500/40"></div>
         </div>
-        <form method="post" action="/login" class="space-y-6">
-          <!-- USER -->
-          <div>
-            <label class="text-sm font-bold text-slate-700">Username</label>
-            <div class="relative mt-2">
-              <i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
-              <input
-                name="username"
-                required
-                class="w-full pl-12 pr-4 py-4 border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
-              />
-            </div>
-          </div>
-          <!-- PASSWORD -->
-          <div>
-            <label class="text-sm font-bold text-slate-700">Password</label>
-            <div class="relative mt-2">
-              <i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
-              <input
-                type="password"
-                name="password"
-                required
-                class="w-full pl-12 pr-4 py-4 border rounded-2xl focus:ring-2 focus:ring-primary-500 focus:outline-none"
-              />
-            </div>
-          </div>
-          <!-- REMEMBER -->
-          <label class="flex items-center gap-3 text-sm text-slate-600">
-            <input type="checkbox" class="rounded text-primary-600">
-            Remember me
-          </label>
-          <!-- BUTTON -->
-          <button
-            class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-primary-600 transition flex justify-center gap-2"
-          >
-            Login
-            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-          </button>
-        </form>
-        <!-- FOOTER -->
-        <p class="mt-6 text-center text-sm text-slate-500">
-          Need help?
-          <a href="#" class="text-primary-600 font-bold">Contact System Admin</a>
-        </p>
       </div>
-      <p class="mt-8 text-center text-xs text-slate-300">
-        © 2026 MK Giken Co., Ltd
-      </p>
+
+      <!-- ================= CARD (INCREASED PADDING) ================= -->
+      <div class="glass-card rounded-[3rem] p-8 sm:p-12 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden relative">
+        
+        <!-- Premium Accent Bar -->
+        <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary-600 via-primary-400 to-primary-700"></div>
+
+        {% if mode == "change_password" %}
+          {% if error %}
+            <div class="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              {{ error }}
+            </div>
+          {% endif %}
+
+          <form method="post" action="/change-password" class="space-y-6">
+            <h2 class="text-2xl font-bold text-slate-800">
+              Change Password
+            </h2>
+
+            <p class="text-sm text-slate-500">
+              You must set a strong password before continuing.
+            </p>
+
+            <div>
+              <label class="text-sm font-bold text-slate-700">New Password</label>
+              <input
+                name="new_password"
+                type="password"
+                required
+                class="w-full px-4 py-4 border rounded-2xl focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+
+            <ul class="text-xs text-slate-500 space-y-1">
+              <li>• At least 8 characters</li>
+              <li>• One uppercase letter</li>
+              <li>• One lowercase letter</li>
+              <li>• One number</li>
+              <li>• One special character</li>
+            </ul>
+
+            <button
+              class="w-full bg-primary-600 text-white py-4 rounded-2xl font-bold hover:bg-primary-700"
+            >
+              Update Password
+            </button>
+          </form>
+
+          {% else %}
+
+          <!-- ===== LOGIN MODE ===== -->
+          <div class="mb-10 text-center sm:text-left">
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">System Login</h2>
+            <p class="text-slate-500 text-lg mt-2 font-medium">Manage your quotations and projects.</p>
+          </div>
+
+          {% if error %}
+            <div class="mb-8 flex items-start gap-4 rounded-2xl bg-red-50 border border-red-200 p-5 text-red-700">
+              <i data-lucide="alert-triangle" class="w-6 h-6 flex-shrink-0 mt-0.5"></i>
+              <div>
+                <p class="font-bold text-sm">Login Failed</p>
+                <p class="text-sm opacity-90">{{ error }}</p>
+              </div>
+            </div>
+          {% endif %}
+
+          <form method="post" action="/login" class="space-y-6">
+
+            <!-- USERNAME -->
+            <div>
+              <label class="block text-sm font-bold text-slate-600 uppercase tracking-widest mb-3 ml-1">Username</label>
+              <div class="relative">
+                <i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6"></i>
+                <input
+                  name="username"
+                  required
+                  autocomplete="username"
+                  placeholder="name@mkgiken"
+                  class="w-full pl-14 pr-6 py-5 bg-slate-100 border border-slate-200 rounded-2xl input-focus focus:outline-none text-slate-800 text-lg font-medium"
+                />
+              </div>
+            </div>
+
+            <!-- PASSWORD -->
+            <div>
+              <div class="flex justify-between items-center mb-3 ml-1">
+                <label class="text-sm font-bold text-slate-600 uppercase tracking-widest">Password</label>
+              </div>
+              <div class="relative">
+                <i data-lucide="lock" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6"></i>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  autocomplete="current-password"
+                  placeholder="••••••••"
+                  class="w-full pl-14 pr-6 py-5 bg-slate-100 border border-slate-200 rounded-2xl input-focus focus:outline-none text-slate-800 text-lg font-medium"
+                />
+              </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="pt-4">
+              <button
+                type="submit"
+                class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg hover:bg-primary-600 transition-all shadow-2xl active:scale-[0.99] flex items-center justify-center gap-4 group"
+              >
+                Sign In to Dashboard
+                <i data-lucide="arrow-right-circle" class="w-6 h-6 transition-transform group-hover:translate-x-2"></i>
+              </button>
+            </div>
+          </form>
+
+        {% endif %}
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="mt-12 flex flex-col items-center gap-6">
+        <div class="flex items-center gap-8">
+          <a href="#" class="text-slate-400 text-sm font-medium hover:text-white transition">Help Center</a>
+          <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
+          <a href="#" class="text-slate-400 text-sm font-medium hover:text-white transition">Security Info</a>
+        </div>
+        <div class="text-center">
+          <p class="text-slate-400 text-xs font-semibold tracking-[0.15em]">
+            &copy; 2026 MK GIKEN CO., LTD
+          </p>
+          <p class="text-slate-500 text-[10px] mt-1 font-medium">Precision Management Solutions</p>
+        </div>
+      </div>
+
     </div>
   </div>
-  {% if error %}
-    <div class="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded">
-      {{ error }}
-    </div>
-  {% endif %}
+
   <script>
     lucide.createIcons();
   </script>
