@@ -12,6 +12,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.routes.auth import router as auth_router
 from app.routes import admin
 
+
 app = FastAPI(title="Company Quotation System")
 app.add_middleware(
     SessionMiddleware,

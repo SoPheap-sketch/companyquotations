@@ -119,6 +119,9 @@ class User(Base):
     job_title = Column(String(100), nullable=True)
 
     is_admin = Column(Boolean, default=False)
+
+    is_active = Column(Boolean, default=True)
+    force_password_change = Column(Boolean, default=False)
 #Create Approval Log Model
 class QuoteApprovalLog(Base):
     __tablename__ = "quote_approval_logs"
