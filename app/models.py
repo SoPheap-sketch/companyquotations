@@ -1,3 +1,4 @@
+
 # app/models.py
 from sqlalchemy import (
     Column, Integer, String, Text, Float, DateTime, ForeignKey
@@ -28,6 +29,7 @@ class Project(Base):
         return f"<Project id={self.id} client_name={self.client_name!r}>"
 # ---------- Customer ----------
 class Customer(Base):
+
     __tablename__ = "customers"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -136,3 +138,21 @@ class QuoteApprovalLog(Base):
     # Relationships
     quote = relationship("Quote", backref="approval_logs")
     # user = relationship("User")
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)  
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    username = Column(String(100), nullable=True)
+
+    action = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+
+    ip_address = Column(String(45), nullable=True)
+    user_agent = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", lazy="joined")

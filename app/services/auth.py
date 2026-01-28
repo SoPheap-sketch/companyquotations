@@ -1,27 +1,34 @@
+# app/services/auth.py
 from fastapi import Request, HTTPException
 from fastapi.responses import RedirectResponse
 
 # =========================
-# Login required (ALL USERS)
+# Login required
 # =========================
 def login_required(request: Request):
     if not request.session.get("user_id"):
-        raise HTTPException(
-            status_code=303,
-            headers={"Location": "/login"}
-        )
+        return RedirectResponse("/login", status_code=303)
+
 # =========================
-# Admin required
+# Approver (Admin / Manager / CEO)
 # =========================
-def admin_required(request: Request):
+def approver_required(request: Request):
     if not request.session.get("user_id"):
+        raise HTTPException(status_code=401)
+
+    role = request.session.get("role")
+    if role not in ["admin", "manager", "ceo"]:
         raise HTTPException(
-            status_code=303,
-            headers={"Location": "/login"}
+            status_code=403,
+            detail="Approval permission required"
         )
 
-    if not request.session.get("is_admin"):
-        raise HTTPException(
-            status_code=303,
-            headers={"Location": "/"}
-        )
+# =========================
+# Admin only
+# =========================
+def admin_only(request: Request):
+    if not request.session.get("user_id"):
+        raise HTTPException(status_code=401)
+
+    if request.session.get("role") != "admin":
+        raise HTTPException(status_code=403)

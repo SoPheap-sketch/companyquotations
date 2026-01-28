@@ -5,7 +5,7 @@ from app.models import User
 db = SessionLocal()
 
 users = {
-    "admin3": ("admin", "Management", "System Administrator", True),
+    "admin3": ("admin3", "Management", "System Administrator", True),
     "sopheap1": ("staff", "IT", "IT Engineer / Technical Interpreter", False),
     "architect1": ("staff", "Design", "Architect", False),
     "designer1": ("staff", "Design", "Designer", False),

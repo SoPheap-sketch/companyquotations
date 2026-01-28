@@ -112,12 +112,26 @@
             </div>
 
             {% if q.status == "draft" %}
-              <span class="text-xs px-2 py-0.5 bg-gray-200 rounded-full">Draft</span>
+              <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full">
+                Draft
+              </span>
+
             {% elif q.status == "pending" %}
-              <span class="text-xs px-2 py-0.5 bg-yellow-200 rounded-full">Pending</span>
+              <span class="text-xs px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-full">
+                Pending
+              </span>
+
             {% elif q.status == "approved" %}
-              <span class="text-xs px-2 py-0.5 bg-green-200 rounded-full">Approved</span>
+              <span class="text-xs px-2 py-0.5 bg-green-200 text-green-800 rounded-full">
+                Approved
+              </span>
+
+            {% elif q.status == "rejected" %}
+              <span class="text-xs px-2 py-0.5 bg-red-200 text-red-800 rounded-full">
+                Rejected
+              </span>
             {% endif %}
+
           </a>
         </li>
         {% endfor %}

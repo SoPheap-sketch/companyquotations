@@ -27,7 +27,11 @@
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
     <a href="/projects/{{ project_id }}" class="text-slate-500 hover:text-sky-600 font-medium">← Back to Project</a>
     {% if quote.status != "approved" %}
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+      <button
+        id="saveBtn"
+        type="button"
+        class="bg-blue-600 text-white px-4 py-2 rounded"
+      >
         Save
       </button>
     {% else %}

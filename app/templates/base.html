@@ -45,7 +45,6 @@
               text-white font-bold transition group-hover:bg-mk-700">
         M
       </div>
-
       <div>
         <p class="text-lg leading-none">
           MK Giken Co., Ltd
@@ -54,7 +53,6 @@
           Estimate & Project Management System
         </p>
       </div>
-
     </a>
     <!-- RIGHT -->
     <div class="flex items-center gap-4">
@@ -62,29 +60,30 @@
         <div class="w-8 h-8 rounded-full bg-mk-600 text-white flex items-center justify-center font-bold text-xs">
           {{ request.session.get("username", "U")[0]|upper }}
         </div>
-
         <div class="leading-tight">
           <p class="text-sm font-semibold">
             {{ request.session.get("username", "User") }}
           </p>
-
           <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
             {{ request.session.get("role", "User") | capitalize }}
           </span>
         </div>
       </div>
       <div class="h-5 w-px bg-slate-300"></div>
-
       <!-- USER MANAGER -->
-       {% if request.session.get("role", "").lower() == "admin"%}
-      <a href="/admin/users"
-        class="text-sm text-slate-500 hover:text-mk-600 font-medium">
-        User Manager
-      </a>
-
-      <div class="h-5 w-px bg-slate-300"></div>
+      {% if request.session.get("role", "").lower() == "admin" %}
+        <a href="/admin/users"
+          class="text-sm text-slate-500 hover:text-mk-600 font-medium">
+          User Manager
+        </a>
+        <div class="h-5 w-px bg-slate-300"></div>
+        <!-- ADMIN MENU -->
+        <a href="/admin/audit-logs"
+          class="text-sm text-slate-500 hover:text-mk-600 font-medium">
+          Audit Logs
+        </a>
+        <div class="h-5 w-px bg-slate-300"></div>
       {% endif %}
-
       <!-- LOGOUT -->
       <a href="/logout"
         class="text-sm text-slate-500 hover:text-red-600">

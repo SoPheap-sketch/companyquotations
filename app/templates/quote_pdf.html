@@ -1,3 +1,5 @@
+<!-- quote_pdf.html
+  -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -186,13 +188,15 @@ th, td {
 </thead>
 <tbody>
 {% for it in items %}
+{% set selling_unit_price = (it.unit_price * (1 + quote.profit_margin)) | int %}
+{% set selling_amount = selling_unit_price * it.quantity %}
 <tr>
     <td class="center">{{ loop.index }}</td>
     <td>{{ it.element }}</td>
     <td class="right">{{ it.quantity }}</td>
     <td class="center">{{ it.unit }}</td>
-    <td class="right">¥{{ "{:,}".format(it.unit_price|int) }}</td>
-    <td class="right">¥{{ "{:,}".format(it.amount|int) }}</td>
+    <td class="right">¥{{ "{:,}".format(selling_unit_price) }}</td>
+    <td class="right">¥{{ "{:,}".format(selling_amount) }}</td>
     <td>{{ it.remark or "" }}</td>
 </tr>
 {% endfor %}
