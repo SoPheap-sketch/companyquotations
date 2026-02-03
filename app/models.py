@@ -156,3 +156,79 @@ class AuditLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", lazy="joined")
+
+class WorkInstruction(Base):
+    __tablename__ = "work_instructions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+
+    status = Column(String(20), default="pending")  
+    due_date = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project")
+    creator = relationship("User", foreign_keys=[created_by])
+    assignee = relationship("User",foreign_keys=[assigned_to])
+# class Attachment(Base):
+#     __tablename__ = "attachments"
+
+#     id = Column(Integer, primary_key=True, index=True)
+
+#     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+#     quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=True)
+#     work_instruction_id = Column(
+#         Integer,
+#         ForeignKey("work_instructions.id"),
+#         nullable=True
+#     )
+
+#     uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+#     file_name = Column(String(255), nullable=False)
+#     file_path = Column(String(500), nullable=False)
+#     file_type = Column(String(50), nullable=True)
+
+#     created_at = Column(DateTime, default=datetime.utcnow)
+
+#     project = relationship("Project")
+#     quote = relationship("Quote")
+#     work_instruction = relationship(
+#         "WorkInstruction",
+#         backref="attachments"
+#     )
+#     uploader = relationship("User")
+class Attachment(Base):
+    __tablename__ = "attachments"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=True)
+    work_instruction_id = Column(
+        Integer,
+        ForeignKey("work_instructions.id"),
+        nullable=True
+    )
+
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    file_name = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_type = Column(String(50), nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project")
+    quote = relationship("Quote")
+    work_instruction = relationship(
+        "WorkInstruction",
+        backref="attachments"
+    )
+    uploader = relationship("User")

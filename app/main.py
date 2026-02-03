@@ -1,19 +1,16 @@
-# app/main.py
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from app import db as _db
 from app.routes.pages import router as pages_router
 from app.routes.api import router as api_router
-from app.pdf_utils import render_pdf_from_html
 from app.routes.quotes import router as quotes_router
-
-from starlette.middleware.sessions import SessionMiddleware
 from app.routes.auth import router as auth_router
-from app.routes import admin
-
+from app.routes import admin, attachments, work_instructions
 
 app = FastAPI(title="Company Quotation System")
+
 app.add_middleware(
     SessionMiddleware,
     secret_key="super-secret-key-change-this"
@@ -32,3 +29,5 @@ app.include_router(api_router)
 app.include_router(quotes_router)
 app.include_router(auth_router)
 app.include_router(admin.router)
+app.include_router(work_instructions.router)
+app.include_router(attachments.router)

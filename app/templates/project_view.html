@@ -27,44 +27,35 @@
 
 <header class="bg-white shadow border-b-2 border-primary-600">
   <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-
     <!-- LEFT -->
     <div class="flex items-center gap-4">
-
       <!-- SMART BACK (goes to where user came from) -->
-      <button
-        type="button"
-        onclick="history.back()"
-        class="text-slate-600 hover:text-primary-600 flex items-center gap-2"
-      >
-        ← Back
-      </button>
-
+      <button type="button" onclick="history.back()" class="text-slate-600 hover:text-primary-600 flex items-center gap-2">← Back</button>
       <!-- ALWAYS BACK TO PROJECT -->
       {% if quote %}
-      <a
-        href="/projects/{{ quote.project_id }}"
-        class="text-slate-500 hover:text-primary-600 text-sm"
-      >
-        Back to Project
-      </a>
+      <a href="/projects/{{ quote.project_id }}"class="text-slate-500 hover:text-primary-600 text-sm">Back to Project</a>
       {% endif %}
-
     </div>
 
     <!-- RIGHT -->
     <a href="/" class="text-slate-600 hover:text-primary-600">
       Dashboard
     </a>
-
   </div>
 </header>
-
-
 <main class="flex-1 max-w-6xl mx-auto px-6 py-10 w-full">
+{% if request.session.get("flash_error") %}
+  <div class="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
+    {{ request.session.pop("flash_error") }}
+  </div>
+{% endif %}
 
+{% if request.session.get("flash_success") %}
+  <div class="mb-4 p-3 rounded bg-green-100 text-green-700 text-sm">
+    {{ request.session.pop("flash_success") }}
+  </div>
+{% endif %}
 {% if project %}
-
   <!-- PROJECT HEADER -->
   <div class="flex justify-between items-start mb-6 border-b pb-4">
     <div>
@@ -77,16 +68,21 @@
     </div>
     <div class="flex gap-3">
       <a href="/projects/{{ project.id }}/edit"
-         class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
         Edit Project
       </a>
-      <a href="/projects/{{ project.id }}/delete"
-         class="px-4 py-2 border border-rose-500 text-rose-600 rounded-lg hover:bg-rose-50">
-        Delete
-      </a>
+
+      <form method="post"
+            action="/projects/{{ project.id }}/delete"
+            onsubmit="return confirm('Delete this project?')">
+        <button
+          type="submit"
+          class="px-4 py-2 border border-rose-500 text-rose-600 rounded-lg hover:bg-rose-50">
+          Delete
+        </button>
+      </form>
     </div>
   </div>
-
   <!-- PROJECT INFO -->
   <div class="bg-white rounded-xl shadow p-6 mb-10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,18 +110,148 @@
       </div>
     </div>
   </div>
+  <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                  <h2 class="text-lg font-bold text-slate-800">Work Instructions</h2>
+                  <p class="text-xs text-slate-500">Manage tasks and project documentation</p>
+              </div>
+              {% if request.session.get("role") in ["admin","manager","ceo"] %}
+              <form method="post" action="/projects/{{ project.id }}/instructions/create" class="flex flex-wrap gap-2">
+                  <input name="title" placeholder="Task Title" required 
+                        class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none w-40">
+                  
+                  <input type="date" name="due_date" 
+                        class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                  
+                  <input name="description" placeholder="Instruction detail..." required 
+                        class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none w-52">
 
+                  <select name="assigned_to" class="border border-slate-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500">
+                      <option value="">-- Assign staff --</option>
+                      {% for u in staff_users %}
+                      <option value="{{ u.id }}">{{ u.username }}</option>
+                      {% endfor %}
+                  </select>
+
+                  <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                      + Add Task
+                  </button>
+              </form>
+              {% endif %}
+          </div>
+      </div>
+      {% if instructions %}
+      <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
+                  <tr>
+                      <th class="px-6 py-4">Instruction Detail</th>
+                      <th class="px-6 py-4 text-center">Assigned To</th>
+                      <th class="px-6 py-4 text-center">Status</th>
+                      <th class="px-6 py-4 text-center">Due Date</th>
+                      <th class="px-6 py-4 text-right">Actions</th>
+                  </tr>
+              </thead>
+
+              <tbody class="divide-y divide-slate-100">
+                  {% for i in instructions %}
+                  <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="px-6 py-4 max-w-xs">
+                          <div class="font-bold text-slate-700 mb-1">{{ i.title }}</div>
+                          
+                          {% if i.attachments %}
+                          <div class="flex flex-wrap gap-2 mb-3">
+                              {% for a in i.attachments %}
+                              <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded border border-slate-200 text-[11px] group">
+                                  <a href="/attachments/{{ a.id }}/download"
+                                    class="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                  >
+                                    📎 {{ a.file_name }}
+                                  </a>
+                                  {% if request.session.get("role") in ["admin","manager","ceo"] or a.uploaded_by == request.session.get("user_id") %}
+                                  <form method="post"
+                                        action="/attachments/{{ a.id }}/delete"
+                                        onsubmit="return confirm('Delete this file?')"
+                                        class="inline-block">
+                                    <button type="submit" class="px-4 py-2 border border-rose-500 text-rose-600 rounded-lg hover:bg-rose-50" >Delete </button>
+                                  </form>
+                                  {% endif %}
+                              </div>
+                              {% endfor %}
+                          </div>
+                          {% endif %}
+
+                          <form method="post" action="/attachments/instructions/{{ i.id }}/upload" enctype="multipart/form-data" class="flex items-center gap-2">
+                              <label class="cursor-pointer bg-slate-50 hover:bg-slate-200 border border-dashed border-slate-300 px-2 py-1 rounded text-[10px] font-medium transition-all">
+                                  <span>+ Add File</span>
+                                  <input type="file" name="file" required class="hidden" onchange="this.form.submit()">
+                              </label>
+                              <span class="text-[10px] text-slate-400 italic">Auto-uploads on select</span>
+                          </form>
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                          {% if i.assignee %}
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                              {{ i.assignee.username }}
+                          </span>
+                          {% else %}
+                          <span class="text-slate-400">-</span>
+                          {% endif %}
+                      </td>
+
+                      <td class="px-6 py-4 text-center">
+                          <form method="post" action="/instructions/{{ i.id }}/status">
+                              <select name="status" onchange="this.form.submit()"  class="text-xs font-semibold rounded-full px-3 py-1 border-none focus:ring-0 cursor-pointer
+                                      {% if i.status == 'pending' %} bg-amber-100 text-amber-700 
+                                      {% elif i.status == 'in_progress' %} bg-blue-100 text-blue-700 
+                                      {% else %} bg-emerald-100 text-emerald-700 {% endif %}">
+                                  <option value="pending" {% if i.status=="pending" %}selected{% endif %}>Pending</option>
+                                  <option value="in_progress" {% if i.status=="in_progress" %}selected{% endif %}>In Progress</option>
+                                  <option value="completed" {% if i.status=="completed" %}selected{% endif %}>Completed</option>
+                              </select>
+                          </form>
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                          <div class="text-xs font-medium {{ 'text-red-500' if i.is_overdue else 'text-slate-600' }}">
+                              {{ i.due_date.strftime("%b %d, %Y") if i.due_date else "-" }}
+                          </div>
+                          <div class="text-[10px] text-slate-400">Created: {{ i.created_at.strftime("%Y-%m-%d") }}</div>
+                      </td>
+                      <td class="px-6 py-4 text-right">
+                          {% if request.session.get("role") in ["admin","manager","ceo"] %}
+                          <form method="post" action="/instructions/{{ i.id }}/delete" onsubmit="return confirm('Delete this work instruction?')">
+                              <button class="p-2 text-slate-400 hover:text-red-600 transition-colors">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                              </button>
+                          </form>
+                          {% else %}
+                          -
+                          {% endif %}
+                      </td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      {% else %}
+      <div class="p-12 text-center">
+          <p class="text-slate-400 italic">No work instructions yet. Create one above.</p>
+      </div>
+      {% endif %}
+  </section>
   <!-- QUOTES -->
   <section>
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-between items-center mb-4 mt-5">
       <h2 class="text-2xl font-bold">Quotes</h2>
-
       <a href="/projects/{{ project.id }}/quotes/new"
          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
         + New Quote
       </a>
     </div>
-
     {% if quotes %}
     <div class="bg-white rounded-xl shadow overflow-hidden">
       <table class="w-full text-left">
@@ -138,7 +264,6 @@
             <th class="px-6 py-3 text-right">Actions</th>
           </tr>
         </thead>
-
         <tbody class="divide-y">
           {% for q in quotes %}
             <tr class="hover:bg-slate-50">
@@ -183,7 +308,6 @@
                     Edit
                   </span>
                 {% endif %}
-
                 <!-- DELETE -->
                 <form
                   action="/quotes/{{ q.id }}/delete"
@@ -192,15 +316,14 @@
                   onsubmit="return confirm('Delete this quote?')"
                 >
                   <input type="hidden" name="next" value="/projects/{{ project.id }}">
-                  <button
-                    type="submit"
+                  <button type="submit"
+                    
                     class="px-3 py-1 border border-rose-500 text-rose-600 rounded hover:bg-rose-50"
                   >
                     Delete
                   </button>
                 </form>
               </td>
-
             </tr>
           {% endfor %}
           </tbody>
@@ -212,15 +335,12 @@
       </div>
     {% endif %}
   </section>
-
   {% else %}
-    <div class="bg-white p-8 rounded shadow text-center">
+    <div class="bg-white p-8 rounded shadow text-center ">
       <h2 class="text-2xl font-bold">Project not found</h2>
     </div>
   {% endif %}
-
 </main>
-
 <footer class="bg-white border-t">
   <div class="max-w-6xl mx-auto px-6 py-4 text-sm text-slate-500">
     {{ current_year or '2025' }} — Company Quotation System

@@ -118,19 +118,47 @@ def new_quote_form(request: Request, project_id: int):
 # =============================
 # DELETE QUOTE
 # =============================
+# @router.post("/quotes/{quote_id}/delete")
+# def delete_quote(quote_id: int, next: str = Form(None)):
+#     db = SessionLocal()
+#     try:
+#         quote = db.query(Quote).filter(Quote.id == quote_id).first()
+#         if quote:
+#             project_id = quote.project_id
+#             db.delete(quote)
+#             db.commit()
+#     finally:
+#         db.close()
+
+#     return RedirectResponse(next or f"/projects/{project_id}", status_code=303)
 @router.post("/quotes/{quote_id}/delete")
-def delete_quote(quote_id: int, next: str = Form(None)):
+def delete_quote(request: Request, quote_id: int):
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if quote:
-            project_id = quote.project_id
-            db.delete(quote)
-            db.commit()
+        if not quote:
+            request.session["flash_error"] = "Quote not found."
+            return RedirectResponse("/", status_code=303)
+
+        #  BLOCK approved quote
+        if quote.status == "approved":
+            request.session["flash_error"] = "Approved quotes cannot be deleted."
+            return RedirectResponse(
+                f"/projects/{quote.project_id}",
+                status_code=303
+            )
+
+        db.delete(quote)
+        db.commit()
+
+        request.session["flash_success"] = "Quote deleted successfully."
+
+        return RedirectResponse(
+            f"/projects/{quote.project_id}",
+            status_code=303
+        )
     finally:
         db.close()
-
-    return RedirectResponse(next or f"/projects/{project_id}", status_code=303)
 
 
 # =============================

@@ -15,11 +15,15 @@ from app.models import Project, Quote, QuoteItem, User, QuoteApprovalLog
 from app.utils.audit import write_audit_log
 from app.models import AuditLog   
 from app.services.auth import admin_only
+from app.models import WorkInstruction
 from typing import Optional
 from fastapi import Query
+from app.models import User
+
 import pytz
 import csv
 import io
+
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -133,12 +137,26 @@ def view_project(request: Request, project_id: int):
             .order_by(Quote.id.desc())
             .all()
         )
+        instructions = (
+            db.query(WorkInstruction)
+            .filter(WorkInstruction.project_id == project_id)
+            .order_by(WorkInstruction.created_at.desc())
+            .all()
+        )
+        staff_users = (
+            db.query(User)
+            .filter(User.role == "staff")
+            .order_by(User.username)
+            .all()
+        )
         return templates.TemplateResponse(
             "project_view.html",
             {
                 "request": request,
                 "project": project,
                 "quotes": quotes,
+                "instructions": instructions,
+                "staff_users": staff_users,
                 "created_at": project.created_at.strftime("%Y-%m-%d"),
                 "current_year": datetime.utcnow().year,
             },
@@ -201,28 +219,62 @@ def edit_project_submit(
         db.close()
     return RedirectResponse(f"/projects/{project_id}", status_code=303)
 
-@router.post("/projects/{project_id}/delete", dependencies=[Depends(login_required)])
+@router.post("/projects/{project_id}/delete")
 def delete_project(request: Request, project_id: int):
+    user_id = request.session.get("user_id")
+    role = request.session.get("role")
+
+    if not user_id:
+        raise HTTPException(401)
+
+    if role not in ["admin", "manager", "ceo"]:
+        raise HTTPException(403)
+
     db = SessionLocal()
     try:
         project = db.query(Project).filter(Project.id == project_id).first()
-        if project:
-            project_name = project.client_name
+        if not project:
+            raise HTTPException(404)
 
-            db.delete(project)
-            db.commit()
-
-            write_audit_log(
-                request=request,
-                action="DELETE_PROJECT",
-                description=f"Deleted project '{project_name}' (ID {project_id})",
-                target_user_id=request.session.get("user_id"),
+        # BLOCK if approved quotes exist
+        approved_quotes = (
+            db.query(Quote)
+            .filter(
+                Quote.project_id == project_id,
+                Quote.status == "approved"
             )
+            .count()
+        )
+
+        if approved_quotes > 0:
+            request.session["flash_error"] = (
+                "❌ Cannot delete project. Approved quotes exist."
+            )
+            return RedirectResponse(
+                f"/projects/{project_id}",
+                status_code=303
+            )
+
+        project_name = project.client_name
+
+        db.delete(project)
+        db.commit()
+
+        request.session["flash_success"] = (
+            f"✅ Project '{project_name}' deleted successfully."
+        )
+
+        write_audit_log(
+            request=request,
+            action="DELETE_PROJECT",
+            description=f"Deleted project '{project_name}' (ID {project_id})",
+            target_user_id=user_id,
+        )
+
+        return RedirectResponse("/projects/list", status_code=303)
+
     finally:
         db.close()
-
-    return RedirectResponse("/projects/list", status_code=303)
-
 # =====================================================
 # NEW QUOTE
 # =====================================================
@@ -444,7 +496,6 @@ def audit_logs(
             )
             .outerjoin(User, User.id == AuditLog.user_id)
         )
-
         # =========================
         # APPLY FILTERS
         # =========================
@@ -464,9 +515,8 @@ def audit_logs(
                 AuditLog.created_at
                 < datetime.fromisoformat(to_date) + timedelta(days=1)
             )
-        # =========================
         # EXECUTE QUERY
-        # =========================
+
         logs = query.order_by(AuditLog.created_at.desc()).all()
         # =========================
         # FORMAT FOR TEMPLATE (UTC ➜ CAMBODIA TIME)
@@ -521,7 +571,7 @@ def audit_logs(
 
     finally:
         db.close()
-        
+       
 @router.get(
     "/admin/audit-logs/export",
     dependencies=[Depends(admin_only)],
