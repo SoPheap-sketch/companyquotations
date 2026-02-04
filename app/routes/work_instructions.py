@@ -1,7 +1,8 @@
 # app/routes/work_instructions.py
-from fastapi import APIRouter, Path, Request, Form, HTTPException
+from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from datetime import datetime
+from pathlib import Path as FsPath
 
 from app.db import SessionLocal
 from app.models import WorkInstruction, Project, Attachment
@@ -122,7 +123,6 @@ def update_instruction_status(
         except Exception:
             db.rollback()
             raise HTTPException(status_code=500, detail="Database busy")
-
         return {"message": "Status updated"}
     finally:
         db.close()
@@ -140,20 +140,20 @@ def delete_work_instruction(request: Request, instruction_id: int):
         if not instruction:
             raise HTTPException(404)
 
-        # 🔐 permission: admin OR creator
+        # permission: admin OR creator
         if role not in ["admin", "manager", "ceo"] and instruction.created_by != user_id:
             raise HTTPException(403)
 
         project_id = instruction.project_id
 
-        # 🔥 delete attachments first
+        # delete attachments first
         attachments = db.query(Attachment).filter(
             Attachment.work_instruction_id == instruction_id
         ).all()
 
         for a in attachments:
             if a.file_path:
-                path = Path("app") / a.file_path.lstrip("/")
+                path = FsPath("app") / a.file_path.lstrip("/")
                 if os.path.exists(path):
                     os.remove(path)
             db.delete(a)

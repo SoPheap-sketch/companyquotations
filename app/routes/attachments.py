@@ -1,19 +1,17 @@
-# app/routes/attachments.py
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Form # Added Form
 from fastapi.responses import FileResponse, RedirectResponse
-from pathlib import Path
+from pathlib import Path as FsPath
 from datetime import datetime
 
 from app.db import SessionLocal
 from app.models import Attachment, WorkInstruction
 from app.utils.audit import write_audit_log
 import os
+
 router = APIRouter(prefix="/attachments")
 
-
-UPLOAD_DIR = Path("app/static/uploads/instructions")
+UPLOAD_DIR = FsPath("app/static/uploads/instructions")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
 
 @router.post("/instructions/{instruction_id}/upload")
 def upload_instruction_attachment(
@@ -27,7 +25,6 @@ def upload_instruction_attachment(
 
     db = SessionLocal()
     try:
-
         instruction = (
             db.query(WorkInstruction)
             .filter(WorkInstruction.id == instruction_id)
@@ -36,10 +33,14 @@ def upload_instruction_attachment(
 
         if not instruction:
             raise HTTPException(status_code=404, detail="Instruction not found")
+        
         filename = f"{int(datetime.utcnow().timestamp())}_{file.filename}"
         real_file_path = UPLOAD_DIR / filename
+    
+        # FIXED: Removed the "wbthis " typo
         with open(real_file_path, "wb") as f:
             f.write(file.file.read())
+
         attachment = Attachment(
             project_id=instruction.project_id,    
             work_instruction_id=instruction.id,
@@ -81,13 +82,11 @@ def delete_attachment(request: Request, attachment_id: int):
         if not attachment:
             raise HTTPException(404)
 
-        # permission
         if role not in ["admin", "manager", "ceo"] and attachment.uploaded_by != user_id:
             raise HTTPException(403)
 
-        # delete physical file
         if attachment.file_path:
-            real_path = Path("app") / attachment.file_path.replace("/static/", "")
+            real_path = FsPath("app") / attachment.file_path.replace("/static/", "")
             if real_path.exists():
                 real_path.unlink()
 
@@ -120,12 +119,10 @@ def download_attachment(request: Request, attachment_id: int):
         if not attachment:
             raise HTTPException(status_code=404, detail="Attachment not found")
 
-        # build real file path
-        real_path = Path("app") / attachment.file_path.lstrip("/")
+        real_path = FsPath("app") / attachment.file_path.lstrip("/")
         if not real_path.exists():
             raise HTTPException(status_code=404, detail="File missing")
 
-        # ✅ AUDIT LOG
         write_audit_log(
             request=request,
             action="DOWNLOAD_ATTACHMENT",
@@ -133,12 +130,41 @@ def download_attachment(request: Request, attachment_id: int):
             target_user_id=user_id,
         )
 
-        # ✅ return file (forces download)
         return FileResponse(
             path=real_path,
             filename=attachment.file_name,
             media_type=attachment.file_type,
         )
 
+    finally:
+        db.close()
+
+@router.post("/{instruction_id}/status")
+def update_instruction_status(request: Request, instruction_id: int, status: str = Form(...)):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401)
+
+    db = SessionLocal()
+    try:
+        instruction = db.query(WorkInstruction).get(instruction_id)
+        if not instruction:
+            raise HTTPException(status_code=404)
+
+        instruction.status = status
+        db.commit()
+
+        write_audit_log(
+            request=request,
+            action="UPDATE_STATUS",
+            description=f"Changed instruction #{instruction_id} status to {status}",
+            target_user_id=user_id,
+        )
+
+        # REDIRECT logic to fix the JSON screen issue
+        return RedirectResponse(
+            url=request.headers.get("referer", f"/projects/{instruction.project_id}"), 
+            status_code=303
+        )
     finally:
         db.close()

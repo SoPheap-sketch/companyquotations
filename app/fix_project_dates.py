@@ -12,4 +12,4 @@ for p in projects:
 db.commit()
 db.close()
 
-print("✅ Project created_at backfilled")
+print(" Project created_at backfilled")

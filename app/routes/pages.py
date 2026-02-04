@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from datetime import datetime, timedelta, timezone
 import json
 
+from app import db
 from app.db import SessionLocal
 
 from app.pdf_utils import render_pdf_from_html
@@ -19,6 +20,8 @@ from app.models import WorkInstruction
 from typing import Optional
 from fastapi import Query
 from app.models import User
+from sqlalchemy import func
+from sqlalchemy.sql import extract
 
 import pytz
 import csv
@@ -35,10 +38,20 @@ templates = Jinja2Templates(directory="app/templates")
 def dashboard(request: Request):
     db = SessionLocal()
     try:
+        role = request.session.get("role")
+        can_view_money= role in ["admin", "manager", "ceo", ]
+
         total_projects = db.query(Project).count()
         pending_estimates = db.query(Quote).filter(Quote.status == "pending").count()
         approved_quotes = db.query(Quote).filter(Quote.status == "approved").count()
 
+        total_approved_amount = (
+            db.query(func.coalesce(func.sum(Quote.total), 0))
+            .filter(Quote.status == "approved")
+            .scalar()
+        ) or 0
+        if not can_view_money:
+            total_approved_amount = 0
         recent_projects = (
             db.query(Project)
             .order_by(Project.created_at.desc())
@@ -60,6 +73,7 @@ def dashboard(request: Request):
                 "total_projects": total_projects,
                 "pending_estimates": pending_estimates,
                 "approved_quotes": approved_quotes,
+                "total_approved_amount": total_approved_amount,
                 "recent_projects": recent_projects,
                 "recent_quotes": recent_quotes,
                 "current_year": datetime.utcnow().year,
@@ -659,5 +673,60 @@ def export_audit_logs_csv(
             },
         )
 
+    finally:
+        db.close()
+@router.get("/reports", response_class=HTMLResponse, dependencies=[Depends(login_required)])
+def reports(request: Request):
+    db = SessionLocal()
+    try:
+        role = request.session.get("role")
+        can_view_money = role in ["admin", "manager", "ceo"]
+        monthly_sales = []
+        
+        if can_view_money:
+            rows = (
+                db.query(
+                    extract("month", Quote.created_at).label("month"),
+                    func.coalesce(func.sum(Quote.total), 0).label("total")
+                )
+                .filter(Quote.status == "approved")
+                .group_by("month")
+                .order_by("month")
+                .all()
+            )
+            
+
+            # Convert to simple arrays for Chart.js
+            monthly_sales = [
+                {
+                    "month": int(row.month),
+                    "total": float(row.total)
+                }
+                for row in rows
+            ]
+        workflow_rows = (
+            db.query(
+                Quote.status,
+                func.count(Quote.id)
+            )
+            .group_by(Quote.status)
+            .all()
+        )
+
+        workflow_data = {
+            status: count
+            for status, count in workflow_rows
+        }
+        return templates.TemplateResponse(
+            "reports.html",
+            {
+                "request": request,
+                "role": role,
+                "can_view_money": can_view_money,
+                "monthly_sales": monthly_sales,
+                "workflow_data": workflow_data,
+                "current_year": datetime.utcnow().year,
+            },
+        )
     finally:
         db.close()
