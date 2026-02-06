@@ -22,6 +22,9 @@ from fastapi import Query
 from app.models import User
 from sqlalchemy import func
 from sqlalchemy.sql import extract
+from app.services.notifications import get_unread_notification_count
+
+from app.models import Notification
 
 import pytz
 import csv
@@ -70,10 +73,12 @@ def dashboard(request: Request):
             "index.html",
             {
                 "request": request,
+                "notification_count": get_unread_notification_count(request),
                 "total_projects": total_projects,
                 "pending_estimates": pending_estimates,
                 "approved_quotes": approved_quotes,
                 "total_approved_amount": total_approved_amount,
+                "can_view_money": can_view_money,
                 "recent_projects": recent_projects,
                 "recent_quotes": recent_quotes,
                 "current_year": datetime.utcnow().year,
@@ -157,10 +162,13 @@ def view_project(request: Request, project_id: int):
             .order_by(WorkInstruction.created_at.desc())
             .all()
         )
-        staff_users = (
+        assignable_users = (
             db.query(User)
-            .filter(User.role == "staff")
-            .order_by(User.username)
+            .filter(
+                User.is_active == True,
+                User.role.in_(["staff", "manager", "admin"])
+            )
+            .order_by(User.role, User.username)
             .all()
         )
         return templates.TemplateResponse(
@@ -170,7 +178,7 @@ def view_project(request: Request, project_id: int):
                 "project": project,
                 "quotes": quotes,
                 "instructions": instructions,
-                "staff_users": staff_users,
+                "assignable_users": assignable_users,
                 "created_at": project.created_at.strftime("%Y-%m-%d"),
                 "current_year": datetime.utcnow().year,
             },
@@ -728,5 +736,47 @@ def reports(request: Request):
                 "current_year": datetime.utcnow().year,
             },
         )
+    finally:
+        db.close()
+
+
+@router.get("/notifications")
+def view_notifications(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return RedirectResponse("/login", status_code=303)
+
+    db = SessionLocal()
+    try:
+        notifications = (
+            db.query(Notification)
+            .filter(Notification.user_id == user_id)
+            .order_by(Notification.created_at.desc())
+            .all()
+        )
+
+        return templates.TemplateResponse(
+            "notifications.html",
+            {
+                "request": request,
+                "notifications": notifications,
+            }
+        )
+    finally:
+        db.close()
+
+@router.post("/notifications/mark-read")
+def mark_notifications_read(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401)
+
+    db = SessionLocal()
+    try:
+        db.query(Notification)\
+          .filter(Notification.user_id == user_id)\
+          .update({"is_read": True})
+        db.commit()
+        return {"ok": True}
     finally:
         db.close()

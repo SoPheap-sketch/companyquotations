@@ -18,4 +18,4 @@ Base = declarative_base()
 
 def init_db():
     from app import models
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine, checkfirst=True)

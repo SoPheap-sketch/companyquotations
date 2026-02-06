@@ -142,6 +142,17 @@ def delete_quote(request: Request, quote_id: int):
 
         #  BLOCK approved quote
         if quote.status == "approved":
+            # 🔐 AUDIT LOG: blocked delete attempt
+            write_audit_log(
+                request=request,
+                action="DELETE_QUOTE_BLOCKED",
+                description=(
+                    f"User attempted to delete approved quote "
+                    f"(Quote ID: {quote.id}, Project ID: {quote.project_id})"
+                ),
+                target_user_id=request.session.get("user_id"),
+            )
+
             request.session["flash_error"] = "Approved quotes cannot be deleted."
             return RedirectResponse(
                 f"/projects/{quote.project_id}",
@@ -150,6 +161,15 @@ def delete_quote(request: Request, quote_id: int):
 
         db.delete(quote)
         db.commit()
+        write_audit_log(
+            request=request,
+            action="DELETE_QUOTE",
+            description=(
+                f"Deleted quote "
+                f"(Quote ID: {quote.id}, Project ID: {quote.project_id})"
+            ),
+            target_user_id=request.session.get("user_id"),
+        )
 
         request.session["flash_success"] = "Quote deleted successfully."
 

@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <title>{% block title %}MK Giken{% endblock %}</title>
+  <title>{% block title %}MK Next Phnom Penh Co., Ltd{% endblock %}</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
       </div>
       <div>
         <p class="text-lg leading-none">
-          MK Giken Co., Ltd
+          MK Next Phnom Penh Co., Ltd
         </p>
         <p class="text-[11px] text-slate-400">
           Estimate & Project Management System
@@ -92,6 +92,19 @@
         Reports
       </a>
       <div class="h-5 w-px bg-slate-300"></div>
+      <a href="/notifications"
+        class="relative text-slate-500 hover:text-mk-600 text-lg">
+
+        🔔
+
+        {% if notification_count and notification_count > 0 %}
+          <span
+            class="absolute -top-1 -right-2 bg-red-500 text-white
+                  text-[10px] px-1.5 rounded-full font-semibold">
+            {{ notification_count }}
+          </span>
+        {% endif %}
+      </a>
       <!-- LOGOUT -->
       <a href="/logout"
         class="text-sm text-slate-500 hover:text-red-600">

@@ -7,6 +7,7 @@ from pathlib import Path as FsPath
 from app.db import SessionLocal
 from app.models import WorkInstruction, Project, Attachment
 from app.utils.audit import write_audit_log
+from app.models import Notification, User
 import os
 
 router = APIRouter()
@@ -18,16 +19,16 @@ def create_work_instruction(
     title: str = Form(...),
     description: str = Form(...),
     assigned_to: int | None = Form(None),
-    due_date: str | None = Form(None)
+    due_date: str | None = Form(None),
 ):
     user_id = request.session.get("user_id")
     role = request.session.get("role")
-    
+
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     if role not in ["admin", "manager", "ceo"]:
         raise HTTPException(status_code=403, detail="Forbidden")
-    
+
     db = SessionLocal()
     try:
         project = db.query(Project).filter(Project.id == project_id).first()
@@ -48,31 +49,49 @@ def create_work_instruction(
             title=title,
             description=description,
             status="pending",
-            due_date=parsed_due_date
+            due_date=parsed_due_date,
         )
 
         db.add(instruction)
-        try:
-            db.commit()
-            
-            # If your audit log also writes to the DB, it shares the session
-            write_audit_log(
-                request=request,
-                action="CREATE_WORK_INSTRUCTION",
-                description=f"Created work instruction for Project #{project_id}",
-                target_user_id=user_id,
-            )
-        except Exception as commit_exc:
-            db.rollback() # Release the lock if the commit fails
-            print(f"Commit failed: {commit_exc}")
-            raise HTTPException(status_code=500, detail="Database busy, please try again.")
+        db.flush()  # ✅ ensures instruction.id exists
+
+        if assigned_to:
+            assigned_user = db.query(User).filter(User.id == assigned_to).first()
+            if assigned_user:
+                notification = Notification(
+                    user_id=assigned_user.id,
+                    project_id=project_id,
+                    work_instruction_id=instruction.id,
+                    title="New Work Assigned",
+                    message=f"You have been assigned a task: {title}",
+                    link=f"/projects/{project_id}#work-{instruction.id}",
+                )
+                db.add(notification)
+
+      
+        db.commit()
+
+        # audit log AFTER successful commit
+        write_audit_log(
+            request=request,
+            action="CREATE_WORK_INSTRUCTION",
+            description=f"Created work instruction for Project #{project_id}",
+            target_user_id=user_id,
+        )
 
         return RedirectResponse(
             f"/projects/{project_id}",
-            status_code=303
+            status_code=303,
         )
+
+    except Exception as exc:
+        db.rollback()
+        print(f"Error creating work instruction: {exc}")
+        raise HTTPException(status_code=500, detail="Database error")
+
     finally:
         db.close()
+
 
 @router.get("/projects/{project_id}/instructions")
 def list_instructions(project_id: int):
