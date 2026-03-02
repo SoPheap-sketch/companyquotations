@@ -9,6 +9,8 @@ from app.routes.quotes import router as quotes_router
 from app.routes.auth import router as auth_router
 from app.routes import admin, attachments, work_instructions
 from app.routes.notifications import router as notifications_router
+from app.routes import invoices
+
 
 app = FastAPI(title="Company Quotation System")
 
@@ -33,3 +35,4 @@ app.include_router(admin.router)
 app.include_router(work_instructions.router)
 app.include_router(attachments.router)
 app.include_router(notifications_router)
+app.include_router(invoices.router)

@@ -87,4 +87,4 @@ db.add_all(users)
 db.commit()
 db.close()
 
-print("✅ Users created successfully")
+print(" Users created successfully")

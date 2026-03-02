@@ -1,3 +1,4 @@
+# app/services/notifications.py
 from app.db import SessionLocal
 from app.models import Notification
 

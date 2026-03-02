@@ -64,7 +64,7 @@ class Quote(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # ✅ AUTO 支払期限（発行日 + 30日）
+    # AUTO 支払期限（発行日 + 30日）
     payment_due = Column(
         DateTime,
         default=lambda: datetime.utcnow() + timedelta(days=30)
@@ -83,6 +83,7 @@ class Quote(Base):
     customer = relationship("Customer", lazy="joined")
     items = relationship("QuoteItem", back_populates="quote", cascade="all, delete-orphan")
 
+    invoice = relationship ("Invoice", back_populates="quote", uselist=False)
 
 # ---------- Quote Item (each Excel row) ----------
 class QuoteItem(Base):
@@ -222,3 +223,39 @@ class Notification(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", lazy="joined")
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+    id = Column(Integer, primary_key=True, index= True)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=False)
+    invoice_number = Column(String(50), unique=True, nullable=False)
+    issue_date = Column(DateTime, default=datetime.utcnow)
+    due_date =Column(DateTime, nullable=True)
+
+    subtotal = Column(Float, default=0.0)
+    tax = Column(Float, default=0.0)
+    total = Column(Float, default=0.0)
+
+    payment_status = Column(String(20), default="unpaid")  # unpaid / paid / overdue
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    quote = relationship("Quote", back_populates="invoice")
+
+#-----------------Receipt-----------------
+class Receipt(Base):
+    __tablename__ = "receipts"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False)
+
+    receipt_number = Column(String(50), unique=True, nullable=False)
+
+    payment_date = Column(DateTime, default=datetime.utcnow)
+    payment_method = Column(String(100), nullable=True)
+
+    amount_received = Column(Float, nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    invoice = relationship("Invoice", lazy="joined")
