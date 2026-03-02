@@ -1,3 +1,4 @@
+
 # app/models.py
 from sqlalchemy import (
     Column, Integer, String, Text, Float, DateTime, ForeignKey
@@ -28,6 +29,7 @@ class Project(Base):
         return f"<Project id={self.id} client_name={self.client_name!r}>"
 # ---------- Customer ----------
 class Customer(Base):
+
     __tablename__ = "customers"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -62,7 +64,7 @@ class Quote(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # ✅ AUTO 支払期限（発行日 + 30日）
+    # AUTO 支払期限（発行日 + 30日）
     payment_due = Column(
         DateTime,
         default=lambda: datetime.utcnow() + timedelta(days=30)
@@ -81,6 +83,7 @@ class Quote(Base):
     customer = relationship("Customer", lazy="joined")
     items = relationship("QuoteItem", back_populates="quote", cascade="all, delete-orphan")
 
+    invoice = relationship ("Invoice", back_populates="quote", uselist=False)
 
 # ---------- Quote Item (each Excel row) ----------
 class QuoteItem(Base):
@@ -136,3 +139,123 @@ class QuoteApprovalLog(Base):
     # Relationships
     quote = relationship("Quote", backref="approval_logs")
     # user = relationship("User")
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)  
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    username = Column(String(100), nullable=True)
+
+    action = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+
+    ip_address = Column(String(45), nullable=True)
+    user_agent = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", lazy="joined")
+
+class WorkInstruction(Base):
+    __tablename__ = "work_instructions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+
+    status = Column(String(20), default="pending")  
+    due_date = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project")
+    creator = relationship("User", foreign_keys=[created_by])
+    assignee = relationship("User",foreign_keys=[assigned_to])
+
+class Attachment(Base):
+    __tablename__ = "attachments"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=True)
+    work_instruction_id = Column(
+        Integer,
+        ForeignKey("work_instructions.id"),
+        nullable=True
+    )
+
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    file_name = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+    file_type = Column(String(50), nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project = relationship("Project")
+    quote = relationship("Quote")
+    work_instruction = relationship(
+        "WorkInstruction",
+        backref="attachments"
+    )
+    uploader = relationship("User")
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    work_instruction_id = Column(Integer, ForeignKey("work_instructions.id"), nullable=True)
+
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    link = Column(String(255), nullable=True)
+    is_read = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", lazy="joined")
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+    id = Column(Integer, primary_key=True, index= True)
+    quote_id = Column(Integer, ForeignKey("quotes.id"), nullable=False)
+    invoice_number = Column(String(50), unique=True, nullable=False)
+    issue_date = Column(DateTime, default=datetime.utcnow)
+    due_date =Column(DateTime, nullable=True)
+
+    subtotal = Column(Float, default=0.0)
+    tax = Column(Float, default=0.0)
+    total = Column(Float, default=0.0)
+
+    payment_status = Column(String(20), default="unpaid")  # unpaid / paid / overdue
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    quote = relationship("Quote", back_populates="invoice")
+
+#-----------------Receipt-----------------
+class Receipt(Base):
+    __tablename__ = "receipts"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False)
+
+    receipt_number = Column(String(50), unique=True, nullable=False)
+
+    payment_date = Column(DateTime, default=datetime.utcnow)
+    payment_method = Column(String(100), nullable=True)
+
+    amount_received = Column(Float, nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    invoice = relationship("Invoice", lazy="joined")

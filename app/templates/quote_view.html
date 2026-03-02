@@ -28,8 +28,14 @@
 <!-- ================= HEADER ================= -->
 <header class="bg-white shadow-md border-b border-primary-100">
   <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="/projects/{{ quote.project_id if quote else 'list' }}"
-       class="text-slate-600 hover:text-primary-700">← Back</a>
+    <button
+      type="button"
+      onclick="history.back()"
+      class="text-slate-600 hover:text-primary-700"
+    >
+      ← Back
+    </button>
+
     <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
   </div>
 </header>
@@ -59,15 +65,23 @@
           <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
             Draft
           </span>
+
         {% elif quote.status == "pending" %}
           <span class="px-3 py-1 text-xs rounded-full bg-yellow-200 text-yellow-800">
             Pending
           </span>
+
         {% elif quote.status == "approved" %}
           <span class="px-3 py-1 text-xs rounded-full bg-green-200 text-green-800">
             Approved
           </span>
+
+        {% elif quote.status == "rejected" %}
+          <span class="px-3 py-1 text-xs rounded-full bg-red-200 text-red-800">
+            Rejected
+          </span>
         {% endif %}
+
       </div>
 
       <p class="text-slate-600">{{ quote.title or '' }}</p>
@@ -78,7 +92,6 @@
 
     <!-- RIGHT -->
     <div class="text-right space-y-2">
-
       <div class="text-sm text-slate-600">
         Original Cost (Subtotal)
       </div>
@@ -90,7 +103,8 @@
         Profit margin: {{ (quote.profit_margin * 100)|round(0) }}%
       </div>
 
-      <div class="text-sm text-slate-600 font-bold mt-2">
+      <!-- Total -->
+      <div class="text-sm text-slate-600 mt-2">
         Selling Price (Inc. Tax)
       </div>
       <div class="text-3xl font-extrabold text-primary-700">
@@ -100,12 +114,25 @@
       <!-- PDF -->
       <div class="mt-4">
         <a href="/quotes/{{ quote.id }}/pdf"
-           target="_blank"
-           class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900">
+          target="_blank"
+          class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900">
           📄 PDF Export
         </a>
       </div>
-
+      <!-- CREATE INVOICE -->
+      {% if quote.status == "approved" and not quote.invoice %}
+      <form method="post" action="/quotes/{{ quote.id }}/create-invoice" class="mt-3">
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 text-sm font-semibold">
+          🧾 Create Invoice
+        </button>
+      </form>
+      {% elif quote.invoice %}
+      <div class="mt-3 text-sm text-slate-500">
+        ✅ Invoice already created
+      </div>
+      {% endif %}
       <!-- SUBMIT FOR APPROVAL -->
       {% if quote.status == "draft" %}
       <form method="post" action="/quotes/{{ quote.id }}/submit" class="mt-3">
@@ -116,12 +143,22 @@
         </button>
       </form>
       {% endif %}
-
       <!-- APPROVE -->
-      {% if quote.status == "pending" and request.session.get("is_admin") %}
+      {% if quote.status == "pending"
+        and request.session.get("role") in ["admin", "manager", "ceo"] %}
       <form method="post" action="/quotes/{{ quote.id }}/approve" class="mt-3">
-        <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-semibold">
+        <button
+          type="submit"
+          class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-semibold">
           ✅ Approve Quote
+        </button>
+      </form>
+
+      <form method="post" action="/quotes/{{ quote.id }}/reject" class="mt-2">
+        <button
+          type="submit"
+          class="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700 text-sm font-semibold">
+          ❌ Reject Quote
         </button>
       </form>
       {% endif %}

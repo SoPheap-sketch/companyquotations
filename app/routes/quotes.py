@@ -9,6 +9,7 @@ from app.db import SessionLocal
 from app.models import Quote, QuoteItem, Project
 from app.pdf_utils import render_pdf_from_html
 from fastapi.responses import StreamingResponse
+from app.utils.audit import write_audit_log
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -118,44 +119,100 @@ def new_quote_form(request: Request, project_id: int):
 # DELETE QUOTE
 # =============================
 @router.post("/quotes/{quote_id}/delete")
-def delete_quote(quote_id: int, next: str = Form(None)):
+def delete_quote(request: Request, quote_id: int):
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if quote:
-            project_id = quote.project_id
-            db.delete(quote)
-            db.commit()
+        if not quote:
+            request.session["flash_error"] = "Quote not found."
+            return RedirectResponse("/", status_code=303)
+
+        #  BLOCK approved quote
+        if quote.status == "approved":
+            # 🔐 AUDIT LOG: blocked delete attempt
+            write_audit_log(
+                request=request,
+                action="DELETE_QUOTE_BLOCKED",
+                description=(
+                    f"User attempted to delete approved quote "
+                    f"(Quote ID: {quote.id}, Project ID: {quote.project_id})"
+                ),
+                target_user_id=request.session.get("user_id"),
+            )
+
+            request.session["flash_error"] = "Approved quotes cannot be deleted."
+            return RedirectResponse(
+                f"/projects/{quote.project_id}",
+                status_code=303
+            )
+
+        db.delete(quote)
+        db.commit()
+        write_audit_log(
+            request=request,
+            action="DELETE_QUOTE",
+            description=(
+                f"Deleted quote "
+                f"(Quote ID: {quote.id}, Project ID: {quote.project_id})"
+            ),
+            target_user_id=request.session.get("user_id"),
+        )
+
+        request.session["flash_success"] = "Quote deleted successfully."
+
+        return RedirectResponse(
+            f"/projects/{quote.project_id}",
+            status_code=303
+        )
     finally:
         db.close()
-
-    return RedirectResponse(next or f"/projects/{project_id}", status_code=303)
 
 
 # =============================
 # SUBMIT FOR APPROVAL
 # =============================
 @router.post("/quotes/{quote_id}/submit")
-def submit_quote(quote_id: int):
+def submit_quote(
+    request: Request,
+    quote_id: int
+):
+    # must be logged in
+    if not request.session.get("user_id"):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
-        if not quote or quote.status != "draft":
-            raise HTTPException(400)
 
+        if not quote:
+            raise HTTPException(status_code=404, detail="Quote not found")
+
+        # only draft can be submitted
+        if quote.status != "draft":
+            raise HTTPException(
+                status_code=400,
+                detail="Only draft quotes can be submitted"
+            )
+
+        # update status
         quote.status = "pending"
         db.commit()
+        db.refresh(quote)
+        # AUDIT LOG
+        write_audit_log(
+            request=request,
+            action="SUBMIT_QUOTE",
+            description=f"Submitted quote #{quote.id} for approval",
+            target_user_id=request.session.get("user_id"),
+        )
     finally:
         db.close()
-
-    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
-
-
+    return RedirectResponse(f"/quotes/{quote_id}",status_code=303)
 # =============================
 # APPROVE QUOTE
 # =============================
 @router.post("/quotes/{quote_id}/approve")
-def approve_quote(quote_id: int):
+def approve_quote(request: Request, quote_id: int):
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
@@ -164,11 +221,40 @@ def approve_quote(quote_id: int):
 
         quote.status = "approved"
         db.commit()
+        db.refresh(quote)
+
+        write_audit_log(
+            request=request,
+            action="APPROVE_QUOTE",
+            description=f"Approved quote #{quote.id}",
+            target_user_id=request.session.get("user_id"),
+        )
     finally:
         db.close()
 
     return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
 
+@router.post("/quotes/{quote_id}/reject")
+def reject_quote(request: Request, quote_id: int):
+    db = SessionLocal()
+    try:
+        quote = db.query(Quote).filter(Quote.id == quote_id).first()
+        if not quote or quote.status != "pending":
+            raise HTTPException(400)
+
+        quote.status = "rejected"
+        db.commit()
+
+        write_audit_log(
+            request=request,
+            action="REJECT_QUOTE",
+            description=f"Rejected quote #{quote.id}",
+            target_user_id=request.session.get("user_id"),
+        )
+    finally:
+        db.close()
+
+    return RedirectResponse(f"/quotes/{quote_id}", status_code=303)
 
 # =============================
 # PDF EXPORT
@@ -184,14 +270,25 @@ def quote_pdf(request: Request, quote_id: int):
         if quote.payment_due is None:
             quote.payment_due = quote.created_at + timedelta(days=30)
             db.commit()
-
+        
+        subtotal = 0
+        for item in quote.items:
+            # Apply profit margin to each unit price, then multiply by quantity
+            selling_unit_price = int(item.unit_price * (1 + quote.profit_margin))
+            subtotal += selling_unit_price * item.quantity
+        
+        # 2. Calculate Tax (10%)
+        tax = int(subtotal * 0.10)
+        
+        # 3. Calculate Final Total
+        total = subtotal + tax
         html = templates.get_template("quote_pdf.html").render({
             "request": request,
             "quote": quote,
             "items": quote.items,
-            "subtotal": quote.subtotal,
-            "tax": quote.tax,
-            "total": quote.total,
+            "subtotal": subtotal,  
+            "tax": tax,
+            "total": total,
             "payment_due": quote.payment_due.strftime("%Y/%m/%d"),
         })
 

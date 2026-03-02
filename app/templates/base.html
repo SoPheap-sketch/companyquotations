@@ -5,7 +5,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <title>{% block title %}MK Giken{% endblock %}</title>
+  <title>{% block title %}MK Next Phnom Penh Co., Ltd{% endblock %}</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -45,16 +45,14 @@
               text-white font-bold transition group-hover:bg-mk-700">
         M
       </div>
-
       <div>
         <p class="text-lg leading-none">
-          MK Giken Co., Ltd
+          MK Next Phnom Penh Co., Ltd
         </p>
         <p class="text-[11px] text-slate-400">
           Estimate & Project Management System
         </p>
       </div>
-
     </a>
     <!-- RIGHT -->
     <div class="flex items-center gap-4">
@@ -62,29 +60,51 @@
         <div class="w-8 h-8 rounded-full bg-mk-600 text-white flex items-center justify-center font-bold text-xs">
           {{ request.session.get("username", "U")[0]|upper }}
         </div>
-
         <div class="leading-tight">
           <p class="text-sm font-semibold">
             {{ request.session.get("username", "User") }}
           </p>
-
           <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
             {{ request.session.get("role", "User") | capitalize }}
           </span>
         </div>
       </div>
       <div class="h-5 w-px bg-slate-300"></div>
-
       <!-- USER MANAGER -->
-       {% if request.session.get("role", "").lower() == "admin"%}
-      <a href="/admin/users"
-        class="text-sm text-slate-500 hover:text-mk-600 font-medium">
-        User Manager
-      </a>
-
-      <div class="h-5 w-px bg-slate-300"></div>
+      {% if request.session.get("role", "").lower() == "admin" %}
+        <a href="/admin/users"
+          class="text-sm text-slate-500 hover:text-mk-600 font-medium">
+          User Manager
+        </a>
+        <div class="h-5 w-px bg-slate-300"></div>
+        <!-- ADMIN MENU -->
+        <a href="/admin/audit-logs"
+          class="text-sm text-slate-500 hover:text-mk-600 font-medium">
+          Audit Logs
+        </a>
+        <div class="h-5 w-px bg-slate-300"></div>
       {% endif %}
+      <a href="/reports"
+        class="text-sm text-slate-500 hover:text-mk-600 font-medium
+                {% if request.url.path == '/reports' %}
+                  text-mk-600 font-semibold
+                {% endif %}">
+        Reports
+      </a>
+      <div class="h-5 w-px bg-slate-300"></div>
+      <a href="/notifications"
+        class="relative text-slate-500 hover:text-mk-600 text-lg">
 
+        🔔
+
+        {% if notification_count and notification_count > 0 %}
+          <span
+            class="absolute -top-1 -right-2 bg-red-500 text-white
+                  text-[10px] px-1.5 rounded-full font-semibold">
+            {{ notification_count }}
+          </span>
+        {% endif %}
+      </a>
       <!-- LOGOUT -->
       <a href="/logout"
         class="text-sm text-slate-500 hover:text-red-600">

@@ -1,4 +1,7 @@
+# app/auth/utils.py
+
 from passlib.context import CryptContext
+import re
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -9,13 +12,8 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, stored_password: str) -> bool:
-    # Case 1: bcrypt hashed password
-    if stored_password.startswith("$2b$"):
-        return pwd_context.verify(plain_password, stored_password)
-
-    # Case 2: plain-text password (legacy users)
-    return plain_password == stored_password
-import re
+    # Let passlib handle ALL bcrypt variants ($2a$, $2b$, $2y$)
+    return pwd_context.verify(plain_password, stored_password)
 
 def validate_password_strength(password: str) -> str | None:
     """
