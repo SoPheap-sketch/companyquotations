@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+             margin: 12mm 18mm 12mm 12mm;
+        }
+
+        body {
+            font-family: "Meiryo", "MS P Gothic", "Hiragino Sans", sans-serif;
+            font-size: 11px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 98%;
+            margin: 0 auto;
+        }
+
+        .page-num {
+            text-align: right;
+            font-size: 11px;
+            margin-bottom: 5px;
+            padding-right: 10px;
+        }
+
+        /* Layout Tables - Used for positioning instead of Flexbox for PDF stability */
+        .layout-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+            table-layout: fixed;
+        }
+
+        .layout-table td {
+            padding: 0;
+            vertical-align: top;
+            border: none;
+        }
+
+        /* Title Area */
+        .title {
+            font-size: 28px;
+
+            font-weight: bold;
+            color: #3B74A8;
+            letter-spacing: 5px;
+            text-align: center;
+            margin-bottom:25px;
+            
+        }
+
+        /* Top Right Meta Table */
+        .meta-table {
+            width: 240px;
+            border-collapse: collapse;
+            margin-left: auto;
+        }
+
+        .meta-table th {
+            background-color: #3B74A8;
+            color: white;
+            font-weight: normal;
+            padding: 3px;
+            border: 1px solid #3B74A8;
+            text-align: center;
+        }
+
+        .meta-table td {
+            border: 1px solid #3B74A8;
+            padding: 3px;
+            text-align: center;
+            background-color: white;
+        }
+
+        /* Client Section */
+        .client-name-box {
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding: 3px 0;
+            display: inline-block;
+            width: 40%;
+            margin-top:5px;
+        }
+
+        /* Company Section */
+        .company-info {
+            text-align: right;
+            line-height: 1.4;
+            padding-top: -8px;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        /* Hanko / Seals Table */
+        .hanko-table {
+            border-collapse: collapse;
+            margin-left: auto;
+            margin-top: 3px;
+            margin-bottom: 12px;
+            
+        }
+
+        .hanko-table td {
+            width: 38px;
+            height: 45px;
+            border: 1px solid #3B74A8 !important;
+            padding-bottom: 2px;
+        }
+
+        /* Grand Total Box (Centered) */
+        .total-box-container {
+            width: 100%;
+            margin: 5px 0 15px 0;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .total-display-table {
+            width: 420px;
+            margin: 0 auto;
+            border: 2px solid #3B74A8;
+            border-collapse: collapse;
+        }
+
+        .total-label-cell {
+            background-color: white;
+            color: #333;
+            width: 120px;
+            text-align: center;
+            font-weight: bold;
+            border-right: 2px solid #3B74A8;
+            padding: 8px 0;
+        }
+
+        .total-amount-cell {
+            padding: 0 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Main Items Table */
+        .main-table {
+            width: 98%;
+            border-collapse: collapse;
+            border: 1px solid #3B74A8;
+            table-layout: fixed;
+            margin: auto;
+        }
+
+        .main-table th {
+            background-color: #3B74A8;
+            color: white;
+            padding: 6px;
+            font-weight: normal;
+            border: 1px solid #3B74A8;
+        }
+
+        .main-table td {
+            padding: 5px 8px;
+            border-right: 1px dotted #3B74A8;
+            border-bottom: 1px dotted #3B74A8;
+            height: 20px;
+            word-wrap: break-word;
+        }
+
+        .main-table td:last-child {
+            border-right: none;
+        }
+
+        /* Footer Positioning Table */
+        .footer-layout-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        .bank-box {
+            border: 1px solid #3B74A8;
+            width: 100%;
+        }
+
+        .bank-header {
+            background: #3B74A8;
+            color: white;
+            text-align: center;
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        .bank-body-table {
+            width: 100%;
+            border: none;
+        }
+
+        .bank-body-table td {
+            padding: 8px;
+            font-size: 10px;
+            border: none;
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #3B74A8;
+        }
+
+        .summary-table td {
+            padding: 6px 8px;
+            border: 1px solid #3B74A8;
+        }
+
+        .summary-label {
+            background-color: #DDEBF7;
+            width: 40%;
+            text-align: center;
+        }
+
+        .summary-total-row {
+            background-color: #3B74A8;
+            color: white;
+            font-weight: bold;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+    </style>
+</head>
+<body>
+
+<body>
+
+<div class="container">
+    <div class="page-num"></div>
+
+    <div class="title">請求書(控)</div>
+
+    <table class="layout-table" style="margin-top:25px;">
+        <tr>
+            <td style="width: 60%;">
+                00118<br>
+                〒 321-4346<br>
+                栃木県真岡市松山町24-3 真岡工場内
+            </td>
+            <td style="width: 40%;">
+                <table class="meta-table">
+                    <tr>
+                        <th style="width: 50%;">請求日</th>
+                        <th style="width: 50%;">請求書番号</th>
+                    </tr>
+                    <tr>
+                        <td>{{ invoice.issue_date.year }}年{{ invoice.issue_date.month }}月{{ invoice.issue_date.day }}日</td>
+                        <td>{{ invoice.invoice_number }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <div class="total-box-container">
+        <table class="total-display-table">
+            <tr>
+                <td class="total-label-cell">ご請求額</td>
+                <td class="total-amount-cell">
+                    <table style="width: 100%; border: none; border-collapse: collapse;">
+                        <tr>
+                            <td style="border:none; text-align: left; padding:0;">¥</td>
+                            <td style="border:none; text-align: right; padding:0;">{{ "{:,}".format(total|int) }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="layout-table">
+        <tr>
+            <td style="width: 55%;">
+                <div class="client-name-box">
+                    {{ quote.project.client_name }} 様
+                </div>
+            </td>
+            <td style="width: 45%;">
+                <div class="company-info">
+                    <div class="company-name">M・K技建株式会社</div>
+                    〒321-4532 栃木県真岡市長島24-9<br>
+                    TEL & FAX : 0285-77-0443<br>
+                    登録番号 : T9060001032383
+                    <table class="hanko-table">
+                        <tr><td></td><td></td><td></td><td></td></tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th style="width:12%">日付</th>
+                <th style="width:30%">名称</th>
+                <th style="width:8%">数量</th>
+                <th style="width:8%">単位</th>
+                <th style="width:12%">単価</th>
+                <th style="width:12%">金額</th>
+                <th>備考</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            {% set selling_price = it.unit_price * (1 + quote.profit_margin) %}
+            {% set amount = selling_price * it.quantity %}
+            <tr>
+                <td class="text-center">{{ quote.created_at.strftime('%Y/%m/%d') }}</td>
+                <td>{{ it.element }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(it.quantity) }}</td>
+                <td class="text-center">{{ it.unit }}</td>
+                <td class="text-right">¥{{ "{:,.2f}".format(selling_price) }}</td>
+                <td class="text-right">¥{{ "{:,.2f}".format(amount) }}</td>
+                <td>{{ it.remark or "" }}</td>
+            </tr>
+            {% endfor %}
+
+            {% for i in range(18 - items|length) %}
+            <tr>
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-center">－</td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="footer-layout-table">
+        <tr>
+            <td style="width:55%; vertical-align:top">
+                <div class="bank-box">
+                    <div class="bank-header">振込先</div>
+                    <table class="bank-body-table">
+                        <tr>
+                            <td style="line-height:1.6">
+                                足利銀行　真岡支店　普通　5503727<br>
+                                群馬銀行　宇都宮支店　普通　0740133
+                            </td>
+                            <td style="text-align:right; vertical-align:bottom">エムケーギケン（カ）</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td style="width:5%"></td>
+            <td style="width:40%; vertical-align:top">
+                <table class="summary-table">
+                    <tr>
+                        <td class="summary-label">小計</td>
+                        <td class="text-right">¥{{ "{:,.0f}".format(subtotal) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="summary-label">消費税（10%）</td>
+                        <td class="text-right">¥{{ "{:,.0f}".format(tax) }}</td>
+                    </tr>
+                    <tr class="summary-total-row">
+                        <td class="text-center">合計</td>
+                        <td class="text-right">¥{{ "{:,.0f}".format(total) }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

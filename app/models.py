@@ -237,6 +237,8 @@ class Invoice(Base):
     total = Column(Float, default=0.0)
 
     payment_status = Column(String(20), default="unpaid")  # unpaid / paid / overdue
+    payment_date = Column(DateTime,nullable=True)
+    notes = Column(String(255),nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     quote = relationship("Quote", back_populates="invoice")

@@ -113,8 +113,6 @@ def new_quote_form(request: Request, project_id: int):
         )
     finally:
         db.close()
-
-
 # =============================
 # DELETE QUOTE
 # =============================
@@ -139,13 +137,11 @@ def delete_quote(request: Request, quote_id: int):
                 ),
                 target_user_id=request.session.get("user_id"),
             )
-
             request.session["flash_error"] = "Approved quotes cannot be deleted."
             return RedirectResponse(
                 f"/projects/{quote.project_id}",
                 status_code=303
             )
-
         db.delete(quote)
         db.commit()
         write_audit_log(
@@ -166,8 +162,6 @@ def delete_quote(request: Request, quote_id: int):
         )
     finally:
         db.close()
-
-
 # =============================
 # SUBMIT FOR APPROVAL
 # =============================
@@ -270,26 +264,28 @@ def quote_pdf(request: Request, quote_id: int):
         if quote.payment_due is None:
             quote.payment_due = quote.created_at + timedelta(days=30)
             db.commit()
-        
+
+        # Format dates safely
+        issue_date = quote.created_at.strftime("%Y/%m/%d")
+        payment_due = quote.payment_due.strftime("%Y/%m/%d")
+
         subtotal = 0
         for item in quote.items:
-            # Apply profit margin to each unit price, then multiply by quantity
             selling_unit_price = int(item.unit_price * (1 + quote.profit_margin))
             subtotal += selling_unit_price * item.quantity
-        
-        # 2. Calculate Tax (10%)
+
         tax = int(subtotal * 0.10)
-        
-        # 3. Calculate Final Total
         total = subtotal + tax
+
         html = templates.get_template("quote_pdf.html").render({
             "request": request,
             "quote": quote,
             "items": quote.items,
-            "subtotal": subtotal,  
+            "subtotal": subtotal,
             "tax": tax,
             "total": total,
-            "payment_due": quote.payment_due.strftime("%Y/%m/%d"),
+            "issue_date": issue_date,      # ✅ pass date
+            "payment_due": payment_due     # ✅ pass date
         })
 
         pdf = render_pdf_from_html(html)
@@ -297,7 +293,10 @@ def quote_pdf(request: Request, quote_id: int):
         return StreamingResponse(
             pdf,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"}
+            headers={
+                "Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"
+            }
         )
+
     finally:
         db.close()

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+</head>
+<style>
+    @page{
+        size:A4;
+        margin:25mm;
+    }
+    body{
+        font-family: "Meiryo",sans-serif;
+        font-size:12px;
+    }
+    .title{
+        text-align: center;
+        font-size: 20px;
+        letter-spacing: 10px;
+        margin-bottom:40px
+    }
+    .amount-box{
+        border:2px solid #000;
+        padding: 15px;
+        font-size:20px;
+        text-align: center;
+        margin:30px 0;
+
+    }
+    .company{
+        text-align: right;
+        margin-top:40px;
+        
+    }
+</style>
+<body>
+    <div class="title">領収書</div>
+    <p>{{ quote.project.client_name }} 様</p>
+    <p>下記金額を領収いたしました</p>
+    <div class="amount-box">
+        ¥{{ "{:,}".format(total|int) }}
+    </div>
+    <p>但し、工事代金として</p>
+    <p>支払日：{{ payment_date }}</p>
+    <div class="company">
+        M・K技建株式会社<br>
+        〒321-4532 栃木県真岡市長島24-9<br>
+        TEL: 0285-77-0443
+    </div>
+</body>
