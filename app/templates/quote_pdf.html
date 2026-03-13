@@ -115,43 +115,36 @@
         .hanko-table {
             border-collapse: collapse;
         }
-
         .hanko-table td {
             border: 1px solid #000;
             width: 40px;
             height: 40px;
         }
-
         /* Total Box (Red Circle 2 - Moved UP) */
         .total-container {
             width: 100%;
             margin: 10px 0;
             text-align: center;
         }
-
         .total-box {
             border: 2px solid #000;
             border-collapse: collapse;
             width: 380px;
             margin: 0 auto;
         }
-
         .total-box td {
             padding: 8px;
         }
-
         .total-label {
             width: 100px;
             border-right: 2px solid #000;
             font-weight: bold;
             font-size: 12px;
         }
-
         .total-amount {
             font-size: 20px;
             text-align: right;
         }
-
         /* Main Table Items */
         .main-table {
             width: 100%;
@@ -159,20 +152,17 @@
             border: 1px solid #000;
             clear: both;
         }
-
         .main-table th {
             border: 1px solid #000;
             padding: 5px 2px;
             font-weight: normal;
             background-color: #fff;
         }
-
         .main-table td {
             border: 1px solid #000;
             padding: 3px 5px;
             height: 20px;
         }
-
         /* Footer Summary */
         .summary-table {
             margin-left: auto;
@@ -180,20 +170,15 @@
             border-collapse: collapse;
             margin-top: 5px;
         }
-
         .summary-table td {
             border: 1px solid #000;
             padding: 4px 8px;
         }
-
         .summary-label { width: 100px; }
-
     </style>
 </head>
 <body>
-
     <div class="title">御見積書</div>
-
     <table class="header-wrapper">
         <tr>
             <td class="header-left">
@@ -207,7 +192,6 @@
                     <tr><td class="details-label">有効期限</td><td>{{ quote.valid_until or "1か月" }}</td></tr>
                 </table>
             </td>
-            
             <td class="header-right">
                 <table class="meta-table">
                     <tr>
@@ -215,7 +199,14 @@
                         <td>御見積書番号</td>
                     </tr>
                     <tr>
-                        <td>{{ issue_date }}</td>
+                        <td>
+                            {% if quote.created_at %}
+                                {{ quote.created_at.strftime('%Y/%m/%d') }}
+                            {% else %}
+                                {# Fallback for new drafts #}
+                                {{ current_year }}/--/-- 
+                            {% endif %}
+                            </td>
                         <td>M{{ quote.id }}</td>
                     </tr>
                 </table>
@@ -246,7 +237,6 @@
             </tr>
         </table>
     </div>
-
     <table class="main-table">
         <thead>
             <tr>
@@ -285,7 +275,6 @@
             {% endfor %}
         </tbody>
     </table>
-
     <table class="summary-table">
         <tr>
             <td class="summary-label">小計</td>
@@ -300,6 +289,5 @@
             <td class="text-right">¥ {{ "{:,.0f}".format(total) }}</td>
         </tr>
     </table>
-
 </body>
 </html>

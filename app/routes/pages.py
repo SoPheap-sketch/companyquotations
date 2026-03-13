@@ -12,7 +12,7 @@ from app.db import SessionLocal
 from app.pdf_utils import render_pdf_from_html
 from app.services.auth import login_required
 
-from app.models import Project, Quote, QuoteItem, User, QuoteApprovalLog
+from app.models import Project, Quote, QuoteItem, User, QuoteApprovalLog, Receipt
 from app.utils.audit import write_audit_log
 from app.models import AuditLog   
 from app.services.auth import admin_only
@@ -25,12 +25,9 @@ from sqlalchemy.sql import extract
 from app.services.notifications import get_unread_notification_count
 
 from app.models import Notification
-
 import pytz
 import csv
 import io
-
-
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
@@ -49,8 +46,7 @@ def dashboard(request: Request):
         approved_quotes = db.query(Quote).filter(Quote.status == "approved").count()
 
         total_approved_amount = (
-            db.query(func.coalesce(func.sum(Quote.total), 0))
-            .filter(Quote.status == "approved")
+            db.query(func.coalesce(func.sum(Receipt.amount_received), 0))
             .scalar()
         ) or 0
         if not can_view_money:
@@ -140,8 +136,6 @@ def create_project(
         db.close()
 
     return RedirectResponse("/projects/list", status_code=303)
-
-
 @router.get("/projects/{project_id}", response_class=HTMLResponse, dependencies=[Depends(login_required)])
 def view_project(request: Request, project_id: int):
     db = SessionLocal()
@@ -295,46 +289,6 @@ def delete_project(request: Request, project_id: int):
 
         return RedirectResponse("/projects/list", status_code=303)
 
-    finally:
-        db.close()
-# =====================================================
-# NEW QUOTE
-# =====================================================
-@router.get("/projects/{project_id}/quotes/new", response_class=HTMLResponse, dependencies=[Depends(login_required)])
-def new_quote_form(request: Request, project_id: int):
-    db = SessionLocal()
-    try:
-        project = db.query(Project).filter(Project.id == project_id).first()
-        if not project:
-            raise HTTPException(404)
-
-        quote = Quote(
-            project_id=project_id,
-            title="Draft Estimate",
-            status="draft",
-            profit_margin=0.30,
-        )
-        db.add(quote)
-        db.commit()
-        db.refresh(quote)
-
-        write_audit_log(
-            request=request,
-            action="CREATE_QUOTE",
-            description=f"Created draft quote #{quote.id} for project #{project_id}",
-            target_user_id=request.session.get("user_id"),
-        )
-
-        return templates.TemplateResponse(
-            "quote_edit.html",
-            {
-                "request": request,
-                "quote": quote,
-                "items_json": "[]",
-                "project_id": project_id,
-                "current_year": datetime.utcnow().year,
-            },
-        )
     finally:
         db.close()
 

@@ -20,7 +20,7 @@ class Project(Base):
     site = Column(String(255))
     contact = Column(String(255))
 
-    status = Column(String(20), default="active")  # 👈 ADD THIS
+    status = Column(String(20), default="active")  
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

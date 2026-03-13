@@ -2,48 +2,164 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-</head>
 <style>
-    @page{
-        size:A4;
-        margin:25mm;
+    @page {
+        size: A4;
+        margin: 0;
     }
-    body{
-        font-family: "Meiryo",sans-serif;
-        font-size:12px;
-    }
-    .title{
-        text-align: center;
-        font-size: 20px;
-        letter-spacing: 10px;
-        margin-bottom:40px
-    }
-    .amount-box{
-        border:2px solid #000;
-        padding: 15px;
-        font-size:20px;
-        text-align: center;
-        margin:30px 0;
 
+    body {
+        font-family: "Meiryo", "MS Gothic", sans-serif;
+        color: #000;
+        margin: 0;
+        padding: 20mm;
+        background-color: #fff;
     }
-    .company{
+
+    /* Use Clearfix for floated elements */
+    .group:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    .receipt-section {
+        width: 100%;
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: 12px;
+        margin-bottom: 30px;
+    }
+
+    /* REPLACED FLEX WITH FLOAT FOR SERVER COMPATIBILITY */
+    .top-info {
+        width: 100%;
+        margin-bottom: 50px;
+    }
+
+    .client-name {
+        float: left;
+        font-size: 16px;
+        width: 70%;
+    }
+
+    .issue-date {
+        float: right;
         text-align: right;
-        margin-top:40px;
-        
+        font-size: 14px;
+        width: 25%;
+    }
+
+    /* Double Border Amount Box */
+    .amount-wrapper {
+        clear: both; /* Stop floats from interfering */
+        width: 85%;
+        margin: 0 auto 30px auto;
+        border-top: 3px double #000;
+        border-bottom: 3px double #000;
+        padding: 15px 0;
+        text-align: center;
+    }
+
+    .amount-value {
+        font-size: 38px;
+        font-weight: bold;
+    }
+
+    .details {
+        text-align: center;
+        font-size: 15px;
+        line-height: 2;
+        margin-bottom: 40px;
+    }
+
+    .issuer-block {
+        text-align: right;
+        width: 100%;
+    }
+
+    .issuer-address {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .issuer-name {
+        font-size: 18px;
+        letter-spacing: 3px;
+    }
+
+    .cut-line {
+        border-top: 1px dashed #ccc;
+        margin: 60px 0;
+        clear: both;
     }
 </style>
+</head>
 <body>
-    <div class="title">領収書</div>
-    <p>{{ quote.project.client_name }} 様</p>
-    <p>下記金額を領収いたしました</p>
-    <div class="amount-box">
-        ¥{{ "{:,}".format(total|int) }}
+
+<div class="receipt-section">
+    <div class="title">領 収 書</div>
+
+    <div class="top-info group">
+        <div class="client-name">M・K 技建株式会社　御中</div>
+        <div class="issue-date">{{ issue_date }}</div>
     </div>
-    <p>但し、工事代金として</p>
-    <p>支払日：{{ payment_date }}</p>
-    <div class="company">
-        M・K技建株式会社<br>
-        〒321-4532 栃木県真岡市長島24-9<br>
-        TEL: 0285-77-0443
+
+    <div class="amount-wrapper">
+        <div class="amount-value">¥{{ "{:,}".format(amount|int) }}※</div>
     </div>
+
+    <div class="details">
+        <div>但し　{{ description }} として</div>
+        <div>上記の金額正に領収いたしました。</div>
+    </div>
+
+    <div class="issuer-block">
+        <div class="issuer-address">
+            {{ quote.project.site }}
+        </div>
+
+        <div class="issuer-name">
+            {{ quote.project.client_name }}
+        </div>
+    </div>
+</div>
+
+<div class="cut-line"></div>
+
+<div class="receipt-section">
+    <div class="title">領 収 書（控）</div>
+
+    <div class="top-info group">
+        <div class="client-name">M・K 技建株式会社　御中</div>
+        <div class="issue-date">{{ issue_date }}</div>
+    </div>
+
+    <div class="amount-wrapper">
+        <div class="amount-value">¥{{ "{:,}".format(amount|int) }}※</div>
+    </div>
+
+    <div class="details">
+        <div>但し　{{ description }} として</div>
+        <div>上記の金額正に領収いたしました。</div>
+    </div>
+
+    <div class="issuer-block">
+        <div class="issuer-address">
+            {{ quote.project.site }}
+        </div>
+
+        <div class="issuer-name">
+            {{ quote.project.client_name }}
+        </div>
+    </div>
+</div>
+
 </body>
+</html>

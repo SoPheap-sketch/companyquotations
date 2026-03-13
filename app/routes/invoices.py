@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from datetime import datetime, timedelta
 
 from app.db import SessionLocal
-from app.models import Quote, Invoice
+from app.models import Quote, Invoice, Receipt
 from fastapi.responses import Response
 
 import pdfkit
@@ -32,7 +32,6 @@ def create_invoice(request: Request, quote_id: int):
                 status_code=400,
                 detail="Invoice already exists"
             )
-
         invoice = Invoice(
             quote_id=quote.id,
             invoice_number=f"INV-{quote.id}",
@@ -42,7 +41,6 @@ def create_invoice(request: Request, quote_id: int):
             tax=quote.tax,
             total=quote.total,
         )
-
         db.add(invoice)
         db.commit()
 
@@ -53,21 +51,25 @@ def create_invoice(request: Request, quote_id: int):
 
 @router.post("/invoices/{invoice_id}/mark-paid")
 def mark_invoice_paid(invoice_id: int):
-
     db = SessionLocal()
-
     try:
         invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
 
         if not invoice:
             raise HTTPException(status_code=404, detail="Invoice not found")
-
+        # mark paid
         invoice.payment_status = "paid"
         invoice.payment_date = datetime.utcnow()
 
-        #  SAVE BEFORE closing session
+        receipt = Receipt(
+            invoice_id=invoice.id,
+            receipt_number=f"R-{invoice.id}",
+            payment_date=invoice.payment_date,
+            payment_method="bank transfer",
+            amount_received=invoice.total
+        )
+        db.add(receipt)
         quote_id = invoice.quote_id
-
         db.commit()
 
     finally:
@@ -126,29 +128,40 @@ def invoice_pdf(request: Request, invoice_id: int):
 
 @router.get("/receipts/{invoice_id}/pdf")
 def receipt_pdf(request: Request, invoice_id:int):
+
     db = SessionLocal()
+
     invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
+
     if invoice.payment_status != "paid":
-        raise HTTPException(status_code=400, detail=" Invoice not paid yet")
+        raise HTTPException(status_code=400, detail="Invoice not paid yet")
+
     quote = invoice.quote
+    issue_date = invoice.payment_date.strftime("%Y/%m/%d")
+
     html = templates.get_template("receipt_pdf.html").render({
         "request": request,
         "invoice": invoice,
-        "quote":quote,
-        "total":invoice.total,
-        "payment_date": invoice.payment_date.strftime("%Y/%m/%d")
-
+        "quote": quote,   
+        "amount": invoice.total,
+        "issue_date": issue_date,
+        "payment_date": invoice.payment_date.strftime("%Y/%m/%d"),
+        "description": quote.title
     })
+
     config = pdfkit.configuration(
-    wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+        wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
     )
-    pdf = pdfkit.from_string(html, False, configuration= config)
+
+    pdf = pdfkit.from_string(html, False, configuration=config)
+
     return Response(
         pdf,
         media_type="application/pdf",
         headers={
-            "Content-Disposition":f"inline; filename=receipt_{invoice_id}.pdf"
+            "Content-Disposition": f"inline; filename=receipt_{invoice_id}.pdf"
         }
     )

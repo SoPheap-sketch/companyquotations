@@ -120,7 +120,6 @@
           class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900 text-sm">
           📄 Download Invoice
         </a>
-
         <!-- If invoice unpaid -->
         {% if quote.invoice.payment_status == "unpaid" %}
         <form method="post" action="/invoices/{{ quote.invoice.id }}/mark-paid">
@@ -191,7 +190,6 @@
         <th class="text-left p-2">Remark</th>
       </tr>
     </thead>
-
     <tbody class="divide-y">
       {% for it in quote.items %}
       <tr class="hover:bg-slate-50">
