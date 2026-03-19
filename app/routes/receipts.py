@@ -30,7 +30,7 @@ def receipt_pdf(request: Request, invoice_id: int):
         html = templates.get_template("receipt_pdf.html").render({
             "request": request,
             "invoice": invoice,
-            "quote": quote,              # ⭐ ADD THIS
+            "quote": quote,              
             "amount": invoice.total,
             "issue_date": issue_date,
             "description": quote.title
