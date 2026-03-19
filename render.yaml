@@ -8,3 +8,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: WKHTMLTOPDF_PATH
+        value: /usr/bin/wkhtmltopdf
