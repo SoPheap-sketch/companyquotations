@@ -35,22 +35,6 @@ def read_root():
 def startup_event():
     _db.init_db()
 
-    #  Create admin user if not exists
-    db = SessionLocal()
-    user = db.query(User).filter(User.username == "admin").first()
-
-    if not user:
-        new_user = User(
-            username="admin",
-            # CHANGE 'hashed_password' TO 'password' TO MATCH MODELS.PY
-            password=get_password_hash("123456"), 
-            role="admin"
-        )
-        db.add(new_user)
-        db.commit()
-        print(" Admin created")
-
-    db.close()
 
 # Routers
 app.include_router(pages_router)
