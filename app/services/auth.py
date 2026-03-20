@@ -1,14 +1,16 @@
 # app/services/auth.py
 from fastapi import Request, HTTPException
-from fastapi.responses import RedirectResponse
+
 
 # =========================
 # Login required
 # =========================
+# def login_required(request: Request):
+#     if not request.session.get("user_id"):
+#         return RedirectResponse("/login", status_code=303)
 def login_required(request: Request):
     if not request.session.get("user_id"):
-        return RedirectResponse("/login", status_code=303)
-
+        raise HTTPException(status_code=401)
 # =========================
 # Approver (Admin / Manager / CEO)
 # =========================

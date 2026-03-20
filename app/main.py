@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.exceptions import HTTPException
 
 from app import db as _db
 from app.routes.pages import router as pages_router
@@ -18,19 +20,27 @@ from fastapi.responses import RedirectResponse
 
 app = FastAPI(title="Company Quotation System")
 
+# app.add_middleware(
+#     SessionMiddleware,
+#     secret_key="super-secret-key-change-this" 
+# )
+@app.exception_handler(401)
+async def unauthorized_handler(request: Request, exc: HTTPException):
+    return RedirectResponse("/login")
+
 app.add_middleware(
     SessionMiddleware,
-    secret_key="super-secret-key-change-this"
+    secret_key="super-secret-key-change-this",
+    same_site="lax",
+    https_only=True,
+    max_age=300  
 )
-
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # @app.on_event("startup")
 # def startup_event():
-#     _db.init_db()
-
-    
+#     _db.init_db() 
 @app.on_event("startup")
 def startup_event():
     _db.init_db()

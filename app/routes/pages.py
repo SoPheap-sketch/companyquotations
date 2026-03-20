@@ -235,7 +235,7 @@ def edit_project_submit(
         db.close()
     return RedirectResponse(f"/projects/{project_id}", status_code=303)
 
-@router.post("/projects/{project_id}/delete")
+@router.post("/projects/{project_id}/delete", dependencies=[Depends(login_required)])
 def delete_project(request: Request, project_id: int):
     user_id = request.session.get("user_id")
     role = request.session.get("role")
