@@ -39,7 +39,8 @@ def startup_event():
     if not user:
         new_user = User(
             username="admin",
-            hashed_password=get_password_hash("123456"),
+            # CHANGE 'hashed_password' TO 'password' TO MATCH MODELS.PY
+            password=get_password_hash("123456"), 
             role="admin"
         )
         db.add(new_user)
