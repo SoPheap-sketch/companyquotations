@@ -39,7 +39,6 @@ def startup_event():
     if not user:
         new_user = User(
             username="admin",
-            email="admin@test.com",
             hashed_password=get_password_hash("123456"),
             role="admin"
         )
