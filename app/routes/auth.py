@@ -45,9 +45,9 @@ def login_submit(
 
         if not user:
             write_audit_log(
-                request=request,  
-                action="login_success",
-                description="User logged in"
+                request=request,
+                action="login_failed",
+                description=f"User '{username}' not found"
             )
             return templates.TemplateResponse(
                 "login.html",
@@ -56,7 +56,7 @@ def login_submit(
             )
 
         # if not verify_password(password, user.password):
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, user.password):
             write_audit_log(
                 request=request,
                 action="login_failed",
