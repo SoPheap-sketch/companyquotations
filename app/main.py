@@ -13,7 +13,7 @@ from app.routes import invoices
 
 from app.db import SessionLocal
 from app.models import User
-from app.auth import get_password_hash
+from app.routes.auth_utils import get_password_hash 
 
 app = FastAPI(title="Company Quotation System")
 
