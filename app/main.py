@@ -29,9 +29,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # @app.on_event("startup")
 # def startup_event():
 #     _db.init_db()
-@app.get("/")
-def read_root():
-      return RedirectResponse("/dashboard")
+
     
 @app.on_event("startup")
 def startup_event():
