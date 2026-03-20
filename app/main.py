@@ -28,6 +28,9 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # @app.on_event("startup")
 # def startup_event():
 #     _db.init_db()
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "Company Quotation System is running"}
 @app.on_event("startup")
 def startup_event():
     _db.init_db()
