@@ -55,7 +55,8 @@ def login_submit(
                 status_code=400
             )
 
-        if not verify_password(password, user.password):
+        # if not verify_password(password, user.password):
+        if not verify_password(password, user.hashed_password):
             write_audit_log(
                 request=request,
                 action="login_failed",
@@ -145,7 +146,8 @@ def change_password(
         db.close()
         raise HTTPException(status_code=404)
     # update password
-    user.password = hash_password(new_password.strip())
+    # user.password = hash_password(new_password.strip())
+    user.hashed_password = hash_password(new_password.strip())
     user.force_password_change = False
     user_id = user.id  
 
