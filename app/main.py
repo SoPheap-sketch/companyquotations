@@ -14,6 +14,7 @@ from app.routes import invoices
 from app.db import SessionLocal
 from app.models import User
 from app.routes.auth_utils import get_password_hash 
+from fastapi.responses import RedirectResponse
 
 app = FastAPI(title="Company Quotation System")
 
@@ -30,7 +31,8 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 #     _db.init_db()
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "Company Quotation System is running"}
+      return RedirectResponse("/dashboard")
+    
 @app.on_event("startup")
 def startup_event():
     _db.init_db()
