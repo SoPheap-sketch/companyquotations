@@ -147,7 +147,7 @@ def change_password(
         raise HTTPException(status_code=404)
     # update password
     # user.password = hash_password(new_password.strip())
-    user.hashed_password = hash_password(new_password.strip())
+    user.password = hash_password(new_password.strip())
     user.force_password_change = False
     user_id = user.id  
 
