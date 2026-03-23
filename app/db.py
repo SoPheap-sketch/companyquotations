@@ -73,7 +73,13 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 import shutil
 
-DATABASE_URL = "sqlite:////tmp/app.db"
+# Detect environment
+if os.name == "nt":  # Windows (local)
+    DB_PATH = os.path.join("data", "app.db")
+else:  # Linux (Render)
+    DB_PATH = "/tmp/app.db"
+
+DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 engine = create_engine(
     DATABASE_URL,
@@ -87,8 +93,10 @@ Base = declarative_base()
 def init_db():
     from app import models
 
-    if not os.path.exists("/tmp/app.db"):
-        if os.path.exists("data/app.db"):
-            shutil.copy("data/app.db", "/tmp/app.db")
+    # Only copy for Render (Linux)
+    if os.name != "nt":
+        if not os.path.exists("/tmp/app.db"):
+            if os.path.exists("data/app.db"):
+                shutil.copy("data/app.db", "/tmp/app.db")
 
     Base.metadata.create_all(bind=engine, checkfirst=True)

@@ -3,7 +3,10 @@ services:
     name: companyquotations
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: 
+      pip install -r requirements.txt 
+      apt apt-get update
+      apt install -y wkhtmltopdf
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
     healthCheckPath: /
     envVars:
