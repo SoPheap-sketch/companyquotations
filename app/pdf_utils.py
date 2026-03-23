@@ -11,14 +11,23 @@
 #     pdf_io.seek(0)
 #     return pdf_io
 
-import pdfkit
+# import pdfkit
+# from io import BytesIO
+# import os
+
+# def render_pdf_from_html(html_content):
+#     wkhtml_path = os.getenv("WKHTMLTOPDF_PATH")
+
+#     config = pdfkit.configuration(wkhtmltopdf=wkhtml_path) if wkhtml_path else None
+
+#     pdf_bytes = pdfkit.from_string(html_content, False, configuration=config)
+#     return BytesIO(pdf_bytes)
+
+from xhtml2pdf import pisa
 from io import BytesIO
-import os
 
 def render_pdf_from_html(html_content):
-    wkhtml_path = os.getenv("WKHTMLTOPDF_PATH")
-
-    config = pdfkit.configuration(wkhtmltopdf=wkhtml_path) if wkhtml_path else None
-
-    pdf_bytes = pdfkit.from_string(html_content, False, configuration=config)
-    return BytesIO(pdf_bytes)
+    result = BytesIO()
+    pisa.CreatePDF(html_content, dest=result)
+    result.seek(0)
+    return result
