@@ -44,11 +44,16 @@
 #     return pdf
 
 
-import pdfkit
-import os
+# import pdfkit
+# import os
+
+# def render_pdf_from_html(html):
+#     config = pdfkit.configuration(
+#         wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
+#     )
+#     return pdfkit.from_string(html, False, configuration=config)
+
+from weasyprint import HTML
 
 def render_pdf_from_html(html):
-    config = pdfkit.configuration(
-        wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
-    )
-    return pdfkit.from_string(html, False, configuration=config)
+    return HTML(string=html).write_pdf()
