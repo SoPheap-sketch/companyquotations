@@ -45,11 +45,15 @@
 
 
 import pdfkit
-import os
 
 def render_pdf_from_html(html):
     config = pdfkit.configuration(
-        wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
+        wkhtmltopdf="/usr/bin/wkhtmltopdf"
     )
-    return pdfkit.from_string(html, False, configuration=config)
 
+    options = {
+        "enable-local-file-access": None,
+        "encoding": "UTF-8"
+    }
+
+    return pdfkit.from_string(html, False, options=options, configuration=config)
