@@ -17,6 +17,7 @@ from app.db import SessionLocal
 from app.models import User
 from app.routes.auth_utils import get_password_hash 
 from fastapi.responses import RedirectResponse
+from starlette.middleware.sessions import SessionMiddleware
 
 app = FastAPI(title="Company Quotation System")
 
@@ -24,6 +25,7 @@ app = FastAPI(title="Company Quotation System")
 #     SessionMiddleware,
 #     secret_key="super-secret-key-change-this" 
 # )
+
 @app.exception_handler(401)
 async def unauthorized_handler(request: Request, exc: HTTPException):
     return RedirectResponse("/login")
@@ -31,9 +33,10 @@ async def unauthorized_handler(request: Request, exc: HTTPException):
 app.add_middleware(
     SessionMiddleware,
     secret_key="super-secret-key-change-this",
+    session_cookie="session",
     same_site="lax",
-    https_only=True,
-    max_age=300  
+    https_only=False,
+    max_age=3600
 )
 # Static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

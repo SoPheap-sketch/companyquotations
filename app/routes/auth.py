@@ -150,7 +150,6 @@ def change_password(
     user.password = hash_password(new_password.strip())
     user.force_password_change = False
     user_id = user.id  
-
     db.commit()
     db.close()
 

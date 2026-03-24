@@ -1,7 +1,5 @@
 # app/services/auth.py
 from fastapi import Request, HTTPException
-
-
 # =========================
 # Login required
 # =========================
@@ -24,7 +22,6 @@ def approver_required(request: Request):
             status_code=403,
             detail="Approval permission required"
         )
-
 # =========================
 # Admin only
 # =========================
