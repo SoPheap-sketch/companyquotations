@@ -5,14 +5,12 @@ services:
     plan: free
     buildCommand: |
       pip install -r requirements.txt
-      apt-get update
-      apt-get install -y wkhtmltopdf
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
     healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      # - key: WKHTMLTOPDF_PATH
-      #   value: /usr/bin/wkhtmltopdf
+      - key: WKHTMLTOPDF_PATH
+        value: /usr/bin/wkhtmltopdf
       - key: DATABASE_URL
         value: sqlite:////tmp/app.db
