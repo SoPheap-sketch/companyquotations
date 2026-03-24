@@ -33,12 +33,24 @@
 #     pdf = pdfkit.from_string(html_content, False, configuration=config)
 #     return pdf
 
+# import pdfkit
+# import os
+
+# def render_pdf_from_html(html_content):
+#     config = pdfkit.configuration(
+#         wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
+#     )
+#     pdf = pdfkit.from_string(html_content, False, configuration=config)
+#     return pdf
+
+
 import pdfkit
 import os
 
 def render_pdf_from_html(html_content):
-    config = pdfkit.configuration(
-        wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
-    )
+    wkhtml_path = os.path.join(os.getcwd(), "app/bin/wkhtmltopdf")
+
+    config = pdfkit.configuration(wkhtmltopdf=wkhtml_path)
+
     pdf = pdfkit.from_string(html_content, False, configuration=config)
     return pdf
