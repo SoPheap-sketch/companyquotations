@@ -9,7 +9,8 @@ from sqlalchemy import func
 from app.db import SessionLocal
 from app.models import Quote, QuoteItem, Project
 from app.pdf_utils import render_pdf_from_html
-from fastapi.responses import StreamingResponse
+# from fastapi.responses import StreamingResponse
+from fastapi.responses import Response
 from app.utils.audit import write_audit_log
 
 router = APIRouter()
@@ -310,8 +311,15 @@ def quote_pdf(request: Request, quote_id: int):
 
         pdf = render_pdf_from_html(html)
 
-        return StreamingResponse(
-            pdf,
+        # return StreamingResponse(
+        #     pdf,
+        #     media_type="application/pdf",
+        #     headers={
+        #         "Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"
+        #     }
+        # )
+        return Response(
+            content=pdf,
             media_type="application/pdf",
             headers={
                 "Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"
