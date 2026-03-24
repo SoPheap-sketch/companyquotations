@@ -7,7 +7,8 @@ from app.db import SessionLocal
 from app.models import Quote, Invoice, Receipt
 from fastapi.responses import Response
 
-import pdfkit
+# import pdfkit
+from app.pdf_utils import render_pdf_from_html
 from fastapi.responses import Response
 router = APIRouter()
 
@@ -112,12 +113,12 @@ def invoice_pdf(request: Request, invoice_id: int):
         "payment_due": invoice.due_date.strftime("%Y/%m/%d")
     })
 
-    config = pdfkit.configuration(
-        wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-    )
+    # config = pdfkit.configuration(
+    #     wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    # )
 
-    pdf = pdfkit.from_string(html, False, configuration=config)
-
+    # pdf = pdfkit.from_string(html, False, configuration=config)
+    pdf = render_pdf_from_html(html)
     return Response(
         pdf,
         media_type="application/pdf",
@@ -152,12 +153,12 @@ def receipt_pdf(request: Request, invoice_id:int):
         "description": quote.title
     })
 
-    config = pdfkit.configuration(
-        wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-    )
+    # config = pdfkit.configuration(
+    #     wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    # )
 
-    pdf = pdfkit.from_string(html, False, configuration=config)
-
+    # pdf = pdfkit.from_string(html, False, configuration=config)
+    pdf = render_pdf_from_html(html)
     return Response(
         pdf,
         media_type="application/pdf",
