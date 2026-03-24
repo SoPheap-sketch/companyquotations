@@ -10,7 +10,8 @@
         }
 
         body {
-            font-family: "Meiryo", "MS P Gothic", sans-serif;
+            /* font-family: "Meiryo", "MS P Gothic", sans-serif; */
+            font-family: "Noto Sans JP", "DejaVu Sans", sans-serif;
             font-size: 11px;
             color: #000;
             margin: 0;
@@ -20,7 +21,9 @@
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         .font-bold { font-weight: bold; }
-
+        table {
+            page-break-inside: avoid;
+        }
         /* Title Section */
         .title {
             text-align: center;
@@ -107,11 +110,15 @@
         }
 
         /* Stamp Boxes (Red Circle 3) */
-        .hanko-wrapper {
+        /* .hanko-wrapper {
             float: right;
             margin-top: 5px;
-        }
+        } */
 
+        .hanko-wrapper {
+            text-align: right;
+            margin-top: 5px;
+        }
         .hanko-table {
             border-collapse: collapse;
         }
@@ -175,6 +182,9 @@
             padding: 4px 8px;
         }
         .summary-label { width: 100px; }
+        .main-table td {
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -218,7 +228,7 @@
                 </div>
 
                 <div class="hanko-wrapper">
-                    <table class="hanko-table">
+                    <table class="hanko-table" style="margin-left: auto;">
                         <tr><td></td><td></td><td></td><td></td></tr>
                     </table>
                 </div>
@@ -230,9 +240,12 @@
         <table class="total-box">
             <tr>
                 <td class="total-label">合計金額<br><span style="font-size: 9px;">(税込)</span></td>
-                <td class="total-amount">
+                <!-- <td class="total-amount">
                     <span style="float: left;">¥</span>
                     {{ "{:,.0f}".format(total) }}
+                </td> -->
+                <td class="total-amount">
+                    ¥ {{ "{:,.0f}".format(total) }}
                 </td>
             </tr>
         </table>
