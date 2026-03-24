@@ -47,10 +47,8 @@
 import pdfkit
 import os
 
-def render_pdf_from_html(html_content):
-    wkhtml_path = os.path.join(os.getcwd(), "app/bin/wkhtmltopdf")
-
-    config = pdfkit.configuration(wkhtmltopdf=wkhtml_path)
-
-    pdf = pdfkit.from_string(html_content, False, configuration=config)
-    return pdf
+def render_pdf_from_html(html):
+    config = pdfkit.configuration(
+        wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
+    )
+    return pdfkit.from_string(html, False, configuration=config)
