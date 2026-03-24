@@ -424,12 +424,18 @@ def quote_pdf(request: Request, quote_id: int):
             description=f"Generated PDF for quote #{quote.id}",
             target_user_id=request.session.get("user_id"),
         )
-        
-        return StreamingResponse(
-            pdf,
+        return Response(
+            content=pdf,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"}
+            headers={
+                "Content-Disposition": f"inline; filename=file.pdf"
+            }
         )
+        # return StreamingResponse(
+        #     pdf,
+        #     media_type="application/pdf",
+        #     headers={"Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"}
+        # )
     finally:
         db.close()
 CAMBODIA_TZ = pytz.timezone("Asia/Phnom_Penh")

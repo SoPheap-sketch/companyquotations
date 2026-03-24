@@ -7,6 +7,8 @@ from app.models import Invoice
 from app.pdf_utils import render_pdf_from_html
 from fastapi.templating import Jinja2Templates
 
+from fastapi.responses import Response
+
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
@@ -37,14 +39,20 @@ def receipt_pdf(request: Request, invoice_id: int):
         })
 
         pdf = render_pdf_from_html(html)
-
-        return StreamingResponse(
-            pdf,
+        return Response(
+            content=pdf,
             media_type="application/pdf",
             headers={
-                "Content-Disposition": f"inline; filename=receipt_{invoice.id}.pdf"
+                "Content-Disposition": f"inline; filename=file.pdf"
             }
         )
+        # return StreamingResponse(
+        #     pdf,
+        #     media_type="application/pdf",
+        #     headers={
+        #         "Content-Disposition": f"inline; filename=receipt_{invoice.id}.pdf"
+        #     }
+        # )
 
     finally:
         db.close()
