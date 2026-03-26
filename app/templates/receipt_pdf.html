@@ -4,10 +4,10 @@
 <head>
 <meta charset="utf-8">
 <style>
-@page {
-size: A4;
-margin: 0;
-}
+    @page {
+        size: A4;
+        margin: 0;
+    }
 
     body {
         font-family: "Meiryo", "MS Gothic", sans-serif;
@@ -42,17 +42,11 @@ margin: 0;
         margin: 15px 0;
     }
 
-    /* DATE */
-    .date {
-        position: absolute;
-        top: 35px;
-        right: 40px;
-        font-size: 14px;
-    }
+    
 
     /* CUSTOMER SECTION */
     .customer-row {
-        width: 65%;
+        width: 40%;
         border-bottom: 1px solid #000;
         font-size: 16px;
         letter-spacing: 1px;
@@ -61,7 +55,13 @@ margin: 0;
         display: flex;
         justify-content: space-between;
     }
-
+    /* DATE */
+    .date {
+        position: absolute;
+        top: 35px;
+        right: 40px;
+        font-size: 14px;
+    }
     /* AMOUNT BOX (Dotted Pattern) */
     .amount-box {
         margin: 25px auto;
@@ -197,7 +197,6 @@ margin: 0;
         <span>{{ customer_name }}</span>
         <span>様</span>
     </div>
-
     <div class="date">{{ issue_date }}</div>
 </div>
 
