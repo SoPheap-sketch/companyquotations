@@ -254,13 +254,14 @@
 <div class="receipt-container">
 <div class="thick-top-line"></div>
 
-<div class="date">{{ issue_date }}</div>
+<div class="title">領収証</div>
 
-<div class="title">領収証（控）</div>
-
-<div class="customer-row">
-    <span>{{ customer_name }}</span>
-    <span>様</span>
+<div class="info-row">
+    <div class="customer-row">
+        <span>{{ customer_name }}</span>
+        <span>様</span>
+    </div>
+    <div class="date">{{ issue_date }}</div>
 </div>
 
 <div class="amount-box">
