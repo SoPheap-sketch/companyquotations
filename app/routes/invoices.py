@@ -127,42 +127,82 @@ def invoice_pdf(request: Request, invoice_id: int):
         }
     )
 
+from fastapi import APIRouter, Request, HTTPException
+from fastapi.responses import Response
+from datetime import datetime
+
+from app.db import SessionLocal
+from app.models import Invoice
+from app.pdf_utils import render_pdf_from_html
+from fastapi.templating import Jinja2Templates
+
+router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
+
+
 @router.get("/receipts/{invoice_id}/pdf")
-def receipt_pdf(request: Request, invoice_id:int):
+def receipt_pdf(request: Request, invoice_id: int):
 
     db = SessionLocal()
 
-    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
+    try:
+        # ===== GET INVOICE =====
+        invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
 
-    if not invoice:
-        raise HTTPException(status_code=404, detail="Invoice not found")
+        if not invoice:
+            raise HTTPException(status_code=404, detail="Invoice not found")
 
-    if invoice.payment_status != "paid":
-        raise HTTPException(status_code=400, detail="Invoice not paid yet")
+        if invoice.payment_status != "paid":
+            raise HTTPException(status_code=400, detail="Invoice not paid yet")
 
-    quote = invoice.quote
-    issue_date = invoice.payment_date.strftime("%Y/%m/%d")
+        quote = invoice.quote
 
-    html = templates.get_template("receipt_pdf.html").render({
-        "request": request,
-        "invoice": invoice,
-        "quote": quote,   
-        "amount": invoice.total,
-        "issue_date": issue_date,
-        "payment_date": invoice.payment_date.strftime("%Y/%m/%d"),
-        "description": quote.title
-    })
+        # ===== DATE (JAPANESE ERA) =====
+        date = invoice.payment_date or datetime.now()
 
-    # config = pdfkit.configuration(
-    #     wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-    # )
+        reiwa_year = date.year - 2018
+        year_str = "元" if reiwa_year == 1 else str(reiwa_year)
 
-    # pdf = pdfkit.from_string(html, False, configuration=config)
-    pdf = render_pdf_from_html(html)
-    return Response(
-        pdf,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"inline; filename=receipt_{invoice_id}.pdf"
-        }
-    )
+        issue_date = f"令和{year_str}年{date.month}月{date.day}日"
+
+        # ===== AMOUNT CALCULATION =====
+        amount = int(invoice.total or 0)
+        subtotal = int(amount / 1.1)
+        tax = amount - subtotal
+
+        # ===== CUSTOMER NAME (SAFE) =====
+        customer_name = (
+            quote.project.client_name
+            if quote and quote.project and quote.project.client_name
+            else "お客様"
+        )
+
+        # ===== DESCRIPTION (SAFE) =====
+        description = quote.title if quote and quote.title else "工事代金"
+
+        # ===== RENDER HTML =====
+        html = templates.get_template("receipt_pdf.html").render({
+            "request": request,
+            "invoice": invoice,
+            "quote": quote,
+            "customer_name": customer_name,
+            "amount": amount,
+            "subtotal": subtotal,
+            "tax": tax,
+            "issue_date": issue_date,
+            "description": description
+        })
+
+        # ===== GENERATE PDF =====
+        pdf = render_pdf_from_html(html)
+
+        return Response(
+            content=pdf,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"inline; filename=receipt_{invoice_id}.pdf"
+            }
+        )
+
+    finally:
+        db.close()

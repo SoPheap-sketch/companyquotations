@@ -43,17 +43,43 @@
 #     pdf = pdfkit.from_string(html_content, False, configuration=config)
 #     return pdf
 
+# import os
+# import platform
+# import pdfkit
 
+# def render_pdf_from_html(html):
+#     config = pdfkit.configuration(
+#         wkhtmltopdf="/usr/bin/wkhtmltopdf"
+#     )
+
+#     options = {
+#         "enable-local-file-access": None,
+#         "encoding": "UTF-8"
+#     }
+
+#     return pdfkit.from_string(html, False, options=options, configuration=config)
+import os
+import platform
 import pdfkit
 
 def render_pdf_from_html(html):
-    config = pdfkit.configuration(
-        wkhtmltopdf="/usr/bin/wkhtmltopdf"
-    )
+
+    # Detect OS
+    if platform.system() == "Windows":
+        wkhtml_path = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    else:
+        wkhtml_path = "/usr/bin/wkhtmltopdf"
+
+    config = pdfkit.configuration(wkhtmltopdf=wkhtml_path)
 
     options = {
         "enable-local-file-access": None,
         "encoding": "UTF-8"
     }
 
-    return pdfkit.from_string(html, False, options=options, configuration=config)
+    return pdfkit.from_string(
+        html,
+        False,
+        options=options,
+        configuration=config
+    )
