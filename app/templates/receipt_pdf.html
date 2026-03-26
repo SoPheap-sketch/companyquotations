@@ -1,158 +1,305 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<script src="https://cdn.tailwindcss.com"></script>
-
 <style>
 @page {
-    size: A4;
-    margin: 0;
+size: A4;
+margin: 0;
 }
-body {
-    font-family: "Meiryo", "MS Gothic", sans-serif;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-}
+
+    body {
+        font-family: "Meiryo", "MS Gothic", sans-serif;
+        margin: 0;
+        padding: 15mm;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background-color: #fff;
+    }
+
+    .receipt-container {
+        border: 1px solid #000;
+        padding: 30px 40px;
+        height: 140mm; 
+        position: relative;
+        box-sizing: border-box;
+        margin-bottom: 10mm;
+    }
+
+    /* Decorative top line from boss's form */
+    .thick-top-line {
+        border-top: 4px solid #000;
+        margin-bottom: 10px;
+    }
+
+    /* TITLE */
+    .title {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        letter-spacing: 12px;
+        margin: 15px 0;
+    }
+
+    /* DATE */
+    .date {
+        position: absolute;
+        top: 35px;
+        right: 40px;
+        font-size: 14px;
+    }
+
+    /* CUSTOMER SECTION */
+    .customer-row {
+        width: 65%;
+        border-bottom: 1px solid #000;
+        font-size: 16px;
+        letter-spacing: 1px;
+        padding-bottom: 5px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* AMOUNT BOX (Dotted Pattern) */
+    .amount-box {
+        margin: 25px auto;
+        width: 85%;
+        height: 90px;
+
+        text-align: center;
+        line-height: 90px;
+
+        background-image: radial-gradient(#555 0.8px, transparent 0.8px);
+        background-size: 3px 3px;
+        background-color: #dcdcdc;
+
+        border: 1px solid #bbb;
+    }
+
+    .amount-value {
+        font-size: 34px;
+        font-weight: bold;
+
+        background: #fff;
+        padding: 8px 30px;
+
+        display: inline-block;
+        line-height: normal;
+        vertical-align: middle;
+    }
+
+    /* DESCRIPTION */
+    .proviso {
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.8;
+        margin: 15px 0;
+    }
+
+    /* BOTTOM SECTION GRID */
+    .bottom-section {
+        position: absolute;
+        bottom: 25px;
+        left: 40px;
+        right: 40px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .bottom-left {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .bottom-right {
+        display: table-cell;
+        width: 50%;
+        vertical-align: top;
+        text-align: right;
+    }
+
+    /* STAMP BOX */
+    .stamp-box {
+        width: 65px;
+        height: 65px;
+        border: 1px solid #000;
+        float: left;
+        margin-right: 15px;
+    }
+
+    /* BREAKDOWN TABLE */
+    .breakdown {
+        float: left;
+        font-size: 13px;
+    }
+
+    .breakdown-table {
+        border-collapse: collapse;
+        margin-top: 5px;
+        min-width: 180px;
+    }
+
+    .breakdown-table th,
+    .breakdown-table td {
+        border-bottom: 1px solid #000;
+        padding: 3px 6px;
+    }
+
+    .breakdown-table th {
+        text-align: left;
+        font-weight: normal;
+    }
+
+    .breakdown-table td {
+        text-align: right;
+    }
+
+    /* COMPANY INFO */
+    .company-info {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .company-name {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    /* CUT LINE */
+    .cut-line {
+        width: 100%;
+        border-top: 1px dashed #bbb;
+        margin: 5px 0;
+    }
+
+    .clear { clear: both; }
 </style>
+
+
 </head>
 
-<body class="bg-white p-[15mm]">
+<body>
 
-<!-- ===== RECEIPT ===== -->
-<div class="border border-black p-[30px_40px] h-[140mm] relative mb-[10mm]">
+<!-- ===== ORIGINAL RECEIPT ===== -->
 
-    <!-- TOP LINE -->
-    <div class="border-t-[4px] border-black mb-2"></div>
+<div class="receipt-container">
+<div class="thick-top-line"></div>
 
-    <!-- TITLE -->
-    <div class="text-center text-[28px] font-bold tracking-[12px] mb-3">
-        領収証
+<div class="title">領収証</div>
+
+<div class="info-row">
+    <div class="customer-row">
+        <span>{{ customer_name }}</span>
+        <span>様</span>
     </div>
 
-    <!-- HEADER ROW -->
-    <div class="flex justify-between items-center mt-2">
-        <div class="flex justify-between border-b border-black w-[40%] text-[16px] pb-1">
-            <span>{{ customer_name }}</span>
-            <span>様</span>
+    <div class="date">{{ issue_date }}</div>
+</div>
+
+<div class="amount-box">
+    <div class="amount-value">
+        ¥{{ "{:,}".format(amount) }}※
+    </div>
+</div>
+
+<div class="proviso">
+    但し、{{ description }}として<br>
+    上記正に領収いたしました。
+</div>
+
+<div class="bottom-section">
+    <div class="bottom-left">
+        <div class="stamp-box"></div>
+        <div class="breakdown">
+            <div>【内訳】</div>
+            <table class="breakdown-table">
+                <tr>
+                    <th>税抜金額</th>
+                    <td>¥{{ "{:,}".format(subtotal) }}</td>
+                </tr>
+                <tr>
+                    <th>消費税10%</th>
+                    <td>¥{{ "{:,}".format(tax) }}</td>
+                </tr>
+            </table>
         </div>
-        <div class="text-[14px]">
-            {{ issue_date }}
-        </div>
+        <div class="clear"></div>
     </div>
 
-    <!-- AMOUNT -->
-    <div class="mt-6 mx-auto w-[85%] h-[90px] flex items-center justify-center border border-gray-300"
-         style="background-image: radial-gradient(#555 0.8px, transparent 0.8px); background-size: 3px 3px; background-color:#dcdcdc;">
-        <div class="bg-white px-6 py-1 text-[34px] font-bold">
-            ¥{{ "{:,}".format(amount) }}※
-        </div>
-    </div>
-
-    <!-- DESCRIPTION -->
-    <div class="text-center text-[14px] leading-relaxed mt-4">
-        但し、{{ description }}として<br>
-        上記正に領収いたしました。
-    </div>
-
-    <!-- BOTTOM -->
-    <div class="absolute bottom-6 left-10 right-10 flex justify-between items-end">
-
-        <!-- LEFT -->
-        <div class="flex items-start">
-            <div class="w-[65px] h-[65px] border border-black mr-4"></div>
-
-            <div class="text-[13px]">
-                <div>【内訳】</div>
-                <table class="mt-1">
-                    <tr>
-                        <td class="pr-4">税抜金額</td>
-                        <td class="text-right">¥{{ "{:,}".format(subtotal) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="pr-4 border-b border-black">消費税10%</td>
-                        <td class="text-right border-b border-black">¥{{ "{:,}".format(tax) }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="text-right text-[13px] leading-relaxed">
-            <div class="text-[20px] font-bold mb-1">
-                M・K技建株式会社
-            </div>
+    <div class="bottom-right">
+        <div class="company-info">
+            <div class="company-name">M・K技建株式会社</div>
             <div>代表取締役　上野 正見</div>
             <div>〒321-4341 栃木県真岡市高勢町3-123-3</div>
             <div>TEL・FAX：0285-77-0443</div>
         </div>
-
     </div>
+</div>
+
 
 </div>
 
-<!-- CUT LINE -->
-<div class="border-t border-dashed border-gray-400 my-2"></div>
+<div class="cut-line"></div>
 
-<!-- ===== COPY ===== -->
-<div class="border border-black p-[30px_40px] h-[140mm] relative">
+<!-- ===== RECEIPT COPY ===== -->
 
-    <div class="border-t-[4px] border-black mb-2"></div>
+<div class="receipt-container">
+<div class="thick-top-line"></div>
 
-    <div class="text-center text-[28px] font-bold tracking-[12px] mb-3">
-        領収証（控）
+<div class="date">{{ issue_date }}</div>
+
+<div class="title">領収証（控）</div>
+
+<div class="customer-row">
+    <span>{{ customer_name }}</span>
+    <span>様</span>
+</div>
+
+<div class="amount-box">
+    <div class="amount-value">
+        ¥{{ "{:,}".format(amount) }}※
+    </div>
+</div>
+
+<div class="proviso">
+    但し、{{ description }}として<br>
+    上記正に領収いたしました。
+</div>
+
+<div class="bottom-section">
+    <div class="bottom-left">
+        <div class="stamp-box"></div>
+        <div class="breakdown">
+            <div>【内訳】</div>
+            <table class="breakdown-table">
+                <tr>
+                    <th>税抜金額</th>
+                    <td>¥{{ "{:,}".format(subtotal) }}</td>
+                </tr>
+                <tr>
+                    <th>消費税10%</th>
+                    <td>¥{{ "{:,}".format(tax) }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="clear"></div>
     </div>
 
-    <div class="flex justify-between items-center mt-2">
-        <div class="flex justify-between border-b border-black w-[40%] text-[16px] pb-1">
-            <span>{{ customer_name }}</span>
-            <span>様</span>
-        </div>
-        <div class="text-[14px]">
-            {{ issue_date }}
-        </div>
-    </div>
-
-    <div class="mt-6 mx-auto w-[85%] h-[90px] flex items-center justify-center border border-gray-300"
-         style="background-image: radial-gradient(#555 0.8px, transparent 0.8px); background-size: 3px 3px; background-color:#dcdcdc;">
-        <div class="bg-white px-6 py-1 text-[34px] font-bold">
-            ¥{{ "{:,}".format(amount) }}※
-        </div>
-    </div>
-
-    <div class="text-center text-[14px] leading-relaxed mt-4">
-        但し、{{ description }}として<br>
-        上記正に領収いたしました。
-    </div>
-
-    <div class="absolute bottom-6 left-10 right-10 flex justify-between items-end">
-        <div class="flex items-start">
-            <div class="w-[65px] h-[65px] border border-black mr-4"></div>
-
-            <div class="text-[13px]">
-                <div>【内訳】</div>
-                <table class="mt-1">
-                    <tr>
-                        <td class="pr-4">税抜金額</td>
-                        <td class="text-right">¥{{ "{:,}".format(subtotal) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="pr-4 border-b border-black">消費税10%</td>
-                        <td class="text-right border-b border-black">¥{{ "{:,}".format(tax) }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <div class="text-right text-[13px] leading-relaxed">
-            <div class="text-[20px] font-bold mb-1">
-                M・K技建株式会社
-            </div>
+    <div class="bottom-right">
+        <div class="company-info">
+            <div class="company-name">M・K技建株式会社</div>
             <div>代表取締役　上野 正見</div>
             <div>〒321-4341 栃木県真岡市高勢町3-123-3</div>
             <div>TEL・FAX：0285-77-0443</div>
         </div>
     </div>
+</div>
+
 
 </div>
 
