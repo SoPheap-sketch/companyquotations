@@ -30,15 +30,15 @@
     <!-- LEFT -->
     <div class="flex items-center gap-4">
       <!-- SMART BACK (goes to where user came from) -->
-      <button type="button" onclick="history.back()" class="text-slate-600 hover:text-primary-600 flex items-center gap-2">← Back</button>
+      <button type="button" onclick="history.back()" data-i18n="back" class="text-slate-600 hover:text-primary-600 flex items-center gap-2">← Back</button>
       <!-- ALWAYS BACK TO PROJECT -->
       {% if quote %}
-      <a href="/projects/{{ quote.project_id }}"class="text-slate-500 hover:text-primary-600 text-sm">Back to Project</a>
+      <a href="/projects/{{ quote.project_id }}" data-i18n="back_project" class="text-slate-500 hover:text-primary-600 text-sm">Back to Project</a>
       {% endif %}
     </div>
 
     <!-- RIGHT -->
-    <a href="/" class="text-slate-600 hover:text-primary-600">
+    <a href="/" data-i18n="dashboard" class="text-slate-600 hover:text-primary-600">
       Dashboard
     </a>
   </div>
@@ -67,16 +67,17 @@
       </p>
     </div>
     <div class="flex gap-3">
-      <a href="/projects/{{ project.id }}/edit"
+      <a href="/projects/{{ project.id }}/edit" data-i18n="edit_project"
         class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
         Edit Project
       </a>
 
       <form method="post"
             action="/projects/{{ project.id }}/delete"
-            onsubmit="return confirm('Delete this project?')">
+            onsubmit="return confirm(window.translations?.delete_confirm || 'Delete this project?')">
         <button
           type="submit"
+          data-i18n="delete"
           class="px-4 py-2 border border-rose-500 text-rose-600 rounded-lg hover:bg-rose-50">
           Delete
         </button>
@@ -87,24 +88,24 @@
   <div class="bg-white rounded-xl shadow p-6 mb-10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <p class="text-slate-500 font-semibold">Site Location</p>
+        <p data-i18n="site_location" class="text-slate-500 font-semibold">Site Location</p>
         <p>{{ project.site or 'N/A' }}</p>
       </div>
 
       <div>
-        <p class="text-slate-500 font-semibold">Primary Contact</p>
+        <p data-i18n="contact" class="text-slate-500 font-semibold">Primary Contact</p>
         <p>{{ project.contact or '-' }}</p>
       </div>
 
       <div>
-        <p class="text-slate-500 font-semibold">Date Created</p>
+        <p data-i18n="date_created" class="text-slate-500 font-semibold">Date Created</p>
         <p>{{ created_at or 'Unknown (legacy data)' }}</p>
 
       </div>
 
       <div>
-        <p class="text-slate-500 font-semibold">Status</p>
-        <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-primary-700 text-sm">
+        <p data-i18n="status" class="text-slate-500 font-semibold">Status</p>
+        <span data-i18n="status_active" class="inline-block px-3 py-1 rounded-full bg-blue-100 text-primary-700 text-sm">
           Active
         </span>
       </div>
@@ -114,18 +115,18 @@
       <div class="p-6 border-b border-slate-100 bg-slate-50/50">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                  <h2 class="text-lg font-bold text-slate-800">Work Instructions</h2>
-                  <p class="text-xs text-slate-500">Manage tasks and project documentation</p>
+                  <h2 data-i18n="work_instructions" class="text-lg font-bold text-slate-800">Work Instructions</h2>
+                  <p data-i18n="work_desc" class="text-xs text-slate-500">Manage tasks and project documentation</p>
               </div>
               {% if request.session.get("role") in ["admin","manager","ceo"] %}
               <form method="post" action="/projects/{{ project.id }}/instructions/create" class="flex flex-wrap gap-2">
-                  <input name="title" placeholder="Task Title" required 
+                  <input name="title" data-i18n-placeholder="task_title" placeholder="Task Title" required 
                         class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none w-40">
                   
                   <input type="date" name="due_date" 
                         class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none">
                   
-                  <input name="description" placeholder="Instruction detail..." required 
+                  <input name="description" data-i18n-placeholder="instruction_detail" placeholder="Instruction detail..." required 
                         class="border border-slate-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none w-52">
 
                   <select name="assigned_to" class="border border-slate-300 px-3 py-2 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500">
@@ -137,7 +138,7 @@
                       {% endfor %}
                   </select>
 
-                  <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                  <button data-i18n="add_task" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
                       + Add Task
                   </button>
               </form>
@@ -149,11 +150,11 @@
           <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold tracking-wider">
                   <tr>
-                      <th class="px-6 py-4">Instruction Detail</th>
-                      <th class="px-6 py-4 text-center">Assigned To</th>
-                      <th class="px-6 py-4 text-center">Status</th>
-                      <th class="px-6 py-4 text-center">Due Date</th>
-                      <th class="px-6 py-4 text-right">Actions</th>
+                      <th data-i18n="instruction_detail" class="px-6 py-4">Instruction Detail</th>
+                      <th data-i18n="instruction_detail" class="px-6 py-4 text-center">Assigned To</th>
+                      <th data-i18n="assigned_to" class="px-6 py-4 text-center">Status</th>
+                      <th data-i18n="status" class="px-6 py-4 text-center">Due Date</th>
+                      <th data-i18n="due_date" class="px-6 py-4 text-right">Actions</th>
                   </tr>
               </thead>
 
@@ -209,9 +210,9 @@
                                       {% if i.status == 'pending' %} bg-amber-100 text-amber-700 
                                       {% elif i.status == 'in_progress' %} bg-blue-100 text-blue-700 
                                       {% else %} bg-emerald-100 text-emerald-700 {% endif %}">
-                                  <option value="pending" {% if i.status=="pending" %}selected{% endif %}>Pending</option>
-                                  <option value="in_progress" {% if i.status=="in_progress" %}selected{% endif %}>In Progress</option>
-                                  <option value="completed" {% if i.status=="completed" %}selected{% endif %}>Completed</option>
+                                  <option value="pending" data-i18n="status_pending" {% if i.status=="pending" %}selected{% endif %}>Pending</option>
+                                  <option value="in_progress" data-i18n="status_in_progress" {% if i.status=="in_progress" %}selected{% endif %}>In Progress</option>
+                                  <option value="completed" data-i18n="status_completed"{% if i.status=="completed" %}selected{% endif %}>Completed</option>
                               </select>
                           </form>
                       </td>
@@ -241,15 +242,16 @@
       </div>
       {% else %}
       <div class="p-12 text-center">
-          <p class="text-slate-400 italic">No work instructions yet. Create one above.</p>
+          <p data-i18n="no_tasks" class="text-slate-400 italic">No work instructions yet. Create one above.</p>
       </div>
       {% endif %}
   </section>
   <!-- QUOTES -->
   <section>
     <div class="flex justify-between items-center mb-4 mt-5">
-      <h2 class="text-2xl font-bold">Quotes</h2>
+      <h2 data-i18n="quotes" class="text-2xl font-bold">Quotes</h2>
       <a href="/projects/{{ project.id }}/quotes/new"
+         data-i18n="new_quote"
          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
         + New Quote
       </a>
@@ -259,11 +261,11 @@
       <table class="w-full text-left">
         <thead class="bg-slate-100 text-sm text-slate-600">
           <tr>
-            <th class="px-6 py-3">ID</th>
-            <th class="px-6 py-3">Title</th>
-            <th class="px-6 py-3">Status</th>
-            <th class="px-6 py-3">Total</th>
-            <th class="px-6 py-3 text-right">Actions</th>
+            <th data-i18n="id" class="px-6 py-3">ID</th>
+            <th data-i18n="id" class="px-6 py-3">Title</th>
+            <th data-i18n="status" class="px-6 py-3">Status</th>
+            <th data-i18n="total" class="px-6 py-3">Total</th>
+            <th data-i18n="actions" class="px-6 py-3 text-right">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y">
@@ -275,19 +277,19 @@
               </td>
               <td class="px-6 py-3">
                 {% if q.status == "draft" %}
-                  <span class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">
+                  <span data-i18n="status_draft" class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">
                     Draft
                   </span>
                 {% elif q.status == "pending" %}
-                  <span class="px-2 py-1 text-xs rounded bg-yellow-200 text-yellow-800">
+                  <span data-i18n="status_pending" class="px-2 py-1 text-xs rounded bg-yellow-200 text-yellow-800">
                     Pending
                   </span>
                 {% elif q.status == "approved" %}
-                  <span class="px-2 py-1 text-xs rounded bg-green-200 text-green-800">
+                  <span data-i18n="status_approved" class="px-2 py-1 text-xs rounded bg-green-200 text-green-800">
                     Approved
                   </span>
                 {% elif q.status == "rejected" %}
-                  <span class="px-2 py-1 text-xs rounded bg-red-200 text-red-800">
+                  <span data-i18n="status_rejected" class="px-2 py-1 text-xs rounded bg-red-200 text-red-800">
                     Rejected
                   </span>
                 {% endif %}
@@ -297,12 +299,12 @@
               </td>
               <td class="px-6 py-3 text-right space-x-3">
                 <!-- VIEW -->
-                <a href="/quotes/{{ q.id }}" class="text-primary-600 hover:underline">
+                <a href="/quotes/{{ q.id }}" data-i18n="view" class="text-primary-600 hover:underline">
                   View
                 </a>
                 <!-- EDIT -->
                 {% if q.status != "approved" %}
-                  <a href="/quotes/{{ q.id }}/edit" class="text-blue-600 hover:underline">
+                  <a href="/quotes/{{ q.id }}/edit" data-i18n="edit" class="text-blue-600 hover:underline">
                     Edit
                   </a>
                 {% else %}
@@ -321,6 +323,7 @@
                     <input type="hidden" name="next" value="/projects/{{ project.id }}">
                     <button
                       type="submit"
+                      data-i18n="delete"
                       class="px-3 py-1 border border-rose-500 text-rose-600 rounded hover:bg-rose-50"
                     >
                       Delete
@@ -338,23 +341,51 @@
       </table>
     </div>
     {% else %}
-      <div class="bg-white p-6 rounded shadow text-center text-slate-500">
+      <div data-i18n="no_quotes" class="bg-white p-6 rounded shadow text-center text-slate-500">
         No quotes yet. Click “New Quote” to create one.
       </div>
     {% endif %}
   </section>
   {% else %}
     <div class="bg-white p-8 rounded shadow text-center ">
-      <h2 class="text-2xl font-bold">Project not found</h2>
+      <h2 data-i18n="project_not_found" class="text-2xl font-bold">Project not found</h2>
     </div>
   {% endif %}
 </main>
 <footer class="bg-white border-t">
-  <div class="max-w-6xl mx-auto px-6 py-4 text-sm text-slate-500">
+  <div data-i18n="footer_text" class="max-w-6xl mx-auto px-6 py-4 text-sm text-slate-500">
     {{ current_year or '2025' }} — Company Quotation System
   </div>
 </footer>
+<script>
+let currentLang = localStorage.getItem("lang") || "en";
 
+async function loadLanguage(lang) {
+  try {
+    const res = await fetch(`/static/lang/${lang}.json`);
+    const data = await res.json();
+
+    window.translations = data;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (data[key]) el.textContent = data[key];
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+      const key = el.getAttribute("data-i18n-placeholder");
+      if (data[key]) el.placeholder = data[key];
+    });
+
+  } catch (err) {
+    console.error("Lang error:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLanguage(currentLang);
+});
+</script>
 </body>
 </html>
 <script>
@@ -368,3 +399,4 @@
     }
   }
 </script>
+

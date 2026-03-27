@@ -28,10 +28,11 @@
     <button
       type="button"
       onclick="history.back()"
+      data-i18n="back"
       class="text-slate-600 hover:text-primary-700">
-      ← Back
+      <span data-i18n="back">Back</span>
     </button>
-    <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
+    <a href="/" data-i18n="dashboard" class="text-slate-600 hover:text-primary-700">Dashboard</a>
   </div>
 </header>
 <!-- ================= MAIN ================= -->
@@ -47,46 +48,46 @@
     <!-- LEFT -->
     <div>
       <div class="flex items-center gap-3 mb-1">
-        <h1 class="text-3xl font-bold text-slate-900">
+        <h1 data-i18n="quote" class="text-3xl font-bold text-slate-900">
           Quote #{{ quote.id }}
         </h1>
         <!-- STATUS BADGE -->
         {% if quote.status == "draft" %}
-          <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
+          <span data-i18n="status_draft" class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
             Draft
           </span>
         {% elif quote.status == "pending" %}
-          <span class="px-3 py-1 text-xs rounded-full bg-yellow-200 text-yellow-800">
+          <span data-i18n="status_pending" class="px-3 py-1 text-xs rounded-full bg-yellow-200 text-yellow-800">
             Pending
           </span>
         {% elif quote.status == "approved" %}
-          <span class="px-3 py-1 text-xs rounded-full bg-green-200 text-green-800">
+          <span data-i18n="status_approved" class="px-3 py-1 text-xs rounded-full bg-green-200 text-green-800">
             Approved
           </span>
         {% elif quote.status == "rejected" %}
-          <span class="px-3 py-1 text-xs rounded-full bg-red-200 text-red-800">
+          <span data-i18n="status_rejected" class="px-3 py-1 text-xs rounded-full bg-red-200 text-red-800">
             Rejected
           </span>
         {% endif %}
       </div>
       <p class="text-slate-600">{{ quote.title or '' }}</p>
       <p class="text-slate-500 text-sm">
-        Version {{ quote.version }} — Created: {{ quote.created_at }}
+        <span data-i18n="version">Version</span> {{ quote.version }}— <span data-i18n="created">Created</span>: {{ quote.created_at }}
       </p>
     </div>
     <!-- RIGHT -->
     <div class="text-right space-y-2">
-      <div class="text-sm text-slate-600">
+      <div data-i18n="original_cost" class="text-sm text-slate-600">
         Original Cost (Subtotal)
       </div>
       <div class="text-2xl font-bold">
         ¥{{ "{:,.0f}".format(quote.subtotal or 0) }}
       </div>
-      <div class="text-sm text-slate-600">
+      <div data-i18n="profit_margin" class="text-sm text-slate-600">
         Profit margin: {{ (quote.profit_margin * 100)|round(0) }}%
       </div>
       <!-- Total -->
-      <div class="text-sm text-slate-600 mt-2">
+      <div data-i18n="selling_price" class="text-sm text-slate-600 mt-2">
         Selling Price (Inc. Tax)
       </div>
       <div class="text-3xl font-extrabold text-primary-700">
@@ -97,7 +98,7 @@
         <a href="/quotes/{{ quote.id }}/pdf"
           target="_blank"
           class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900">
-          📄 PDF Export
+          📄 <span data-i18n="pdf_export">PDF Export</span>
         </a>
       </div>
       <!-- CREATE INVOICE -->
@@ -106,19 +107,19 @@
         <button
           type="submit"
           class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 text-sm font-semibold">
-          🧾 Create Invoice
+          🧾 <span data-i18n="create_invoice">Create Invoice</span>
         </button>
       </form>
       {% elif quote.invoice %}
       <div class="mt-3 space-y-2">
-        <div class="text-sm text-green-600 font-semibold">
+        <div data-i18n="invoice_created" class="text-sm text-green-600 font-semibold">
           ✅ Invoice Created ({{ quote.invoice.invoice_number }})
         </div>
         <!-- Download Invoice PDF -->
         <a href="/invoices/{{ quote.invoice.id }}/pdf"
           target="_blank"
           class="inline-block bg-slate-800 text-white px-5 py-2 rounded hover:bg-slate-900 text-sm">
-          📄 Download Invoice
+          📄 <span data-i18n="download_invoice">Download Invoice</span>
         </a>
         <!-- If invoice unpaid -->
         {% if quote.invoice.payment_status == "unpaid" %}
@@ -126,19 +127,19 @@
             <button
               type="submit"
               class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-semibold">
-              💰 Mark Payment Received
+              💰<span data-i18n="mark_paid">Mark Payment Received</span>
             </button>
         </form>
         {% endif %}
         <!-- If invoice paid -->
         {% if quote.invoice.payment_status == "paid" %}
-        <div class="text-sm text-green-700">
+        <div data-i18n="paid_on" class="text-sm text-green-700">
             Paid on {{ quote.invoice.payment_date }}
         </div>
         <a href="/receipts/{{ quote.invoice.id }}/pdf"
           target="_blank"
           class="inline-block bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 text-sm">
-          🧾 Download Receipt
+          🧾 <span data-i18n="download_receipt">Download Receipt</span>
         </a>
         {% endif %}
       </div>
@@ -179,15 +180,15 @@
   <table class="w-full text-sm border-collapse">
     <thead class="text-xs text-primary-700 border-b">
       <tr>
-        <th class="text-left p-2">Work Category</th>
-        <th class="text-left p-2">Work Type</th>
-        <th class="text-left p-2">Element</th>
-        <th class="text-left p-2">Supplier</th>
-        <th class="text-right p-2">Qty</th>
-        <th class="text-left p-2">Unit</th>
-        <th class="text-right p-2">Unit Price</th>
-        <th class="text-right p-2">Amount</th>
-        <th class="text-left p-2">Remark</th>
+        <th data-i18n="work_category" class="text-left p-2">Work Category</th>
+        <th data-i18n="work_type" class="text-left p-2">Work Type</th>
+        <th data-i18n="element" class="text-left p-2">Element</th>
+        <th data-i18n="supplier" class="text-left p-2">Supplier</th>
+        <th data-i18n="qty" class="text-right p-2">Qty</th>
+        <th data-i18n="unit" class="text-left p-2">Unit</th>
+        <th data-i18n="unit_price" class="text-right p-2">Unit Price</th>
+        <th data-i18n="amount" class="text-right p-2">Amount</th>
+        <th data-i18n="remark" class="text-left p-2">Remark</th>
       </tr>
     </thead>
     <tbody class="divide-y">
@@ -216,6 +217,29 @@
 
 {% endif %}
 </main>
+<script>
+let currentLang = localStorage.getItem("lang") || "en";
 
+async function loadLanguage(lang) {
+  try {
+    const res = await fetch(`/static/lang/${lang}.json`);
+    const data = await res.json();
+
+    window.langData = data;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (data[key]) el.textContent = data[key];
+    });
+
+  } catch (err) {
+    console.error("Lang error:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLanguage(currentLang);
+});
+</script>
 </body>
 </html>

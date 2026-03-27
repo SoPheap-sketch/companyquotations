@@ -1,3 +1,4 @@
+<!-- admin_audit_logs.html -->
 {% extends "base.html" %}
 {% block title %}Audit Logs{% endblock %}
 
@@ -5,13 +6,14 @@
 
 <div class="bg-white rounded-xl shadow p-6 mb-6">
   <div class="flex items-center justify-between mb-4">
-    <h2 class="text-lg font-semibold text-slate-800">
+    <h2 data-i18n="audit_filters" class="text-lg font-semibold text-slate-800">
       🔍 Audit Log Filters
     </h2>
 
     <a
       href="/admin/audit-logs/export?{{ request.query_params }}"
       class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg"
+      data-i18n="export_csv"
     >
       Export CSV
     </a>
@@ -20,14 +22,14 @@
   <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <!-- USER -->
     <div>
-      <label class="block text-xs font-medium text-slate-500 mb-1">
+      <label data-i18n="user" class="block text-xs font-medium text-slate-500 mb-1">
         User
       </label>
       <select
         name="user_id"
         class="w-full border rounded-lg px-3 py-2 text-sm"
       >
-        <option value="">All Users</option>
+        <option value="" data-i18n="all_users">All Users</option>
         {% for user in users %}
           <option
             value="{{ user.id }}"
@@ -41,14 +43,14 @@
 
     <!-- ACTION -->
     <div>
-      <label class="block text-xs font-medium text-slate-500 mb-1">
+      <label data-i18n="action"  class="block text-xs font-medium text-slate-500 mb-1">
         Action
       </label>
       <select
         name="action"
         class="w-full border rounded-lg px-3 py-2 text-sm"
       >
-        <option value="">All Actions</option>
+        <option value="" data-i18n="all_actions">All Actions</option>
         {% for act in actions %}
           <option
             value="{{ act }}"
@@ -62,7 +64,7 @@
 
     <!-- FROM DATE -->
     <div>
-      <label class="block text-xs font-medium text-slate-500 mb-1">
+      <label data-i18n="from" class="block text-xs font-medium text-slate-500 mb-1">
         From
       </label>
       <input
@@ -75,7 +77,7 @@
 
     <!-- TO DATE -->
     <div>
-      <label class="block text-xs font-medium text-slate-500 mb-1">
+      <label data-i18n="to" class="block text-xs font-medium text-slate-500 mb-1">
         To
       </label>
       <input
@@ -91,12 +93,14 @@
       <a
         href="/admin/audit-logs"
         class="px-4 py-2 border rounded-lg text-sm"
+        data-i18n="reset"
       >
         Reset
       </a>
 
       <button
         type="submit"
+        data-i18n="apply_filters"
         class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
       >
         Apply Filters
@@ -109,11 +113,11 @@
   <table class="w-full text-sm">
     <thead class="bg-slate-100 text-xs uppercase text-slate-600">
       <tr>
-        <th class="px-4 py-3 text-left w-40">Time (UTC+7)</th>
-        <th class="px-4 py-3 text-left">User</th>
-        <th class="px-4 py-3 text-left">Action</th>
-        <th class="px-4 py-3 text-left">Description</th>
-        <th class="px-4 py-3 text-left w-24">IP</th>
+        <th data-i18n="time" class="px-4 py-3 text-left w-40">Time (UTC+7)</th>
+        <th data-i18n="user" class="px-4 py-3 text-left">User</th>
+        <th data-i18n="action" class="px-4 py-3 text-left">Action</th>
+        <th data-i18n="description" class="px-4 py-3 text-left">Description</th>
+        <th data-i18n="ip" class="px-4 py-3 text-left w-24">IP</th>
       </tr>
     </thead>
 

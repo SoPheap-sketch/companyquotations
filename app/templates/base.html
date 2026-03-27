@@ -1,6 +1,6 @@
 <!-- base.html -->
 <!doctype html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -46,10 +46,11 @@
         M
       </div>
       <div>
-        <p class="text-lg leading-none">
+        <p data-i18n="company_name_header" class="text-lg leading-none">
           MK Next Phnom Penh Co., Ltd
         </p>
-        <p class="text-[11px] text-slate-400">
+
+        <p data-i18n="system_name" class="text-[11px] text-slate-400">
           Estimate & Project Management System
         </p>
       </div>
@@ -73,18 +74,21 @@
       <!-- USER MANAGER -->
       {% if request.session.get("role", "").lower() == "admin" %}
         <a href="/admin/users"
+          data-i18n="user_manager"
           class="text-sm text-slate-500 hover:text-mk-600 font-medium">
           User Manager
         </a>
         <div class="h-5 w-px bg-slate-300"></div>
         <!-- ADMIN MENU -->
         <a href="/admin/audit-logs"
+          data-i18n="audit_logs"
           class="text-sm text-slate-500 hover:text-mk-600 font-medium">
           Audit Logs
         </a>
         <div class="h-5 w-px bg-slate-300"></div>
       {% endif %}
       <a href="/reports"
+        data-i18n="reports"
         class="text-sm text-slate-500 hover:text-mk-600 font-medium
                 {% if request.url.path == '/reports' %}
                   text-mk-600 font-semibold
@@ -105,11 +109,21 @@
           </span>
         {% endif %}
       </a>
+      <div class="h-5 w-px bg-slate-300"></div>
       <!-- LOGOUT -->
       <a href="/logout"
+        data-i18n="logout"
         class="text-sm text-slate-500 hover:text-red-600">
         Logout
       </a>
+      <div class="h-5 w-px bg-slate-300"></div>
+      <!-- LANGUAGE SWITCH -->
+      <div class="flex gap-1 text-xs border rounded overflow-hidden">
+        <button onclick="setLanguage('en')" class="px-2 py-1 hover:bg-slate-100">EN</button>
+        <button onclick="setLanguage('jp')" class="px-2 py-1 hover:bg-slate-100">JP</button>
+      </div>
+
+     
     </div>
 
   </div>
@@ -124,10 +138,38 @@
 <footer class="bg-white border-t">
   <div class="w-[90vw] mx-auto py-2 text-xs text-slate-400 flex justify-between">
 
-    <span>© {{ current_year }} MK Giken Co., Ltd.</span>
-    <span>Powered by FastAPI</span>
+    <span data-i18n="company_footer">© {{ current_year }} MK Giken Co., Ltd.</span>
+    <span data-i18n="powered_by">Powered by FastAPI</span>
+
   </div>
 </footer>
+<script>
+async function loadLanguage(lang) {
+  try {
+    const response = await fetch(`/static/lang/${lang}.json`);
+    const data = await response.json();
 
+    window.langData = data;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (data[key]) el.textContent = data[key];
+    });
+
+  } catch (err) {
+    console.error("Lang error:", err);
+  }
+}
+
+function setLanguage(lang) {
+  localStorage.setItem("lang", lang);
+  loadLanguage(lang);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lang = localStorage.getItem("lang") || "en";
+  loadLanguage(lang);
+});
+</script>
 </body>
 </html>

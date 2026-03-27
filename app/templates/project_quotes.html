@@ -1,3 +1,4 @@
+<!-- project quotes -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,10 +23,10 @@
 
 <header class="bg-white shadow border-b border-primary-600">
   <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="/projects/{{ project.id }}" class="text-slate-600 hover:text-primary-700">
+    <a href="/projects/{{ project.id }}"  data-i18n="back" class="text-slate-600 hover:text-primary-700">
       ← Back
     </a>
-    <a href="/" class="text-slate-600 hover:text-primary-700">Dashboard</a>
+    <a href="/" data-i18n="dashboard" class="text-slate-600 hover:text-primary-700">Dashboard</a>
   </div>
 </header>
 
@@ -33,17 +34,18 @@
 
   <div class="flex justify-between items-center mb-6">
     <div>
-      <h1 class="text-3xl font-bold text-slate-900">
+      <h1 data-i18n="quotes" class="text-3xl font-bold text-slate-900">
         Quotes — {{ project.client_name }}
       </h1>
-      <p class="text-slate-500">
+      <p data-i18n="quotes_desc" class="text-slate-500">
         All versions and drafts for this project
       </p>
     </div>
 
     <!-- ✅ ONLY way to create a quote -->
     <a href="/projects/{{ project.id }}/quotes/new"
-       class="px-5 py-3 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700">
+      data-i18n="new_quote"
+      class="px-5 py-3 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700">
       + New Quote
     </a>
   </div>
@@ -53,12 +55,12 @@
     <table class="w-full">
       <thead class="text-left text-sm text-primary-700 border-b">
         <tr>
-          <th class="py-2">ID</th>
-          <th>Version</th>
-          <th>Status</th>
-          <th>Title</th>
-          <th>Total</th>
-          <th>Actions</th>
+          <th data-i18n="id" class="py-2">ID</th>
+          <th data-i18n="version">Version</th>
+          <th data-i18n="status">Status</th>
+          <th data-i18n="title">Title</th>
+          <th data-i18n="total">Total</th>
+          <th data-i18n="actions">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y">
@@ -71,11 +73,11 @@
           <!-- STATUS -->
           <td>
             {% if q.status == 'draft' %}
-              <span class="px-2 py-1 text-xs rounded bg-slate-200">Draft</span>
+              <span data-i18n="status_pending" class="px-2 py-1 text-xs rounded bg-slate-200">Draft</span>
             {% elif q.status == 'pending' %}
               <span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-700">Pending</span>
             {% elif q.status == 'approved' %}
-              <span class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700">Approved</span>
+              <span data-i18n="status_approved" class="px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700">Approved</span>
             {% endif %}
           </td>
 
@@ -83,14 +85,14 @@
           <td>{{ q.total or 0 }}</td>
 
           <td class="space-x-3">
-            <a href="/quotes/{{ q.id }}" class="text-primary-600">View</a>
-            <a href="/quotes/{{ q.id }}/edit" class="text-slate-700">Edit</a>
+            <a href="/quotes/{{ q.id }}" data-i18n="view" class="text-primary-600" >View</a>
+            <a href="/quotes/{{ q.id }}/edit" data-i18n="edit" class="text-slate-700">Edit</a>
 
             <form method="post"
                   action="/quotes/{{ q.id }}/delete?next=/projects/{{ project.id }}/quotes"
                   class="inline">
-              <button class="text-rose-600"
-                      onclick="return confirm('Delete this quote?')">
+              <button data-i18n="delete" class="text-rose-600"
+                      onclick="return confirm(window.langData?.delete_confirm || 'Delete this quote?')">
                 Delete
               </button>
             </form>
@@ -101,12 +103,38 @@
       </tbody>
     </table>
     {% else %}
-      <p class="text-center text-slate-500 py-14">
+      <p data-i18n="no_quotes" class="text-center text-slate-500 py-14">
         No quotes yet. Click “New Quote” to create one.
       </p>
     {% endif %}
   </div>
 
 </main>
+<script>
+let currentLang = localStorage.getItem("lang") || "en";
+
+async function loadLanguage(lang) {
+  try {
+    const res = await fetch(`/static/lang/${lang}.json`);
+    const data = await res.json();
+
+    window.langData = data;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (data[key]) {
+        el.textContent = data[key];
+      }
+    });
+
+  } catch (err) {
+    console.error("Lang error:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLanguage(currentLang);
+});
+</script>
 </body>
 </html>

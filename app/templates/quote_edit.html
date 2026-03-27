@@ -25,17 +25,18 @@
 
 <header class="bg-white shadow-sm border-b sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <a href="/projects/{{ project_id }}" class="text-slate-500 hover:text-sky-600 font-medium">← Back to Project</a>
+    <a href="/projects/{{ project_id }}" data-i18n="back_project" class="text-slate-500 hover:text-sky-600 font-medium">← Back to Project</a>
     {% if quote.status != "approved" %}
       <button
         id="saveBtn"
         type="button"
+        data-i18n="save"
         class="bg-blue-600 text-white px-4 py-2 rounded"
       >
         Save
       </button>
     {% else %}
-      <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded cursor-not-allowed">
+      <button disabled data-i18n="approved_locked" class="bg-gray-300 text-gray-500 px-4 py-2 rounded cursor-not-allowed">
         Approved (Locked)
       </button>
     {% endif %}
@@ -43,35 +44,35 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-8">
-  <h1 class="text-3xl font-black text-slate-900 mb-2">Edit Estimate #{{ quote.id }}</h1>
-  <p class="text-slate-500 mb-6">Client: <span class="font-bold text-slate-700">{{ project_client_name }}</span></p>
+  <h1 data-i18n="edit_estimate" class="text-3xl font-black text-slate-900 mb-2">Edit Estimate #{{ quote.id }}</h1>
+  <p data-i18n="client" class="text-slate-500 mb-6">Client: <span class="font-bold text-slate-700">{{ project_client_name }}</span></p>
 
   <div class="mb-3 max-w-xl">
-    <label class="label-mini">Estimate Title</label>
+    <label data-i18n="estimate_title" class="label-mini">Estimate Title</label>
     <input id="quoteTitle" class="input-standard w-full" value="{{ quote.title or '' }}">
   </div>
 
   <div class="bg-white rounded-xl shadow-xl p-6 card-header-blue mb-8">
     <div class="flex justify-between mb-4">
-      <h2 class="text-lg font-bold">🚀 Item Entry / Edit</h2>
-      <button onclick="toggleDetails()" class="text-xs font-bold text-sky-600">+ Show Detail Fields</button>
+      <h2 data-i18n="item_entry" class="text-lg font-bold">🚀 Item Entry / Edit</h2>
+      <button onclick="toggleDetails()" data-i18n="show_details" class="text-xs font-bold text-sky-600">+ Show Detail Fields</button>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-      <div class="md:col-span-2"><label class="label-mini">Category (区分)</label><input id="fCat" class="input-standard w-full"></div>
-      <div class="md:col-span-2"><label class="label-mini">Work Type (工種)</label><input id="fType" class="input-standard w-full"></div>
-      <div class="md:col-span-2"><label class="label-mini">Item Name (要素)</label><input id="fName" class="input-standard w-full"></div>
-      <div class="md:col-span-1"><label class="label-mini">Qty</label><input id="fQty" type="number" value="1" class="input-standard w-full text-center"></div>
-      <div class="md:col-span-1"><label class="label-mini">Unit</label><input id="fUnit" class="input-standard w-full text-center" placeholder="式"></div>
-      <div class="md:col-span-2"><label class="label-mini">Unit Price</label><input id="fPrice" type="number" class="input-standard w-full text-right font-bold text-rose-600"></div>
-      <div class="md:col-span-2"><button id="addBtn" class="w-full bg-emerald-600 text-white font-black py-2.5 rounded-lg">ADD</button></div>
+      <div class="md:col-span-2"><label data-i18n="category" class="label-mini">Category (区分)</label><input id="fCat" class="input-standard w-full"></div>
+      <div class="md:col-span-2"><label data-i18n="category" class="label-mini">Work Type (工種)</label><input id="fType" class="input-standard w-full"></div>
+      <div class="md:col-span-2"><label data-i18n="work_type" class="label-mini">Item Name (要素)</label><input id="fName" class="input-standard w-full"></div>
+      <div class="md:col-span-1"><label data-i18n="item_name" class="label-mini">Qty</label><input id="fQty" type="number" value="1" class="input-standard w-full text-center"></div>
+      <div class="md:col-span-1"><label data-i18n="unit" class="label-mini">Unit</label><input id="fUnit" class="input-standard w-full text-center" placeholder="式"></div>
+      <div class="md:col-span-2"><label data-i18n="unit_price" class="label-mini">Unit Price</label><input id="fPrice" type="number" class="input-standard w-full text-right font-bold text-rose-600"></div>
+      <div class="md:col-span-2"><button id="addBtn" data-i18n="add" class="w-full bg-emerald-600 text-white font-black py-2.5 rounded-lg">ADD</button></div>
     </div>
 
     <div id="detailDrawer" class="hidden mt-6 grid grid-cols-1 md:grid-cols-12 gap-4">
-      <div class="md:col-span-3"><label class="label-mini">Supplier</label><input id="fSup" class="input-standard w-full"></div>
-      <div class="md:col-span-3"><label class="label-mini">Specification</label><input id="fSpec" class="input-standard w-full"></div>
-      <div class="md:col-span-2"><label class="label-mini">Date</label><input id="fDate" type="date" class="input-standard w-full"></div>
-      <div class="md:col-span-4"><label class="label-mini">Remark</label><input id="fRem" class="input-standard w-full"></div>
+      <div class="md:col-span-3"><label data-i18n="supplier" class="label-mini">Supplier</label><input id="fSup" class="input-standard w-full"></div>
+      <div class="md:col-span-3"><label data-i18n="specification" class="label-mini">Specification</label><input id="fSpec" class="input-standard w-full"></div>
+      <div class="md:col-span-2"><label data-i18n="date" class="label-mini">Date</label><input id="fDate" type="date" class="input-standard w-full"></div>
+      <div class="md:col-span-4"><label data-i18n="remark" class="label-mini">Remark</label><input id="fRem" class="input-standard w-full"></div>
     </div>
   </div>
 
@@ -79,22 +80,22 @@
     <table class="w-full">
       <thead class="bg-slate-800 text-white text-xs">
         <tr>
-          <th class="px-4 py-3 text-left">Category</th>
-          <th class="px-4 py-3 text-left">Work Type</th>
-          <th class="px-4 py-3 text-left">Element</th>
-          <th class="px-4 py-3 text-center">Qty</th>
-          <th class="px-4 py-3 text-center">Unit</th>
-          <th class="px-4 py-3 text-right">Unit Price</th>
-          <th class="px-4 py-3 text-right">Total</th>
-          <th class="px-4 py-3 text-center">Actions</th>
+          <th data-i18n="category" class="px-4 py-3 text-left">Category</th>
+          <th data-i18n="work_type" class="px-4 py-3 text-left">Work Type</th>
+          <th data-i18n="element" class="px-4 py-3 text-left">Element</th>
+          <th data-i18n="qty" class="px-4 py-3 text-center">Qty</th>
+          <th data-i18n="unit" class="px-4 py-3 text-center">Unit</th>
+          <th data-i18n="unit_price" class="px-4 py-3 text-right">Unit Price</th>
+          <th data-i18n="total" class="px-4 py-3 text-right">Total</th>
+          <th data-i18n="actions" class="px-4 py-3 text-center">Actions</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
     <div class="p-6 bg-slate-50 text-right">
-      <div class="text-slate-600">Subtotal: <span id="dispSub">¥0</span></div>
-      <div class="text-slate-600">Margin (%): <input id="globalMargin" type="number" class="w-14 text-center border rounded"></div>
-      <div class="text-xl font-black mt-2 text-slate-900">TOTAL: <span id="dispTotal">¥0</span></div>
+      <div data-i18n="subtotal" class="text-slate-600">Subtotal: <span id="dispSub">¥0</span></div>
+      <div data-i18n="margin" class="text-slate-600">Margin (%): <input id="globalMargin" type="number" class="w-14 text-center border rounded"></div>
+      <div data-i18n="total" class="text-xl font-black mt-2 text-slate-900">TOTAL: <span id="dispTotal">¥0</span></div>
     </div>
   </div>
 </main>
@@ -192,7 +193,7 @@ document.getElementById('addBtn').onclick = () => {
     date: document.getElementById('fDate').value,
     remark: document.getElementById('fRem').value
   };
-  if (!item.element || item.unit_price <= 0) return alert("Enter Name and Price");
+  if (!item.element || item.unit_price <= 0) return alert(window.langData?.enter_name_price || "Enter Name and Price");
   renderItemRow(item);
   calculate();
   ['fName', 'fPrice', 'fType'].forEach(id => document.getElementById(id).value = '');
@@ -200,7 +201,7 @@ document.getElementById('addBtn').onclick = () => {
 
 document.getElementById('saveBtn').onclick = async () => {
   const title = document.getElementById('quoteTitle').value.trim();
-  if (!title) return alert("Enter Estimate Title");
+  if (!title) return alert(window.langData?.enter_title || "Enter Estimate Title");
   
   const items = Array.from(tableBody.querySelectorAll('tr')).map(r => ({
     work_category: r.dataset.category,
@@ -222,11 +223,35 @@ document.getElementById('saveBtn').onclick = async () => {
       body: JSON.stringify({ title, items, profit_margin: Number(marginInput.value) / 100 })
     });
     if (res.ok) window.location.href = `/projects/${PROJECT_ID}`;
-    else alert("Failed to save changes.");
-  } catch (err) { alert("Server connection error."); }
+    else alert(window.langData?.save_failed || "Failed to save changes.");
+  } catch (err) { alert(window.langData?.server_error || "Server connection error."); }
 };
 
 marginInput.oninput = calculate;
+</script>
+<script>
+let currentLang = localStorage.getItem("lang") || "en";
+
+async function loadLanguage(lang) {
+  try {
+    const res = await fetch(`/static/lang/${lang}.json`);
+    const data = await res.json();
+
+    window.langData = data;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (data[key]) el.textContent = data[key];
+    });
+
+  } catch (err) {
+    console.error("Lang error:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadLanguage(currentLang);
+});
 </script>
 </body>
 </html>

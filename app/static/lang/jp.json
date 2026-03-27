@@ -1,0 +1,259 @@
+{
+  "login": "ログイン",
+  "dashboard": "ダッシュボード",
+  "new_project": "新規プロジェクト",
+  "logout": "ログアウト",
+
+  "system_login": "システムログイン",
+  "login_desc": "見積とプロジェクトを管理します。",
+  "username": "ユーザー名",
+  "password": "パスワード",
+  "sign_in": "ダッシュボードにログイン",
+
+  "company_name": "MKネクストプノンペン株式会社",
+  "system_title": "見積・プロジェクトシステム",
+
+  "company_name_header": "MKネクストプノンペン株式会社",
+  "system_name": "見積・プロジェクト管理システム",
+
+  "help_center": "ヘルプセンター",
+  "security_info": "セキュリティ情報",
+  "footer_tagline": "精密管理ソリューション",
+  "company_footer": "© 2026 MKネクストプノンペン株式会社",
+
+  "user_manager": "ユーザー管理",
+  "audit_logs": "監査ログ",
+  "reports": "レポート",
+
+  "powered_by": "FastAPIによって提供されています",
+  "business_overview": "業務概要",
+"total_projects": "プロジェクト数",
+"pending_estimates": "保留中の見積",
+"approved_quotes": "承認済み見積",
+"total_amount": "承認済み合計金額",
+
+"quick_actions": "クイック操作",
+"create_project": "新規プロジェクト作成",
+"project_list": "プロジェクト一覧",
+"view_projects": "プロジェクトを見る",
+
+"recent_activity": "最近の活動",
+"recent_projects": "最近のプロジェクト",
+"recent_quotes": "最近の見積",
+
+"notifications": "通知",
+"system_update": "システム更新",
+"estimate_added": "見積テンプレートが追加されました",
+"pending_approval": "承認待ち",
+"pending_text": "件",
+
+"developer_docs": "開発者ドキュメント",
+"api_reference": "FastAPIリファレンス",
+
+"status_draft": "下書き",
+"status_pending": "保留中",
+"status_approved": "承認済み",
+"status_rejected": "却下",
+"audit_filters": "監査ログフィルター",
+"export_csv": "CSVエクスポート",
+"user": "ユーザー",
+"all_users": "全ユーザー",
+"action": "操作",
+"all_actions": "全操作",
+"from": "開始日",
+"to": "終了日",
+"reset": "リセット",
+"apply_filters": "フィルター適用",
+
+"time": "時間 (UTC+7)",
+"description": "説明",
+"ip": "IP",
+
+"admin": "管理",
+"user_management": "ユーザー管理",
+"system_users": "システムユーザー",
+"manage_permissions": "チーム権限と部署を管理します。",
+"cannot_modify_self": "※ 自分の管理者権限は変更できません。",
+"add_user": "新規ユーザー追加",
+
+"user_details": "ユーザー詳細",
+"access_role": "権限",
+"department": "部署",
+"actions": "操作",
+
+"disabled": "無効",
+"you": "自分",
+
+"staff": "スタッフ",
+"manager": "マネージャー",
+"admin_role": "管理者",
+
+"none": "なし",
+"it_dept": "IT部門",
+"design_team": "デザインチーム",
+"management": "管理部",
+
+"save_changes": "変更保存",
+
+"admin_account": "管理者アカウント",
+
+"create_user": "ユーザー作成",
+"locked": "ロック中",
+"disable": "無効化",
+"enable": "有効化",
+
+"disable_confirm": "このユーザーを無効にしますか？",
+"enable_confirm": "このユーザーを有効にしますか？",
+
+"reset_password": "パスワードリセット",
+"target_user": "対象ユーザー",
+"new_password": "新しいパスワード",
+"enter_new_password": "新しいパスワードを入力してください",
+
+"cancel": "キャンセル",
+"update_password": "パスワード更新",
+
+"role": "権限",
+
+"notifications_desc": "あなたに割り当てられたタスクとシステム更新",
+"mark_all_read": "すべて既読にする",
+"no_notifications": "通知はまだありません",
+"delete_project_title": "プロジェクト削除",
+"back_project": "プロジェクト詳細へ戻る",
+
+"project_not_found": "プロジェクトが見つかりません",
+"project_not_exist": "削除対象のプロジェクトは存在しません",
+"go_projects": "プロジェクト一覧へ",
+
+"confirm_deletion": "削除確認",
+"delete_confirm_text": "このプロジェクトを本当に削除しますか？",
+"warning": "警告:",
+"delete_warning": "この操作は元に戻せません",
+
+"delete_confirm_btn": "完全に削除する",
+"edit_project_title": "プロジェクト編集",
+"edit_project": "プロジェクト編集",
+"updating_details": "更新対象:",
+
+"client_name": "顧客名",
+"site_location": "現場住所",
+"contact": "連絡先",
+
+"client_placeholder": "会社名を入力",
+"site_placeholder": "現場住所を入力",
+"contact_placeholder": "電話番号またはメール",
+
+
+
+"error": "エラー！",
+"quotes_title": "見積一覧",
+"quotes": "見積",
+"quotes_desc": "このプロジェクトのすべてのバージョンと下書き",
+
+"new_quote": "新規見積",
+
+"id": "ID",
+"version": "バージョン",
+"status": "状態",
+"title": "タイトル",
+"total": "合計",
+
+
+"view": "表示",
+"edit": "編集",
+"delete": "削除",
+
+"delete_confirm": "この見積を削除しますか？",
+
+"no_quotes": "見積がまだありません",
+"pw_rule_1": "・8文字以上",
+"pw_rule_2": "・大文字を1つ含む",
+"pw_rule_3": "・小文字を1つ含む",
+"pw_rule_4": "・数字を1つ含む",
+"pw_rule_5": "・記号を1つ含む",
+
+"change_password": "パスワード変更",
+"change_password_desc": "続行するには強力なパスワードを設定する必要があります。",
+
+"quote": "見積",
+"untitled": "無題",
+
+"sales_overview": "売上概要",
+"sales_desc": "承認済み見積金額の推移",
+
+"workflow_overview": "ワークフロー概要",
+"workflow_desc": "見積ステータスの分布",
+
+"notes": "注意事項",
+"note_1": "売上には承認済み見積のみ含まれます。",
+"note_2": "見積ステータスで業務のボトルネックを把握できます。",
+"note_3": "金額データは権限により制限されます。",
+"work_instructions": "作業指示",
+"work_desc": "タスクとプロジェクトドキュメントを管理します",
+"task_title": "タスクタイトル",
+"instruction_detail": "指示内容",
+"add_task": "タスク追加",
+"no_tasks": "作業指示はまだありません。上で作成してください。",
+"date_created": "作成日",
+"assign_staff": "担当者を選択",
+"status_in_progress": "進行中",
+"status_completed": "完了",
+"footer_text": "見積・プロジェクト管理システム",
+"back": "戻る",
+"original_cost": "原価（小計）",
+  "profit_margin": "利益率",
+  "selling_price": "販売価格（税込）",
+
+  "pdf_export": "PDF出力",
+  "create_invoice": "請求書作成",
+  "download_invoice": "請求書ダウンロード",
+  "mark_paid": "入金済みにする",
+  "download_receipt": "領収書ダウンロード",
+
+  "submit_approval": "承認申請",
+  "approve_quote": "見積承認",
+  "reject_quote": "見積却下",
+
+  "work_category": "作業分類",
+  "work_type": "作業タイプ",
+  "element": "項目",
+  "supplier": "仕入先",
+  "qty": "数量",
+  "unit": "単位",
+  "unit_price": "単価",
+  "amount": "金額",
+  "remark": "備考",
+  "draft_estimate": "下書き見積",
+
+  "created": "作成日",
+  "invoice_created": "請求書作成済み",
+  "paid_on": "支払日",
+  "edit_estimate": "見積編集",
+  "client": "顧客",
+  "estimate_title": "見積タイトル",
+
+  "item_entry": "項目入力 / 編集",
+  "show_details": "詳細項目を表示",
+
+  "category": "分類",
+  "item_name": "項目名",
+  "add": "追加",
+
+  "specification": "仕様",
+  "date": "日付",
+
+  "subtotal": "小計",
+  "margin": "利益率",
+
+  "save": "保存",
+  "approved_locked": "承認済み（ロック）",
+
+  "enter_name_price": "項目名と単価を入力してください",
+  "enter_title": "見積タイトルを入力してください",
+  "save_failed": "保存に失敗しました",
+  "server_error": "サーバー接続エラー",
+  "projects_title": "プロジェクト一覧",
+  "projects_desc": "すべての進行中および完了したプロジェクトを管理します。",
+  "no_projects": "プロジェクトがありません。新規作成してください。"
+
+}

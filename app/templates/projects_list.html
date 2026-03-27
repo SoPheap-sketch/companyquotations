@@ -33,11 +33,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Dashboard
+           <span data-i18n="dashboard">Dashboard</span>
           </a>
         </div>
         <div>
-          <a href="/projects/form" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg shadow hover:bg-primary-700 transition duration-150">
+          <a href="/projects/form" data-i18n="new_project" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg shadow hover:bg-primary-700 transition duration-150">
             ➕ New Project
           </a>
         </div>
@@ -45,8 +45,8 @@
     </header>
 
     <main class="flex-1 max-w-6xl mx-auto px-6 py-10 w-full">
-      <h1 class="text-3xl font-bold text-slate-900 mb-2">Client Projects</h1>
-      <p class="text-md text-slate-500 mb-6">Manage all current and completed design and construction projects.</p>
+      <h1 data-i18n="projects_title" class="text-3xl font-bold text-slate-900 mb-2">Client Projects</h1>
+      <p data-i18n="projects_desc" class="text-md text-slate-500 mb-6">Manage all current and completed design and construction projects.</p>
 
       <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
         
@@ -54,11 +54,11 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-primary-50">
               <tr class="text-left text-xs font-semibold uppercase tracking-wider text-primary-700">
-                <th class="px-6 py-3">ID</th>
-                <th class="px-6 py-3">Client Name</th>
-                <th class="px-6 py-3">Site Location</th>
-                <th class="px-6 py-3">Primary Contact</th>
-                <th class="px-6 py-3 text-center">Actions</th>
+                <th data-i18n="id" class="px-6 py-3">ID</th>
+                <th data-i18n="client_name" class="px-6 py-3">Client Name</th>
+                <th data-i18n="site_location" class="px-6 py-3">Site Location</th>
+                <th data-i18n="primary_contact" class="px-6 py-3">Primary Contact</th>
+                <th data-i18n="actions" class="px-6 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
@@ -71,13 +71,13 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ p.site or 'N/A' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ p.contact or '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                  <a href="/projects/{{ p.id }}" class="text-primary-600 hover:text-primary-700 font-medium mr-4">View</a>
-                  <a href="/projects/{{ p.id }}/edit" class="text-sky-600 hover:text-sky-700 font-medium mr-4">Edit</a>
+                  <a href="/projects/{{ p.id }}" data-i18n="view" class="text-primary-600 hover:text-primary-700 font-medium mr-4">View</a>
+                  <a href="/projects/{{ p.id }}/edit" data-i18n="edit" class="text-sky-600 hover:text-sky-700 font-medium mr-4">Edit</a>
                   <form action="/projects/{{ p.id }}/delete"
                         method="post"
                         class="inline"
-                        onsubmit="return confirm('Delete this project?')">
-                    <button class="text-rose-600 hover:underline">
+                        onsubmit="return confirm(window.translations?.delete_confirm || 'Delete this project?')"
+                    <button data-i18n="delete" class="text-rose-600 hover:underline">
                       Delete
                     </button>
                   </form>
@@ -87,7 +87,7 @@
               {% endfor %}
               {% if not projects %}
               <tr>
-                <td colspan="5" class="px-6 py-10 text-center text-slate-500 text-lg">
+                <td colspan="5" data-i18n="no_projects" class="px-6 py-10 text-center text-slate-500 text-lg">
                   No projects found. Start by creating a new one!
                 </td>
               </tr>
@@ -99,10 +99,29 @@
     </main>
 
     <footer class="bg-white border-t mt-10">
-      <div class="max-w-6xl mx-auto px-6 py-4 text-sm text-slate-500">
+      <div data-i18n="footer_text" class="max-w-6xl mx-auto px-6 py-4 text-sm text-slate-500">
         Design & Build Quoter — MVP
       </div>
     </footer>
   </div>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const lang = localStorage.getItem("lang") || "en";
+
+  fetch(`/static/lang/${lang}.json`)
+    .then(res => res.json())
+    .then(data => {
+
+      window.translations = data;
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (data[key]) el.textContent = data[key];
+      });
+
+    })
+    .catch(err => console.error("Lang error:", err));
+});
+</script>
 </body>
 </html>

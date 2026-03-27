@@ -4,8 +4,8 @@
 <div class="max-w-7xl mx-auto px-6 py-6 space-y-8">
   <!-- ================= PAGE HEADER ================= -->
   <header>
-    <h1 class="text-2xl font-bold text-slate-800">Reports</h1>
-    <p class="text-sm text-slate-500 mt-1">
+    <h1 data-i18n="reports" class="text-2xl font-bold text-slate-800">Reports</h1>
+    <p data-i18n="reports_desc" class="text-sm text-slate-500 mt-1">
       Business overview and workflow analysis based on quotation data.
     </p>
   </header>
@@ -13,10 +13,10 @@
   {% if can_view_money %}
   <section class="bg-white rounded-xl shadow p-6">
     <header class="mb-4">
-      <h2 class="text-lg font-semibold text-slate-800">
+      <h2 data-i18n="sales_overview" class="text-lg font-semibold text-slate-800">
         Sales Overview
       </h2>
-      <p class="text-sm text-slate-500">
+      <p data-i18n="sales_desc" class="text-sm text-slate-500">
         Approved quotation amounts over time.
       </p>
     </header>
@@ -34,10 +34,10 @@
   <!-- ================= WORKFLOW OVERVIEW ================= -->
   <section class="bg-white rounded-xl shadow p-6">
     <header class="mb-4">
-      <h2 class="text-lg font-semibold text-slate-800">
+      <h2 data-i18n="workflow_overview" class="text-lg font-semibold text-slate-800">
         Workflow Overview
       </h2>
-      <p class="text-sm text-slate-500">
+      <p data-i18n="workflow_desc" class="text-sm text-slate-500">
         Current quotation status distribution.
       </p>
     </header>
@@ -45,28 +45,28 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
 
     <div class="bg-slate-50 rounded-lg p-4 text-center">
-        <p class="text-xs text-slate-500">Draft</p>
+        <p data-i18n="status_draft" class="text-xs text-slate-500">Draft</p>
         <p class="text-xl font-bold text-slate-700">
         {{ workflow_data.get('draft', 0) }}
         </p>
     </div>
 
     <div class="bg-amber-50 rounded-lg p-4 text-center">
-        <p class="text-xs text-amber-600">Pending</p>
+        <p data-i18n="status_pending" class="text-xs text-amber-600">Pending</p>
         <p class="text-xl font-bold text-amber-700">
         {{ workflow_data.get('pending', 0) }}
         </p>
     </div>
 
     <div class="bg-emerald-50 rounded-lg p-4 text-center">
-        <p class="text-xs text-emerald-600">Approved</p>
+        <p data-i18n="status_approved"class="text-xs text-emerald-600">Approved</p>
         <p class="text-xl font-bold text-emerald-700">
         {{ workflow_data.get('approved', 0) }}
         </p>
     </div>
 
     <div class="bg-red-50 rounded-lg p-4 text-center">
-        <p class="text-xs text-red-600">Rejected</p>
+        <p data-i18n="status_rejected" class="text-xs text-red-600">Rejected</p>
         <p class="text-xl font-bold text-red-700">
         {{ workflow_data.get('rejected', 0) }}
         </p>
@@ -82,13 +82,13 @@
   </section>
   <!-- ================= NOTES ================= -->
   <section class="bg-slate-50 border border-slate-200 rounded-xl p-5">
-    <h3 class="text-sm font-semibold text-slate-700 mb-2">
+    <h3 data-i18n="notes" class="text-sm font-semibold text-slate-700 mb-2">
       Notes
     </h3>
     <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
-      <li>Only approved quotations are included in sales figures.</li>
-      <li>Quotation status helps identify workflow bottlenecks.</li>
-      <li>Access to financial data is restricted by user role.</li>
+      <li data-i18n="note_1">Only approved quotations are included in sales figures.</li>
+      <li data-i18n="note_2">Quotation status helps identify workflow bottlenecks.</li>
+      <li data-i18n="note_3">Access to financial data is restricted by user role.</li>
     </ul>
   </section>
 
@@ -99,100 +99,104 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('approvedAmountChart');
-  if (!canvas) return;
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('approvedAmountChart');
+      if (!canvas) return;
 
-  const monthlyData = JSON.parse(canvas.dataset.monthly || '[]');
+      const monthlyData = JSON.parse(canvas.dataset.monthly || '[]');
 
-  if (monthlyData.length === 0) {
-    canvas.parentElement.innerHTML =
-      '<div class="h-64 flex items-center justify-center text-slate-400">No approved data yet</div>';
-    return;
-  }
+      if (monthlyData.length === 0) {
+        const emptyText = (window.translations && translations.no_data) || "No approved data yet";
 
-  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const labels = monthlyData.map(item => monthNames[item.month - 1]);
-  const values = monthlyData.map(item => item.total);
+        canvas.parentElement.innerHTML =
+          `<div class="h-64 flex items-center justify-center text-slate-400">${emptyText}</div>`;
+        return;
+      }
 
-  new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Approved Amount (¥)',
-        data: values,
-        borderColor: '#0284c7',
-        backgroundColor: 'rgba(2,132,199,0.15)',
-        tension: 0.35,
-        fill: true,
-        pointRadius: 4,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: value => '¥' + value.toLocaleString()
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const labels = monthlyData.map(item => monthNames[item.month - 1]);
+      const values = monthlyData.map(item => item.total);
+
+      new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: (window.translations && translations.approved_amount) || 'Approved Amount (¥)',
+            data: values,
+            borderColor: '#0284c7',
+            backgroundColor: 'rgba(2,132,199,0.15)',
+            tension: 0.35,
+            fill: true,
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => '¥' + value.toLocaleString()
+              }
+            }
           }
         }
-      }
-    }
-  });
-});
+      });
+    });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const canvas = document.getElementById('workflowStatusChart');
-  if (!canvas) return;
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('workflowStatusChart');
+      if (!canvas) return;
 
-  const rawData = JSON.parse(canvas.dataset.workflow || '{}');
+      const rawData = JSON.parse(canvas.dataset.workflow || '{}');
 
-  const labels = ['Draft', 'Pending', 'Approved', 'Rejected'];
-  const values = [
-    rawData.draft || 0,
-    rawData.pending || 0,
-    rawData.approved || 0,
-    rawData.rejected || 0
-  ];
+      const labels = [
+        (window.translations && translations.status_draft) || 'Draft',
+        (window.translations && translations.status_pending) || 'Pending',
+        (window.translations && translations.status_approved) || 'Approved',
+        (window.translations && translations.status_rejected) || 'Rejected'
+      ];
 
-  new Chart(canvas.getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Number of Quotes',
-        data: values,
-        backgroundColor: [
-          '#94a3b8',   // draft
-          '#facc15',   // pending
-          '#22c55e',   // approved
-          '#ef4444'    // rejected
-        ],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { precision: 0 }
+      const values = [
+        rawData.draft || 0,
+        rawData.pending || 0,
+        rawData.approved || 0,
+        rawData.rejected || 0
+      ];
+
+      new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: (window.translations && translations.num_quotes) || 'Number of Quotes',
+            data: values,
+            backgroundColor: [
+              '#94a3b8',
+              '#facc15',
+              '#22c55e',
+              '#ef4444'
+            ],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 }
+            }
+          }
         }
-      }
-    }
-  });
-});
+      });
+    });
 </script>
 
 {% endif %}

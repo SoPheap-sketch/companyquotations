@@ -63,7 +63,11 @@
   </div>
 {% endif %}
 <body class="bg-construction min-h-screen relative font-sans antialiased">
-
+<!-- LANGUAGE SWITCH -->
+  <div class="absolute top-6 right-6 z-50 flex gap-2">
+    <button onclick="setLanguage('en')" class="px-3 py-1 bg-white/20 text-white rounded hover:bg-white/30 text-xs">EN</button>
+    <button onclick="setLanguage('jp')" class="px-3 py-1 bg-white/20 text-white rounded hover:bg-white/30 text-xs">JP</button>
+  </div>
   <!-- DYNAMIC OVERLAY -->
   <div class="absolute inset-0 bg-gradient-to-br from-slate-900/85 via-slate-800/75 to-slate-900/90"></div>
 
@@ -78,12 +82,12 @@
         <div class="inline-flex items-center justify-center w-24 h-24 rounded-[28px] bg-white shadow-2xl mb-8 transform transition hover:rotate-3 duration-300">
           <span class="text-primary-600 text-4xl font-black tracking-tighter">MK</span>
         </div>
-        <h1 class="text-4xl font-extrabold text-white tracking-tight mb-3">
+        <h1 data-i18n="company_name" class="text-4xl font-extrabold text-white tracking-tight mb-3">
           MK Next Phnom Penh Co., Ltd
         </h1>
         <div class="flex items-center justify-center gap-4">
           <div class="h-px w-12 bg-primary-500/40"></div>
-          <p class="text-slate-300 text-sm font-semibold uppercase tracking-[0.2em]">
+          <p data-i18n="system_title" class="text-slate-300 text-sm font-semibold uppercase tracking-[0.2em]">
             Quotation & Project System
           </p>
           <div class="h-px w-12 bg-primary-500/40"></div>
@@ -104,16 +108,16 @@
           {% endif %}
 
           <form method="post" action="/change-password" class="space-y-6">
-            <h2 class="text-2xl font-bold text-slate-800">
+            <h2 data-i18n="change_password" class="text-2xl font-bold text-slate-800">
               Change Password
             </h2>
 
-            <p class="text-sm text-slate-500">
+            <p data-i18n="change_password_desc" class="text-sm text-slate-500">
               You must set a strong password before continuing.
             </p>
 
             <div>
-              <label class="text-sm font-bold text-slate-700">New Password</label>
+              <label data-i18n="new_password" class="text-sm font-bold text-slate-700">New Password</label>
               <input
                 name="new_password"
                 type="password"
@@ -123,14 +127,15 @@
             </div>
 
             <ul class="text-xs text-slate-500 space-y-1">
-              <li>• At least 8 characters</li>
-              <li>• One uppercase letter</li>
-              <li>• One lowercase letter</li>
-              <li>• One number</li>
-              <li>• One special character</li>
+              <li data-i18n="pw_rule_1">• At least 8 characters</li>
+              <li data-i18n="pw_rule_2">• One uppercase letter</li>
+              <li data-i18n="pw_rule_3">• One lowercase letter</li>
+              <li data-i18n="pw_rule_4">• One number</li>
+              <li data-i18n="pw_rule_5">• One special character</li>
             </ul>
 
             <button
+              data-i18n="update_password"
               class="w-full bg-primary-600 text-white py-4 rounded-2xl font-bold hover:bg-primary-700"
             >
               Update Password
@@ -141,15 +146,15 @@
 
           <!-- ===== LOGIN MODE ===== -->
           <div class="mb-10 text-center sm:text-left">
-            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">System Login</h2>
-            <p class="text-slate-500 text-lg mt-2 font-medium">Manage your quotations and projects.</p>
+            <h2 data-i18n="system_login" class="text-3xl font-extrabold text-slate-900 tracking-tight">System Login</h2>
+            <p data-i18n="login_desc" class="text-slate-500 text-lg mt-2 font-medium">Manage your quotations and projects.</p>
           </div>
 
           {% if error %}
             <div class="mb-8 flex items-start gap-4 rounded-2xl bg-red-50 border border-red-200 p-5 text-red-700">
               <i data-lucide="alert-triangle" class="w-6 h-6 flex-shrink-0 mt-0.5"></i>
               <div>
-                <p class="font-bold text-sm">Login Failed</p>
+                <p data-i18n="login_failed" class="font-bold text-sm">Login Failed</p>
                 <p class="text-sm opacity-90">{{ error }}</p>
               </div>
             </div>
@@ -159,14 +164,16 @@
 
             <!-- USERNAME -->
             <div>
-              <label class="block text-sm font-bold text-slate-600 uppercase tracking-widest mb-3 ml-1">Username</label>
+              <label  data-i18n="username"  class="block text-sm font-bold text-slate-600 uppercase tracking-widest mb-3 ml-1">Username</label>
               <div class="relative">
                 <i data-lucide="mail" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6"></i>
                 <input
                   name="username"
                   required
                   autocomplete="username"
+                  data-i18n-placeholder="username_placeholder"
                   placeholder="name@mknextphnompenh"
+
                   class="w-full pl-14 pr-6 py-5 bg-slate-100 border border-slate-200 rounded-2xl input-focus focus:outline-none text-slate-800 text-lg font-medium"
                 />
               </div>
@@ -175,7 +182,7 @@
             <!-- PASSWORD -->
             <div>
               <div class="flex justify-between items-center mb-3 ml-1">
-                <label class="text-sm font-bold text-slate-600 uppercase tracking-widest">Password</label>
+                <label data-i18n="password" class="text-sm font-bold text-slate-600 uppercase tracking-widest">Password</label>
               </div>
               <div class="relative">
                 <i data-lucide="lock" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6"></i>
@@ -194,6 +201,7 @@
               <button
                 type="submit"
                 class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg hover:bg-primary-600 transition-all shadow-2xl active:scale-[0.99] flex items-center justify-center gap-4 group"
+                data-i18n="sign_in"
               >
                 Sign In to Dashboard
                 <i data-lucide="arrow-right-circle" class="w-6 h-6 transition-transform group-hover:translate-x-2"></i>
@@ -208,15 +216,25 @@
       <!-- FOOTER -->
       <div class="mt-12 flex flex-col items-center gap-6">
         <div class="flex items-center gap-8">
-          <a href="#" class="text-slate-400 text-sm font-medium hover:text-white transition">Help Center</a>
+          <a href="#" data-i18n="help_center"
+            class="text-slate-400 text-sm font-medium hover:text-white transition">
+            Help Center
+          </a>
           <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
-          <a href="#" class="text-slate-400 text-sm font-medium hover:text-white transition">Security Info</a>
+          <a href="#" data-i18n="security_info"
+            class="text-slate-400 text-sm font-medium hover:text-white transition">
+            Security Info
+          </a>
         </div>
         <div class="text-center">
-          <p class="text-slate-400 text-xs font-semibold tracking-[0.15em]">
-            &copy; 2026 MK Next Phnom Penh Co., Ltd
+          <p data-i18n="company_footer"
+            class="text-slate-400 text-xs font-semibold tracking-[0.15em]">
+            © 2026 MK Next Phnom Penh Co., Ltd
           </p>
-          <p class="text-slate-500 text-[10px] mt-1 font-medium">Precision Management Solutions</p>
+          <p data-i18n="footer_tagline"
+              class="text-slate-500 text-[10px] mt-1 font-medium">
+              Precision Management Solutions
+          </p>
         </div>
       </div>
 
@@ -226,6 +244,46 @@
   <script>
     lucide.createIcons();
   </script>
+ <script>
+    let currentLang = localStorage.getItem("lang") || "en";
 
+    async function loadLanguage(lang) {
+        try {
+            const response = await fetch(`/static/lang/${lang}.json`);
+            const data = await response.json();
+
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.getAttribute("data-i18n");
+                if (data[key]) {
+                    if (el.childNodes.length === 1) {
+                        el.textContent = data[key];
+                    } else {
+                        el.childNodes[0].nodeValue = data[key] + " ";
+                    }
+                }
+            });
+
+            // ✅ placeholder support
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+                const key = el.getAttribute("data-i18n-placeholder");
+                if (data[key]) {
+                    el.placeholder = data[key];
+                }
+            });
+
+        } catch (err) {
+            console.error("Language load error:", err);
+        }
+    }
+
+    function setLanguage(lang) {
+        localStorage.setItem("lang", lang);
+        loadLanguage(lang);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLanguage(currentLang);
+    });
+</script>
 </body>
 </html>

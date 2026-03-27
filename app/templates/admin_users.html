@@ -8,14 +8,14 @@
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
   <div>
     <nav class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-      <a href="/" class="hover:text-mk-600">Admin</a>
+      <a href="/" class="hover:text-mk-600" data-i18n="admin">Admin</a>
       <span>/</span>
-      <span class="text-slate-600">User Management</span>
+      <span class="text-slate-600" data-i18n="user_management">User Management</span>
     </nav>
-    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">System Users</h1>
-    <p class="text-sm text-slate-500 mt-1">
+    <h1 data-i18n="system_users" class="text-2xl font-extrabold text-slate-900 tracking-tight">System Users</h1>
+    <p data-i18n="manage_permissions" class="text-sm text-slate-500 mt-1">
       Manage team permissions and departmental assignments.
-      <span class="text-amber-600 font-medium ml-1">
+      <span data-i18n="cannot_modify_self" class="text-amber-600 font-medium ml-1">
         ※ You cannot modify your own admin role.
       </span>
     </p>
@@ -25,7 +25,7 @@
     onclick="document.getElementById('addUserModal').classList.remove('hidden')"
     class="bg-mk-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-mk-600/20 hover:bg-mk-700 transition-all flex items-center gap-2 w-fit">
     <span class="text-lg leading-none">+</span>
-    Add New User
+    <span data-i18n="add_user">Add New User</span>
   </button>
 </div>
 
@@ -35,10 +35,10 @@
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50/50 border-b border-slate-100">
-          <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">User Details</th>
-          <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Access Role</th>
-          <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Department</th>
-          <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+          <th data-i18n="user_details" class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">User Details</th>
+          <th data-i18n="access_role" class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Access Role</th>
+          <th data-i18n="department" class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Department</th>
+          <th data-i18n="actions" class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -60,15 +60,18 @@
 
                   {% if not u.is_active %}
                     <span
+                      data-i18n="disabled"
                       class="text-[10px] px-2 py-0.5 rounded-full
-                            bg-red-100 text-red-700 font-medium">
+                            bg-red-100 text-red-700 font-medium"
+                            >
                       Disabled
                     </span>
                   {% endif %}
 
                   {% if u.id == request.session.get("user_id") %}
                     <span
-                      class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                      class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded"
+                      data-i18n="you">
                       YOU
                     </span>
                   {% endif %}
@@ -89,9 +92,9 @@
               form="update-{{ u.id }}"
               class="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-2 focus:ring-mk-600/20 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
               {% if u.id == request.session.get("user_id") %}disabled{% endif %}>
-              <option value="staff" {% if u.role == "staff" %}selected{% endif %}>Staff</option>
-              <option value="manager" {% if u.role == "manager" %}selected{% endif %}>Manager</option>
-              <option value="admin" {% if u.role == "admin" %}selected{% endif %}>Admin</option>
+              <option value="staff" data-i18n="staff" {% if u.role == "staff" %}selected{% endif %}>Staff</option>
+              <option value="manager" data-i18n="manager" {% if u.role == "manager" %}selected{% endif %}>Manager</option>
+              <option value="admin" data-i18n="admin_role"{% if u.role == "admin" %}selected{% endif %}>Admin</option>
             </select>
           </td>
 
@@ -102,10 +105,10 @@
               form="update-{{ u.id }}"
               class="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-2 focus:ring-mk-600/20 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
               {% if u.id == request.session.get("user_id") %}disabled{% endif %}>
-              <option value="">None</option>
-              <option value="IT" {% if u.department == "IT" %}selected{% endif %}>IT Dept</option>
-              <option value="Design" {% if u.department == "Design" %}selected{% endif %}>Design Team</option>
-              <option value="Management" {% if u.department == "Management" %}selected{% endif %}>Management</option>
+              <option value="" data-i18n="none">None</option>
+              <option value="IT"  data-i18n="it_dept"{% if u.department == "IT" %}selected{% endif %}>IT Dept</option>
+              <option value="Design"  data-i18n="design_team"{% if u.department == "Design" %}selected{% endif %}>Design Team</option>
+              <option value="Management" data-i18n="management"{% if u.department == "Management" %}selected{% endif %}>Management</option>
             </select>
           </td>
 
@@ -119,11 +122,12 @@
                   {% if u.id != request.session.get("user_id") %}
                     <button
                       type="submit"
+                      data-i18n="save_changes"
                       class="text-xs font-bold text-mk-600 hover:text-mk-800 transition-colors">
                       Save Changes
                     </button>
                   {% else %}
-                    <span class="text-[10px] font-bold text-slate-300 uppercase italic">Locked</span>
+                    <span data-i18n="locked" class="text-[10px] font-bold text-slate-300 uppercase italic">Locked</span>
                   {% endif %}
                 </form>
 
@@ -132,6 +136,7 @@
                 <!-- RESET PASSWORD -->
                 <button
                   type="button"
+                  data-i18n="reset"
                   onclick="openResetModal('{{ u.id }}', '{{ u.username }}')"
                   class="text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors">
                   Reset
@@ -141,21 +146,23 @@
 
               <!-- DELETE / ADMIN LABEL -->
               {% if u.role == "admin" %}
-                <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-tighter">Admin Account</span>
+                <span data-i18n="admin_account" class="text-[9px] font-bold text-emerald-600 uppercase tracking-tighter">Admin Account</span>
               {% else %}
                 <form method="post" action="/admin/users/toggle">
                   <input type="hidden" name="user_id" value="{{ u.id }}">
 
                   {% if u.is_active %}
                     <button
+                      data-i18n="disable"
                       type="submit"
                       class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
-                      onclick="return confirm('Disable this user?')">
+                      onclick="return confirm(window.langData?.disable_confirm || 'Disable this user?')">
                       Disable
                     </button>
                   {% else %}
                     <button
                       type="submit"
+                      data-i18n="enable"
                       class="bg-emerald-600 text-white px-3 py-1 rounded text-xs hover:bg-emerald-700"
                       onclick="return confirm('Enable this user?')">
                       Enable
@@ -177,47 +184,47 @@
 <div id="addUserModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
   <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-      <h2 class="text-sm font-bold text-slate-800">Add New User</h2>
+      <h2 data-i18n="add_user" class="text-sm font-bold text-slate-800">Add New User</h2>
       <button onclick="document.getElementById('addUserModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">✕</button>
     </div>
 
     <form method="post" action="/admin/users/create" class="p-6 space-y-4">
       <div class="space-y-1">
-        <label class="text-[11px] font-bold text-slate-500 uppercase">Username</label>
+        <label data-i18n="username" class="text-[11px] font-bold text-slate-500 uppercase">Username</label>
         <input name="username" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
       </div>
 
       <div class="space-y-1">
-        <label class="text-[11px] font-bold text-slate-500 uppercase">Temporary Password</label>
+        <label data-i18n="password" class="text-[11px] font-bold text-slate-500 uppercase">Temporary Password</label>
         <input name="password" type="password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-1">
-          <label class="text-[11px] font-bold text-slate-500 uppercase">Role</label>
+          <label data-i18n="role" class="text-[11px] font-bold text-slate-500 uppercase">Role</label>
           <select name="role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
-            <option value="staff">Staff</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
+            <option value="staff" data-i18n="staff">Staff</option>
+            <option value="manager" data-i18n="manager">Manager</option>
+            <option value="admin" data-i18n="admin_role">Admin</option>
           </select>
         </div>
         <div class="space-y-1">
-          <label class="text-[11px] font-bold text-slate-500 uppercase">Department</label>
+          <label data-i18n="department" class="text-[11px] font-bold text-slate-500 uppercase">Department</label>
           <select name="department" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
-            <option value="IT">IT</option>
-            <option value="Design">Design</option>
-            <option value="Management">Management</option>
+            <option value="IT"data-i18n="it_dept" >IT</option>
+            <option value="Design" data-i18n="design_team">Design</option>
+            <option value="Management" data-i18n="management">Management</option>
           </select>
         </div>
       </div>
 
       <div class="flex justify-end gap-3 pt-4">
-        <button type="button"
+        <button data-i18n="cancel" type="button"
           onclick="document.getElementById('addUserModal').classList.add('hidden')"
           class="px-5 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700">
           Cancel
         </button>
-        <button type="submit"
+        <button  data-i18n="create_user" type="submit"
           class="px-6 py-2.5 text-xs bg-mk-600 text-white rounded-xl font-bold hover:bg-mk-700 transition-all shadow-sm">
           Create User
         </button>
@@ -230,27 +237,27 @@
 <div id="resetPasswordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
   <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-      <h2 class="text-sm font-bold text-slate-800">Reset User Password</h2>
+      <h2 data-i18n="reset_password" class="text-sm font-bold text-slate-800">Reset User Password</h2>
     </div>
 
     <form method="post" action="/admin/users/reset-password" class="p-6 space-y-4">
       <input type="hidden" name="user_id" id="reset_user_id">
 
       <div class="space-y-1">
-        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target User</label>
+        <label data-i18n="target_user" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Target User</label>
         <input id="reset_username" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-500 font-bold outline-none">
       </div>
 
       <div class="space-y-1">
-        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">New Password</label>
-        <input name="new_password" required placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
+        <label  data-i18n="new_password" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">New Password</label>
+        <input data-i18n-placeholder="enter_new_password" name="new_password" required placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-mk-600/20 outline-none">
       </div>
 
       <div class="flex justify-end gap-3 pt-4">
-        <button type="button" onclick="closeResetModal()" class="px-5 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
+        <button data-i18n="cancel" type="button" onclick="closeResetModal()" class="px-5 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
           Cancel
         </button>
-        <button type="submit" class="px-6 py-2.5 text-xs bg-mk-600 text-white rounded-xl font-bold hover:bg-mk-700 shadow-sm uppercase tracking-widest">
+        <button data-i18n="update_password" type="submit" class="px-6 py-2.5 text-xs bg-mk-600 text-white rounded-xl font-bold hover:bg-mk-700 shadow-sm uppercase tracking-widest">
           Update Password
         </button>
       </div>
@@ -267,6 +274,23 @@ function openResetModal(userId, username) {
 
 function closeResetModal() {
   document.getElementById("resetPasswordModal").classList.add("hidden");
+}
+function applyTranslations(data) {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (data[key]) {
+      el.textContent = data[key];   // ✅ USE THIS (NOT innerText)
+    }
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (data[key]) {
+      el.placeholder = data[key];
+    }
+  });
+
+  window.langData = data;
 }
 </script>
 

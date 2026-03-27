@@ -1,0 +1,240 @@
+{
+  "login": "Login",
+  "dashboard": "Dashboard",
+  "new_project": "New Project",
+  "logout": "Logout",
+
+  "system_login": "System Login",
+  "login_desc": "Manage your quotations and projects.",
+  "username": "Username",
+  "password": "Password",
+  "sign_in": "Sign In to Dashboard",
+
+  "company_name": "MK Next Phnom Penh Co., Ltd",
+  "system_title": "Quotation & Project System",
+
+  "company_name_header": "MK Next Phnom Penh Co., Ltd",
+  "system_name": "Estimate & Project Management System",
+
+  "help_center": "Help Center",
+  "security_info": "Security Info",
+  "footer_tagline": "Precision Management Solutions",
+  "company_footer": "© 2026 MK Next Phnom Penh Co., Ltd",
+
+  "user_manager": "User Manager",
+  "audit_logs": "Audit Logs",
+  "reports": "Reports",
+
+  "powered_by": "Powered by FastAPI",
+  "business_overview": "Business Overview",
+"total_projects": "Total Projects",
+"pending_estimates": "Pending Estimates",
+"approved_quotes": "Approved Quotes",
+"total_amount": "Total Approved Amount",
+
+"quick_actions": "Quick Actions",
+"create_project": "Create new project",
+"project_list": "Project List",
+"view_projects": "View projects",
+
+"recent_activity": "Recent Activity",
+"recent_projects": "Recent Projects",
+"recent_quotes": "Recent Quotes",
+
+"notifications": "Notifications",
+"system_update": "System Update",
+"estimate_added": "Estimate template added",
+"pending_approval": "Pending Approval",
+"pending_text": "pending",
+
+"developer_docs": "Developer Docs",
+"api_reference": "FastAPI reference",
+
+"status_draft": "Draft",
+"status_pending": "Pending",
+"status_approved": "Approved",
+"status_rejected": "Rejected",
+"audit_filters": "Audit Log Filters",
+"export_csv": "Export CSV",
+"user": "User",
+"all_users": "All Users",
+"action": "Action",
+"all_actions": "All Actions",
+"from": "From",
+"to": "To",
+"reset": "Reset",
+"apply_filters": "Apply Filters",
+
+"time": "Time (UTC+7)",
+"description": "Description",
+"ip": "IP",
+"admin": "Admin",
+"user_management": "User Management",
+"system_users": "System Users",
+"manage_permissions": "Manage team permissions and departmental assignments.",
+"cannot_modify_self": "※ You cannot modify your own admin role.",
+"add_user": "Add New User",
+
+"user_details": "User Details",
+"access_role": "Access Role",
+"department": "Department",
+"actions": "Actions",
+
+"disabled": "Disabled",
+"you": "YOU",
+
+"staff": "Staff",
+"manager": "Manager",
+"admin_role": "Admin",
+
+"none": "None",
+"it_dept": "IT Dept",
+"design_team": "Design Team",
+"management": "Management",
+
+"save_changes": "Save Changes",
+
+"admin_account": "Admin Account",
+
+"create_user": "Create User",
+
+"notifications_desc": "Tasks and system updates assigned to you",
+"mark_all_read": "Mark all as read",
+"no_notifications": "No notifications yet.",
+"delete_project_title": "Delete Project",
+"back_project": "Back to Project Details",
+
+"project_not_found": "Project Not Found",
+"project_not_exist": "The project does not exist",
+"go_projects": "Go to Projects List",
+
+"confirm_deletion": "Confirm Deletion",
+"delete_confirm_text": "Are you sure you want to delete this project?",
+"warning": "Warning:",
+"delete_warning": "This action cannot be undone",
+
+"delete_confirm_btn": "Yes, Permanently Delete",
+"cancel": "Cancel",
+"edit_project_title": "Edit Project",
+"edit_project": "Edit Project",
+"updating_details": "Updating details for:",
+
+"client_name": "Client Name",
+"site_location": "Site Location",
+"contact": "Contact",
+
+"client_placeholder": "Client company name",
+"site_placeholder": "Project location",
+"contact_placeholder": "Phone or email",
+
+
+
+"error": "Error!",
+
+"quotes_title": "Quotes",
+"quotes": "Quotes",
+"quotes_desc": "All versions and drafts for this project",
+
+"new_quote": "New Quote",
+
+"id": "ID",
+"version": "Version",
+"status": "Status",
+"title": "Title",
+"total": "Total",
+
+
+"view": "View",
+"edit": "Edit",
+"delete": "Delete",
+
+"delete_confirm": "Delete this quote?",
+
+"no_quotes": "No quotes yet. Click New Quote to create one.",
+"pw_rule_1": "• At least 8 characters",
+"pw_rule_2": "• One uppercase letter",
+"pw_rule_3": "• One lowercase letter",
+"pw_rule_4": "• One number",
+"pw_rule_5": "• One special character",
+
+"change_password": "Change Password",
+"change_password_desc": "You must set a strong password before continuing.",
+"quote": "Quote",
+"untitled": "Untitled",
+
+"sales_overview": "Sales Overview",
+"sales_desc": "Approved quotation amounts over time.",
+
+"workflow_overview": "Workflow Overview",
+"workflow_desc": "Current quotation status distribution.",
+
+"notes": "Notes",
+"note_1": "Only approved quotations are included in sales figures.",
+"note_2": "Quotation status helps identify workflow bottlenecks.",
+"note_3": "Access to financial data is restricted by user role.",
+"footer_text": "Company Quotation System",
+"back": "Back",
+"original_cost": "Original Cost (Subtotal)",
+"profit_margin": "Profit margin",
+"selling_price": "Selling Price (Inc. Tax)",
+
+"pdf_export": "PDF Export",
+"create_invoice": "Create Invoice",
+"download_invoice": "Download Invoice",
+"mark_paid": "Mark Payment Received",
+"download_receipt": "Download Receipt",
+
+"submit_approval": "Submit for Approval",
+"approve_quote": "Approve Quote",
+"reject_quote": "Reject Quote",
+
+"work_category": "Work Category",
+"work_type": "Work Type",
+"element": "Element",
+"supplier": "Supplier",
+"qty": "Qty",
+"unit": "Unit",
+"unit_price": "Unit Price",
+"amount": "Amount",
+"remark": "Remark",
+
+  "save": "Save",
+  "approved_locked": "Approved (Locked)",
+
+  "edit_estimate": "Edit Estimate",
+  "client": "Client",
+  "estimate_title": "Estimate Title",
+
+  "item_entry": "Item Entry / Edit",
+  "show_details": "Show Detail Fields",
+
+  "category": "Category",
+
+  "item_name": "Item Name",
+
+
+  "add": "Add",
+
+
+  "specification": "Specification",
+  "date": "Date",
+
+
+  "subtotal": "Subtotal",
+  "margin": "Margin (%)",
+
+
+  "draft_estimate": "Draft Estimate",
+
+  "created": "Created",
+  "invoice_created": "Invoice Created",
+  "paid_on": "Paid on",
+
+  "enter_name_price": "Enter Name and Price",
+  "enter_title": "Enter Estimate Title",
+  "save_failed": "Failed to save changes",
+  "server_error": "Server connection error",
+  "projects_title": "Client Projects",
+  "projects_desc": "Manage all current and completed design and construction projects.",
+  "no_projects": "No projects found. Start by creating a new one!"
+}

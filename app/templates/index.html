@@ -5,27 +5,27 @@
 
 <!-- ================= BUSINESS OVERVIEW ================= -->
 <section>
-  <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
+  <h2 data-i18n="business_overview" class="text-xs font-semibold text-slate-400 uppercase mb-3">
     Business Overview
   </h2>
 
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <div class="bg-white p-4 rounded-lg shadow-sm">
-      <p class="text-xs text-slate-400">Total Projects</p>
+      <p  data-i18n="total_projects" class="text-xs text-slate-400">Total Projects</p>
       <p class="text-3xl font-bold mt-1">{{ total_projects }}</p>
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow-sm">
-      <p class="text-xs text-slate-400">Pending Estimates</p>
+      <p data-i18n="pending_estimates" class="text-xs text-slate-400">Pending Estimates</p>
       <p class="text-3xl font-bold text-amber-600 mt-1">{{ pending_estimates }}</p>
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow-sm">
-      <p class="text-xs text-slate-400">Approved Quotes</p>
+      <p data-i18n="approved_quotes" class="text-xs text-slate-400">Approved Quotes</p>
       <p class="text-3xl font-bold text-emerald-600 mt-1">{{ approved_quotes }}</p>
     </div>
     <div class="bg-white p-4 rounded-lg shadow-sm">
-      <p class="text-xs text-slate-400">Total Approved Amount</p>
+      <p data-i18n="total_amount" class="text-xs text-slate-400">Total Approved Amount</p>
       <p class="text-2xl font-bold text-emerald-600">
         {% if can_view_money %}
           ¥{{ "{:,.0f}".format(total_approved_amount) }}
@@ -45,7 +45,7 @@
 
     <!-- QUICK ACTIONS -->
     <section>
-      <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
+      <h2 data-i18n="quick_actions" class="text-xs font-semibold text-slate-400 uppercase mb-3">
         Quick Actions
       </h2>
 
@@ -56,8 +56,8 @@
             +
           </div>
           <div>
-            <p class="font-semibold">New Project</p>
-            <p class="text-xs text-slate-400">Create new project</p>
+            <p data-i18n="new_project" class="font-semibold">New Project</p>
+            <p data-i18n="create_project" class="text-xs text-slate-400">Create new project</p>
           </div>
         </a>
 
@@ -67,8 +67,8 @@
             📁
           </div>
           <div>
-            <p class="font-semibold">Project List</p>
-            <p class="text-xs text-slate-400">View projects</p>
+            <p data-i18n="project_list" class="font-semibold">Project List</p>
+            <p data-i18n="view_projects" class="text-xs text-slate-400">View projects</p>
           </div>
         </a>
       </div>
@@ -76,12 +76,12 @@
 
     <!-- RECENT ACTIVITY -->
     <section class="bg-white rounded-lg shadow-sm p-4">
-      <h3 class="text-sm font-semibold text-slate-600 mb-4">
+      <h3 data-i18n="recent_activity" class="text-sm font-semibold text-slate-600 mb-4">
         Recent Activity
       </h3>
 
       <div class="mb-4">
-        <p class="text-xs font-semibold text-slate-400 uppercase mb-2">
+        <p data-i18n="recent_projects" class="text-xs font-semibold text-slate-400 uppercase mb-2">
           Recent Projects
         </p>
 
@@ -103,7 +103,7 @@
 
       <hr class="my-4">
 
-      <p class="text-xs font-semibold text-slate-400 uppercase mb-2">
+      <p data-i18n="recent_quotes" class="text-xs font-semibold text-slate-400 uppercase mb-2">
         Recent Quotes
       </p>
 
@@ -114,7 +114,7 @@
              class="flex justify-between items-center bg-slate-50 hover:bg-slate-100 rounded-md px-4 py-2">
             <div>
               <p class="font-semibold text-sm">
-                Quote #{{ q.id }} — {{ q.title or "Untitled" }}
+                <span data-i18n="quote">Quote</span> #{{ q.id }} — {{ q.title or t("untitled") }}
               </p>
               <p class="text-xs text-slate-400">
                 {{ q.created_at.strftime("%Y-%m-%d") }}
@@ -122,22 +122,22 @@
             </div>
 
             {% if q.status == "draft" %}
-              <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full">
+              <span data-i18n="status_draft" class="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full">
                 Draft
               </span>
 
             {% elif q.status == "pending" %}
-              <span class="text-xs px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-full">
+              <span data-i18n="status_pending" class="text-xs px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-full">
                 Pending
               </span>
 
             {% elif q.status == "approved" %}
-              <span class="text-xs px-2 py-0.5 bg-green-200 text-green-800 rounded-full">
+              <span data-i18n="status_approved" class="text-xs px-2 py-0.5 bg-green-200 text-green-800 rounded-full">
                 Approved
               </span>
 
             {% elif q.status == "rejected" %}
-              <span class="text-xs px-2 py-0.5 bg-red-200 text-red-800 rounded-full">
+              <span data-i18n="status_rejected" class="text-xs px-2 py-0.5 bg-red-200 text-red-800 rounded-full">
                 Rejected
               </span>
             {% endif %}
@@ -152,26 +152,26 @@
   <!-- RIGHT -->
   <div class="space-y-4">
     <section>
-      <h2 class="text-xs font-semibold text-slate-400 uppercase mb-3">
+      <h2 data-i18n="notifications" class="text-xs font-semibold text-slate-400 uppercase mb-3">
         Notifications
       </h2>
 
       <div class="bg-white p-3 rounded-lg border-l-4 border-mk-600 shadow-sm mb-2">
-        <p class="text-xs font-semibold text-mk-600">System Update</p>
-        <p class="text-sm">Estimate template added</p>
+        <p data-i18n="system_update" class="text-xs font-semibold text-mk-600">System Update</p>
+        <p data-i18n="estimate_added" class="text-sm">Estimate template added</p>
         <p class="text-xs text-slate-400">2026/01/12</p>
       </div>
 
       <div class="bg-white p-3 rounded-lg border-l-4 border-amber-500 shadow-sm">
-        <p class="text-xs font-semibold text-amber-600">Pending Approval</p>
-        <p class="text-sm">{{ pending_estimates }} pending</p>
+        <p data-i18n="pending_approval" class="text-xs font-semibold text-amber-600">Pending Approval</p>
+        <p data-i18n="pending_text" class="text-sm">{{ pending_estimates }} pending</p>
       </div>
     </section>
 
     
     <a href="/docs" class="block bg-slate-800 p-4 rounded-lg text-white border-l-4 border-red-700 shadow-sm">
-      <p class="font-semibold text-sm text-red-600">Developer Docs</p>
-      <p class="text-xs text-slate-400">FastAPI reference</p>
+      <p data-i18n="developer_docs" class="font-semibold text-sm text-red-600">Developer Docs</p>
+      <p data-i18n="api_reference" class="text-xs text-slate-400">FastAPI reference</p>
     </a>
   </div>
 </div>

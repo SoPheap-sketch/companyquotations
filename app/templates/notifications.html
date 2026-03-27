@@ -1,15 +1,16 @@
+<!-- Notifications -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-6">
   <div class="flex justify-between items-center">
     <div>
-      <h1 class="text-2xl font-bold text-slate-800">Notifications</h1>
-      <p class="text-sm text-slate-500">Tasks and system updates assigned to you</p>
+      <h1 data-i18n="notifications" class="text-2xl font-bold text-slate-800">Notifications</h1>
+      <p data-i18n="notifications_desc" class="text-sm text-slate-500">Tasks and system updates assigned to you</p>
     </div>
     
     {% if notifications %}
-    <button onclick="markAllRead()" class="text-sm text-blue-600 hover:underline">
+    <button data-i18n="mark_all_read" onclick="markAllRead()" class="text-sm text-blue-600 hover:underline">
       Mark all as read
     </button>
     {% endif %}
@@ -25,17 +26,20 @@
             <p class="font-semibold text-slate-800">{{ n.title }}</p>
             <p class="text-sm text-slate-600 mt-1">{{ n.message }}</p>
             <p class="text-xs text-slate-400 mt-2">
-              {{ n.created_at.strftime("%Y-%m-%d %H:%M") }}
+              {{ n.created_at.strftime("%Y年%m月%d日 %H:%M") }}
             </p>
         </a>
       {% endfor %}
     </div>
   {% else %}
-    <div class="text-slate-400 text-sm">No notifications yet.</div>
+    <div data-i18n="no_notifications" class="text-slate-400 text-sm">No notifications yet.</div>
   {% endif %}
 </div>
 
 <script>
-  fetch("/notifications/mark-read", { method: "POST" });
+  function markAllRead() {
+    fetch("/notifications/mark-read", { method: "POST" })
+      .then(() => location.reload());
+  }
 </script>
 {% endblock %}
