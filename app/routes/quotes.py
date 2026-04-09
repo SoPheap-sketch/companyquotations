@@ -12,6 +12,8 @@ from app.pdf_utils import render_pdf_from_html
 # from fastapi.responses import StreamingResponse
 from fastapi.responses import Response
 from app.utils.audit import write_audit_log
+from app.pdf_utils import render_pdf_landscape
+
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -122,6 +124,7 @@ def new_quote_form(request: Request, project_id: int):
                 "items_json": "[]",
                 "project_id": project_id,
                 "current_year": datetime.utcnow().year,
+                "profit_margin": int((quote.profit_margin or 0) * 100),
             },
         )
 
@@ -269,9 +272,13 @@ def reject_quote(request: Request, quote_id: int):
 # =============================
 @router.get("/quotes/{quote_id}/pdf")
 def quote_pdf(request: Request, quote_id: int):
+   
     db = SessionLocal()
     try:
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
+        year = datetime.now().year
+        month = datetime.now().month
+        invoice_number = f"M{datetime.now().year}-{datetime.now().month:02d}-{quote.id:03d}"
         if not quote:
             raise HTTPException(404)
 
@@ -298,7 +305,7 @@ def quote_pdf(request: Request, quote_id: int):
         tax = int(subtotal * 0.10)
         total = subtotal + tax
        
-        html = templates.get_template("quote_pdf.html").render({
+        html = templates.env.get_template("quote_pdf.html").render({
             "request": request,
             "quote": quote,
             "items": quote.items,
@@ -306,10 +313,11 @@ def quote_pdf(request: Request, quote_id: int):
             "tax": tax,
             "total": total,
             "issue_date": issue_date,     
-            "payment_due": payment_due    
+            "payment_due": payment_due,
+            "invoice_number": invoice_number, 
         })
-
-        pdf = render_pdf_from_html(html)
+        print("DEBUG invoice_number:", invoice_number)
+        pdf = render_pdf_landscape(html)
 
         # return StreamingResponse(
         #     pdf,

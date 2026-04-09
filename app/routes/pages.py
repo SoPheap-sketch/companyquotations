@@ -1,5 +1,7 @@
 # app/routes/pages.py
 
+from itertools import count
+
 from fastapi import APIRouter, Request, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -8,8 +10,7 @@ import json
 
 from app import db
 from app.db import SessionLocal
-
-from app.pdf_utils import render_pdf_from_html
+from app.pdf_utils import render_pdf_landscape
 from app.services.auth import login_required
 
 from app.models import Project, Quote, QuoteItem, User, QuoteApprovalLog, Receipt
@@ -382,6 +383,14 @@ def quote_pdf(request: Request, quote_id: int):
         quote = db.query(Quote).filter(Quote.id == quote_id).first()
         if not quote:
             raise HTTPException(404)
+        year = datetime.now().year
+        month = datetime.now().month
+
+        count = db.query(Quote).filter(
+            Quote.project_id == quote.project_id
+        ).count()
+
+        invoice_number = f"M{year}-{month:02d}-{count:03d}"
 
         # Handle payment due date
         if quote.payment_due is None:
@@ -403,7 +412,6 @@ def quote_pdf(request: Request, quote_id: int):
         
         calc_tax = int(calc_subtotal * 0.10)
         calc_total = calc_subtotal + calc_tax
-        # -----------------------------------------------
 
         # Render the template with the CALCULATED values
         html_content = templates.get_template("quote_pdf.html").render({
@@ -414,16 +422,18 @@ def quote_pdf(request: Request, quote_id: int):
             "tax": calc_tax,            # Sent to HTML as {{ tax }}
             "total": calc_total,        # Sent to HTML as {{ total }}
             "payment_due": quote.payment_due.strftime("%Y/%m/%d"),
+            "invoice_number": invoice_number,
         })
 
-        pdf = render_pdf_from_html(html_content)
-
+        pdf = render_pdf_landscape(html_content)
+        print("🔥 USING PAGES ROUTE 🔥")
         write_audit_log(
             request=request,
             action="GENERATE_QUOTE_PDF",
             description=f"Generated PDF for quote #{quote.id}",
             target_user_id=request.session.get("user_id"),
         )
+        
         return Response(
             content=pdf,
             media_type="application/pdf",
@@ -431,11 +441,6 @@ def quote_pdf(request: Request, quote_id: int):
                 "Content-Disposition": f"inline; filename=file.pdf"
             }
         )
-        # return StreamingResponse(
-        #     pdf,
-        #     media_type="application/pdf",
-        #     headers={"Content-Disposition": f"inline; filename=quote_{quote.id}.pdf"}
-        # )
     finally:
         db.close()
 CAMBODIA_TZ = pytz.timezone("Asia/Phnom_Penh")

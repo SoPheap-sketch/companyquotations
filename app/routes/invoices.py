@@ -1,3 +1,5 @@
+
+
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -5,11 +7,17 @@ from datetime import datetime, timedelta
 
 from app.db import SessionLocal
 from app.models import Quote, Invoice, Receipt
-from fastapi.responses import Response
+from fastapi.responses import Response,RedirectResponse
+from app.pdf_utils import render_pdf_portrait
+from datetime import datetime
+
+from app.db import SessionLocal
+from app.models import Invoice
+
+from fastapi.templating import Jinja2Templates
 
 # import pdfkit
-from app.pdf_utils import render_pdf_from_html
-from fastapi.responses import Response
+
 router = APIRouter()
 
 templates = Jinja2Templates(directory="app/templates")
@@ -118,7 +126,9 @@ def invoice_pdf(request: Request, invoice_id: int):
     # )
 
     # pdf = pdfkit.from_string(html, False, configuration=config)
-    pdf = render_pdf_from_html(html)
+  
+
+    pdf = render_pdf_portrait(html)
     return Response(
         pdf,
         media_type="application/pdf",
@@ -127,17 +137,8 @@ def invoice_pdf(request: Request, invoice_id: int):
         }
     )
 
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import Response
-from datetime import datetime
 
-from app.db import SessionLocal
-from app.models import Invoice
-from app.pdf_utils import render_pdf_from_html
-from fastapi.templating import Jinja2Templates
 
-router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/receipts/{invoice_id}/pdf")
@@ -194,7 +195,8 @@ def receipt_pdf(request: Request, invoice_id: int):
         })
 
         # ===== GENERATE PDF =====
-        pdf = render_pdf_from_html(html)
+       
+        pdf = render_pdf_portrait(html)
 
         return Response(
             content=pdf,

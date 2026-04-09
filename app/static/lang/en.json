@@ -198,10 +198,10 @@
 "amount": "Amount",
 "remark": "Remark",
 
-  "save": "Save",
-  "approved_locked": "Approved (Locked)",
+"save": "Save",
+"approved_locked": "Approved (Locked)",
 
-  "edit_estimate": "Edit Estimate",
+"edit_estimate": "Edit Estimate",
   "client": "Client",
   "estimate_title": "Estimate Title",
 
@@ -221,7 +221,7 @@
 
 
   "subtotal": "Subtotal",
-  "margin": "Margin (%)",
+  "margin": "Margin",
 
 
   "draft_estimate": "Draft Estimate",

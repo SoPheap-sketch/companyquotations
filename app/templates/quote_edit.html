@@ -20,7 +20,7 @@
   data-quote-id="{{ quote.id }}"
   data-project-id="{{ project_id }}"
   data-items='{{ items_json | safe }}'
-  data-margin="{{ quote.profit_margin or 0.3 }}"
+  data-margin="{{ quote.profit_margin if quote.profit_margin is not none else 0.3 }}"
 >
 
 <header class="bg-white shadow-sm border-b sticky top-0 z-50">
@@ -93,9 +93,19 @@
       <tbody id="tableBody"></tbody>
     </table>
     <div class="p-6 bg-slate-50 text-right">
-      <div data-i18n="subtotal" class="text-slate-600">Subtotal: <span id="dispSub">¥0</span></div>
-      <div data-i18n="margin" class="text-slate-600">Margin (%): <input id="globalMargin" type="number" class="w-14 text-center border rounded"></div>
-      <div data-i18n="total" class="text-xl font-black mt-2 text-slate-900">TOTAL: <span id="dispTotal">¥0</span></div>
+      <div class="text-slate-600">
+        <span data-i18n="subtotal">Subtotal</span>: <span id="dispSub">¥0</span>
+      </div>
+      
+      <div class="text-slate-600">
+        <span data-i18n="margin">Margin</span>:
+        <input id="globalMargin" type="number" class="w-14 text-center border rounded">
+        = <span id="dispMargin">¥0</span>
+      </div>
+      
+      <div class="text-xl font-black mt-2 text-slate-900">
+        <span data-i18n="total">TOTAL</span>: <span id="dispTotal">¥0</span>
+      </div>
     </div>
   </div>
 </main>
@@ -104,7 +114,8 @@
 const QUOTE_ID = Number(document.body.dataset.quoteId);
 const PROJECT_ID = Number(document.body.dataset.projectId);
 const INITIAL_ITEMS = JSON.parse(document.body.dataset.items || "[]");
-const INITIAL_MARGIN = Number(document.body.dataset.margin || 0.3);
+const rawMargin = document.body.dataset.margin;
+const INITIAL_MARGIN = rawMargin && rawMargin !== "None" ? Number(rawMargin) : 0.3;
 
 const tableBody = document.getElementById('tableBody');
 const marginInput = document.getElementById('globalMargin');
@@ -116,12 +127,23 @@ function toggleDetails() { document.getElementById('detailDrawer').classList.tog
 
 function calculate() {
   let sub = 0;
-  tableBody.querySelectorAll('tr').forEach(r => { sub += Number(r.dataset.total || 0); });
-  const marginPercent = Number(marginInput.value) / 100;
-  document.getElementById('dispSub').innerText = fmt(sub);
-  document.getElementById('dispTotal').innerText = fmt(sub * (1 + marginPercent));
-}
 
+  // Calculate using the hidden data attributes we stored in the rows
+  document.querySelectorAll('#tableBody tr').forEach(row => {
+    const qty = Number(row.dataset.qty) || 0;
+    const price = Number(row.dataset.unitPrice) || 0;
+    sub += qty * price;
+  });
+
+  const marginPercent = (Number(marginInput.value) || 0) / 100;
+  const marginValue = sub * marginPercent;
+  const total = sub + marginValue;
+
+  // Update only the spans with IDs
+  document.getElementById('dispSub').innerText = fmt(sub);
+  document.getElementById('dispMargin').innerText = fmt(marginValue);
+  document.getElementById('dispTotal').innerText = fmt(total);
+}
 window.editItem = (btn) => {
   const row = btn.closest('tr');
   document.getElementById('fCat').value = row.dataset.category;
@@ -147,16 +169,17 @@ function renderItemRow(item) {
   const tr = document.createElement('tr');
   tr.className = "border-b hover:bg-slate-50 transition-colors";
   
+  // 🔥 CRITICAL: These dataset keys MUST match what calculate() looks for
   Object.assign(tr.dataset, {
     category: item.work_category || '',
-    workType: item.work_type || '', // Added
+    workType: item.work_type || '',
     name: item.element || '',
     supplier: item.supplier || '',
     date: item.date || '',
     spec: item.spec || '',
-    qty: qty,
+    qty: qty,                // Used by calculate()
     unit: item.unit || '',
-    unitPrice: price,
+    unitPrice: price,        // Used by calculate()
     remark: item.remark || '',
     total: total
   });
@@ -174,12 +197,14 @@ function renderItemRow(item) {
       <button class="text-rose-500 hover:text-rose-700 font-bold" onclick="this.closest('tr').remove();calculate()">✕</button>
     </td>
   `;
+
   tableBody.appendChild(tr);
+  calculate(); // Run calculation immediately after adding
 }
-
 INITIAL_ITEMS.forEach(item => renderItemRow(item));
-calculate();
-
+window.onload = () => {
+  calculate();
+};
 document.getElementById('addBtn').onclick = () => {
   const item = {
     element: document.getElementById('fName').value.trim(),
@@ -232,22 +257,29 @@ marginInput.oninput = calculate;
 <script>
 let currentLang = localStorage.getItem("lang") || "en";
 
-async function loadLanguage(lang) {
-  try {
-    const res = await fetch(`/static/lang/${lang}.json`);
-    const data = await res.json();
+  async function loadLanguage(lang) {
+    try {
+      const res = await fetch(`/static/lang/${lang}.json`);
+      const data = await res.json();
+      window.langData = data;
 
-    window.langData = data;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (data[key]) {
+          // Only replace text for labels, don't overwrite our price spans
+          if (el.id !== 'dispSub' && el.id !== 'dispTotal' && el.id !== 'dispMargin') {
+            el.textContent = data[key];
+          }
+        }
+      });
 
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (data[key]) el.textContent = data[key];
-    });
+      // 🔥 Recalculate everything after words have been translated
+      calculate();
 
-  } catch (err) {
-    console.error("Lang error:", err);
+    } catch (err) {
+      console.error("Lang error:", err);
+    }
   }
-}
 
 document.addEventListener("DOMContentLoaded", () => {
   loadLanguage(currentLang);

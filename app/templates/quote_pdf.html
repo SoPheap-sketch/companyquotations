@@ -5,14 +5,18 @@
     <title>御見積書</title>
     <style>
         @page {
-            size: A4;
-            margin: 10mm 15mm;
+            size: A4 landscape;
+            margin: 8mm 10mm;
+        }
+        .page-break {
+            break-before: page;
+            page-break-before: always;
         }
 
         body {
             font-family: "Meiryo", "MS P Gothic", sans-serif;
-           font-size: 10px;
-            color: #000;
+            font-size: 13px;
+            color: #000; /* Set all text to pure black */
             margin: 0;
             line-height: 1.3;
         }
@@ -21,37 +25,33 @@
         .text-right { text-align: right; }
         .font-bold { font-weight: bold; }
 
-        /* Title Section */
         .title {
             text-align: center;
             font-size: 24px;
             letter-spacing: 12px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             text-decoration: underline;
             font-weight: normal;
+            color: #000;
         }
 
-        /* Top Header Layout */
         .header-wrapper {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 5px;
+            vertical-align: top;
         }
 
-        .header-left {
-            width: 55%;
-        }
-        .header-right {
-            width: 45%;
-        }
+        .header-left { width: 60%; }
+        .header-right { width: 40%; }
 
-        /* Client & Project */
         .client-name {
             font-size: 15px;
             border-bottom: 1px solid #000;
             width: 85%;
             padding-bottom: 2px;
             margin-bottom: 12px;
+            color: #000;
         }
 
         .project-name {
@@ -59,18 +59,19 @@
             width: 85%;
             margin-bottom: 8px;
             padding-bottom: 2px;
+            color: #000;
         }
 
-        /* The 4-row Detail Table (Red Circle 1) */
         .details-table {
             border-collapse: collapse;
-            width: 240px;
+            width: 350px;
         }
 
         .details-table td {
             border: 1px solid #000;
             padding: 2px 5px;
             height: 18px;
+            color: #000;
         }
 
         .details-label {
@@ -79,7 +80,6 @@
             letter-spacing: 2px;
         }
 
-        /* Meta Table (Top Right) */
         .meta-table {
             border-collapse: collapse;
             margin-left: auto;
@@ -90,12 +90,13 @@
             border: 1px solid #000;
             padding: 3px;
             text-align: center;
+            color: #000;
         }
 
-        /* Company Info */
         .company-info {
             text-align: right;
             margin-top: 10px;
+            color: #000;
         }
 
         .company-name {
@@ -103,23 +104,16 @@
             font-weight: bold;
         }
 
-        /* Stamp Boxes (Red Circle 3) */
-        .hanko-wrapper {
-            width: 100%;
-            text-align: right;
-            margin-top: 5px;
-        }
-
-
         .hanko-table {
-            margin-left: auto;   /* 🔥 THIS IS THE KEY */
+            margin-left: auto;
+            margin-top: 5px;
         }
         .hanko-table td {
             border: 1px solid #000;
             width: 40px;
             height: 40px;
         }
-        /* Total Box (Red Circle 2 - Moved UP) */
+
         .total-container {
             width: 100%;
             margin: 5px 0 10px 0;
@@ -128,56 +122,71 @@
         .total-box {
             border: 2px solid #000;
             border-collapse: collapse;
-            width: 300px;
+            width: 600px;
             margin: 0 auto;
         }
-        .total-box td {
-            padding: 8px;
+        .total-box td { 
+            padding: 8px; 
+            color: #000;
         }
         .total-label {
             width: 100px;
             border-right: 2px solid #000;
             font-weight: bold;
-            font-size: 12px;
         }
         .total-amount {
             font-size: 20px;
             text-align: right;
         }
-        /* Main Table Items */
+
+        /* Main Table Layout */
         .main-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid #000;
-            clear: both;
+            table-layout: fixed;
         }
         .main-table th {
             border: 1px solid #000;
             padding: 5px 2px;
-            font-weight: normal;
+            font-weight: bold;
+            font-size: 12.5px;
             background-color: #fff;
+            color: #000;
         }
         .main-table td {
             border: 1px solid #000;
-            padding: 3px 5px;
-            height: 16px;
+            padding: 4px 6px;
+            height: 22px;
+            word-wrap: break-word;
+            color: #000;
         }
-        /* Footer Summary */
-        .summary-table {
+
+        /* Footer Tax Box Layout */
+        .bottom-summary-container {
+            width: 100%;
+        }
+
+        .tax-summary-table {
+            width: 350px;
             margin-left: auto;
-            width: 280px;
-            border-collapse: collapse;
-            margin-top: 5px;
         }
-        .summary-table td {
+        .tax-summary-table td {
             border: 1px solid #000;
             padding: 4px 8px;
+            height: 22px;
+            color: #000;
         }
-        .summary-label { width: 100px; }
+
+        /* Ensure dashes in empty rows are visible and black */
+        .dash-placeholder {
+            color: #000 !important;
+        }
     </style>
 </head>
 <body>
     <div class="title">御見積書</div>
+    
     <table class="header-wrapper">
         <tr>
             <td class="header-left">
@@ -193,20 +202,11 @@
             </td>
             <td class="header-right">
                 <table class="meta-table">
+                    <tr><td style="width: 40%;">日付</td><td>御見積書番号</td></tr>
                     <tr>
-                        <td style="width: 40%;">日付</td>
-                        <td>御見積書番号</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {% if quote.created_at %}
-                                {{ quote.created_at.strftime('%Y/%m/%d') }}
-                            {% else %}
-                                {# Fallback for new drafts #}
-                                {{ current_year }}/--/-- 
-                            {% endif %}
-                            </td>
-                        <td>M{{ quote.id }}</td>
+                        <td>{{ quote.created_at.strftime('%Y/%m/%d') if quote.created_at else current_year ~ "/--/--" }}</td>
+                        <td>{{ invoice_number }}</td>
+                        
                     </tr>
                 </table>
 
@@ -216,11 +216,9 @@
                     TEL & FAX : 0285-77-0443
                 </div>
 
-                <div class="hanko-wrapper">
-                    <table class="hanko-table">
-                        <tr><td></td><td></td><td></td><td></td></tr>
-                    </table>
-                </div>
+                <table class="hanko-table">
+                    <tr><td></td><td></td><td></td><td></td></tr>
+                </table>
             </td>
         </tr>
     </table>
@@ -236,57 +234,164 @@
             </tr>
         </table>
     </div>
+
+    {% set items_per_page = 18 %}
+    <!-- ================= PAGE 1 ================= -->
     <table class="main-table">
+        <colgroup>
+            <col style="width: 4%;">  <!-- No -->
+            <col style="width: 24%;"> <!-- 名称 -->
+            <col style="width: 30%;"> <!-- 仕様 -->
+            <col style="width: 6%;">  <!-- 数量 -->
+            <col style="width: 4%;">  <!-- 単位 -->
+            <col style="width: 11%;"> <!-- 単価 -->
+            <col style="width: 11%;"> <!-- 金額 -->
+            <col style="width: 10%;"> <!-- 備考 -->
+        </colgroup>
         <thead>
             <tr>
-                <th style="width: 5%;">No.</th>
-                <th style="width: 24%;">名称</th>
-                <th style="width: 24%;">仕様</th>
-                <th style="width: 7%;">数量</th>
-                <th style="width: 7%;">単位</th>
-                <th style="width: 10%;">単価</th>
-                <th style="width: 13%;">金額</th>
+                <th>No.</th>
+                <th>名称</th>
+                <th>仕様</th>
+                <th>数量</th>
+                <th>単位</th>
+                <th>単価</th>
+                <th>金額</th>
                 <th>備考</th>
             </tr>
         </thead>
         <tbody>
-            {% for it in items %}
-                {% set selling_unit_price = (it.unit_price * (1 + quote.profit_margin)) | int %}
-                {% set amount = selling_unit_price * it.quantity %}
-                <tr>
-                    <td class="text-center">{{ loop.index }}</td>
-                    <td>{{ it.element }}</td>
-                    <td style="font-size: 9px;">{{ it.spec or "" }}</td>
-                    <td class="text-right">{{ it.quantity }}</td>
-                    <td class="text-center">{{ it.unit }}</td>
-                    <td class="text-right">{{ "{:,.0f}".format(selling_unit_price) }}</td>
-                    <td class="text-right">{{ "{:,.0f}".format(amount) }}</td>
-                    <td style="font-size: 9px;">{{ it.remark or "" }}</td>
-                </tr>
+            {% for it in page1 %}
+            {% set selling_unit_price = (it.unit_price * (1 + quote.profit_margin)) | int %}
+            {% set amount = selling_unit_price * it.quantity %}
+            <tr>
+                <td class="text-center">{{ loop.index }}</td>
+                <td>{{ it.element }}</td>
+                <td style="font-size: 9px;">{{ it.spec or "" }}</td>
+                <td class="text-right">{{ it.quantity }}</td>
+                <td class="text-center">{{ it.unit }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(selling_unit_price) }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(amount) }}</td>
+                <td style="font-size: 9px;">{{ it.remark or "" }}</td>
+            </tr>
             {% endfor %}
 
-            {% for i in range(18 - items|length) %}
-                <tr>
-                    <td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td class="text-center" style="color: #ccc; font-size: 9px;">-</td>
-                    <td></td>
-                </tr>
+            {% for i in range(items_per_page - page1|length) %}
+            <tr>
+                <td></td><td></td><td></td><td></td><td></td><td></td>
+                <td class="text-center dash-placeholder">-</td><td></td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-    <table class="summary-table">
-        <tr>
-            <td class="summary-label">小計</td>
-            <td class="text-right">{{ "{:,.0f}".format(subtotal) }}</td>
-        </tr>
-        <tr>
-            <td class="summary-label">消費税(10%)</td>
-            <td class="text-right">{{ "{:,.0f}".format(tax) }}</td>
-        </tr>
-        <tr class="font-bold">
-            <td class="summary-label">合計</td>
-            <td class="text-right">¥ {{ "{:,.0f}".format(total) }}</td>
-        </tr>
+
+    <div class="page-break"></div>
+    <!-- ================= PAGE 2 ================= -->
+    <table class="main-table">
+        <colgroup>
+            <col style="width: 4%;">
+            <col style="width: 24%;">
+            <col style="width: 30%;">
+            <col style="width: 6%;">
+            <col style="width: 4%;">
+            <col style="width: 11%;">
+            <col style="width: 11%;">
+            <col style="width: 10%;">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>名称</th>
+                <th>仕様</th>
+                <th>数量</th>
+                <th>単位</th>
+                <th>単価</th>
+                <th>金額</th>
+                <th>備考</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in page2 %}
+            {% set selling_unit_price = (it.unit_price * (1 + quote.profit_margin)) | int %}
+            {% set amount = selling_unit_price * it.quantity %}
+            <tr>
+                <td class="text-center">{{ loop.index + items_per_page }}</td>
+                <td>{{ it.element }}</td>
+                <td style="font-size: 9px;">{{ it.spec or "" }}</td>
+                <td class="text-right">{{ it.quantity }}</td>
+                <td class="text-center">{{ it.unit }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(selling_unit_price) }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(amount) }}</td>
+                <td style="font-size: 9px;">{{ it.remark or "" }}</td>
+            </tr>
+            {% endfor %}
+
+            {% for i in range(items_per_page - page2|length) %}
+            <tr>
+                <td></td><td></td><td></td><td></td><td></td><td></td>
+                <td class="text-center dash-placeholder">-</td><td></td>
+            </tr>
+            {% endfor %}
+
+            <!-- SUMMARY ROWS -->
+            <tr>
+                <td></td>
+                <td class="text-right">小計</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">{{ "{:,.0f}".format(subtotal) }}</td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td class="text-right">諸経費</td>
+                <td style="font-size: 10px;">法定福利費及び各種消耗品費含む</td>
+                <td class="text-center">12</td>
+                <td class="text-center">%</td>
+                <td></td>
+                <td class="text-right">{{ "{:,.0f}".format(tax) }}</td>
+                <td></td>
+            </tr>
+
+            <tr class="font-bold">
+                <td></td>
+                <td class="text-right">計</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">{{ "{:,.0f}".format(subtotal + tax) }}</td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td class="text-right">値引</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">▲ {{ "{:,.0f}".format(discount_amount if discount_amount else 0) }}</td>
+                <td></td>
+            </tr>
+        </tbody>
     </table>
+
+    <div class="bottom-summary-container">
+        <table class="tax-summary-table">
+            <tr>
+                <td class="text-center" style="width: 40%;">税抜金額</td>
+                <td class="text-right">{{ "{:,.0f}".format(subtotal + tax - (discount_amount or 0)) }}</td>
+            </tr>
+            <tr>
+                <td class="text-center">消費税10%</td>
+                <td class="text-right">{{ "{:,.0f}".format(consumption_tax or (total * 0.1)) }}</td>
+            </tr>
+        </table>
+    </div>
+
 </body>
 </html>

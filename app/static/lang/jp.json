@@ -201,7 +201,7 @@
 "footer_text": "見積・プロジェクト管理システム",
 "back": "戻る",
 "original_cost": "原価（小計）",
-  "profit_margin": "利益率",
+"profit_margin": "利益率",
   "selling_price": "販売価格（税込）",
 
   "pdf_export": "PDF出力",
@@ -243,7 +243,7 @@
   "date": "日付",
 
   "subtotal": "小計",
-  "margin": "利益率",
+  "margin": "利益率 (%)",
 
   "save": "保存",
   "approved_locked": "承認済み（ロック）",
@@ -254,6 +254,11 @@
   "server_error": "サーバー接続エラー",
   "projects_title": "プロジェクト一覧",
   "projects_desc": "すべての進行中および完了したプロジェクトを管理します。",
-  "no_projects": "プロジェクトがありません。新規作成してください。"
+  "no_projects": "プロジェクトがありません。新規作成してください。",
+  "projects_list": "プロジェクト一覧",
+  "client_projects": "顧客プロジェクト",
+
+  "delete_project": "このプロジェクトを削除しますか？"
+
 
 }
