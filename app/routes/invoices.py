@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from app.db import SessionLocal
 from app.models import Quote, Invoice, Receipt
 from fastapi.responses import Response,RedirectResponse
-from app.pdf_utils import render_pdf_portrait
+from app.pdf_utils import render_pdf_landscape, render_pdf_portrait
 from datetime import datetime
 
 from app.db import SessionLocal
@@ -128,7 +128,7 @@ def invoice_pdf(request: Request, invoice_id: int):
     # pdf = pdfkit.from_string(html, False, configuration=config)
   
 
-    pdf = render_pdf_portrait(html)
+    pdf = render_pdf_landscape(html)
     return Response(
         pdf,
         media_type="application/pdf",

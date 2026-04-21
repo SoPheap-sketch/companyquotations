@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <style>
         @page {
-            size: A4;
-             margin: 12mm 18mm 12mm 12mm;
+            size: A4 landscape;
+            margin: 8mm;
         }
         .page-break {
         page-break-before: always;
-    }
+        }
         body {
             font-family: "Meiryo", "MS P Gothic", "Hiragino Sans", sans-serif;
             font-size: 11px;
@@ -354,7 +354,7 @@
             </tr>
             {% endfor %}
 
-            {% for i in range(18 - items|length) %}
+            {% for i in range(12 - items|length if 12 - items|length > 0 else 0) %}
             <tr>
                 <td>&nbsp;</td>
                 <td></td>
@@ -443,8 +443,6 @@
             </td>
         </tr>
     </table>
-
-
     <!-- total -->
     <div class="total-box-container">
         <table class="total-display-table">
@@ -527,7 +525,7 @@
             </tr>
             {% endfor %}
 
-            {% for i in range(18 - items|length) %}
+            {% for i in range(12 - items|length if 12 - items|length > 0 else 0) %}
             <tr>
                 <td>&nbsp;</td>
                 <td></td>

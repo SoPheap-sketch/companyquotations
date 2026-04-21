@@ -33,6 +33,17 @@ def view_quote(request: Request, quote_id: int):
             if quote.created_at
             else datetime.now().strftime("%Y/%m/%d")
         )
+        subtotal = 0
+        for item in quote.items:
+            subtotal += item.unit_price * item.quantity
+
+        margin = int(subtotal * (quote.profit_margin or 0))
+        tax = int((subtotal + margin) * 0.10)
+        total = subtotal + margin + tax
+
+        # 🔥 attach to quote (IMPORTANT)
+        quote.subtotal = subtotal
+        quote.total = total
         return templates.TemplateResponse(
             "quote_view.html",
             {
@@ -40,6 +51,10 @@ def view_quote(request: Request, quote_id: int):
                 "quote": quote,
                 "issue_date": issue_date,
                 "current_year": datetime.utcnow().year,
+                "subtotal": subtotal,
+                "margin": margin,
+                "tax": tax,
+                "total": total,
             },
         )
     finally:
