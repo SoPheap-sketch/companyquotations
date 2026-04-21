@@ -136,11 +136,6 @@ def invoice_pdf(request: Request, invoice_id: int):
             "Content-Disposition": f"inline; filename=invoice_{invoice_id}.pdf"
         }
     )
-
-
-
-
-
 @router.get("/receipts/{invoice_id}/pdf")
 def receipt_pdf(request: Request, invoice_id: int):
 
